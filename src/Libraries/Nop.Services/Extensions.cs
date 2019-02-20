@@ -11,7 +11,7 @@ namespace Nop.Services
     /// <summary>
     /// Extensions
     /// </summary>
-    public static class Extensions
+    public static class Extensions 
     {
         /// <summary>
         /// Convert to select list

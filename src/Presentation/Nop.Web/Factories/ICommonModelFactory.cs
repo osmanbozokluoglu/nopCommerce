@@ -27,12 +27,6 @@ namespace Nop.Web.Factories
         CurrencySelectorModel PrepareCurrencySelectorModel();
 
         /// <summary>
-        /// Prepare the tax type selector model
-        /// </summary>
-        /// <returns>Tax type selector model</returns>
-        TaxTypeSelectorModel PrepareTaxTypeSelectorModel();
-
-        /// <summary>
         /// Prepare the header links model
         /// </summary>
         /// <returns>Header links model</returns>

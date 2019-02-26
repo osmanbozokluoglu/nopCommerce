@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Nop.Core.Domain.Discounts;
 using Nop.Core.Domain.Localization;
 using Nop.Core.Domain.Security;
 using Nop.Core.Domain.Seo;
@@ -12,10 +11,9 @@ namespace Nop.Core.Domain.Catalog
     /// <summary>
     /// Represents a product
     /// </summary>
-    public partial class Product : BaseEntity, ILocalizedEntity, ISlugSupported, IAclSupported, IStoreMappingSupported, IDiscountSupported
+    public partial class Product : BaseEntity, ILocalizedEntity, ISlugSupported, IAclSupported, IStoreMappingSupported
     {
         private ICollection<ProductCategory> _productCategories;
-        private ICollection<ProductManufacturer> _productManufacturers;
         private ICollection<ProductPicture> _productPictures;
         private ICollection<ProductReview> _productReviews;
         private ICollection<ProductSpecificationAttribute> _productSpecificationAttributes;
@@ -23,8 +21,6 @@ namespace Nop.Core.Domain.Catalog
         private ICollection<ProductAttributeMapping> _productAttributeMappings;
         private ICollection<ProductAttributeCombination> _productAttributeCombinations;
         protected ICollection<TierPrice> _tierPrices;
-        protected ICollection<DiscountProductMapping> _discountProductMappings;
-        private ICollection<ProductWarehouseInventory> _productWarehouseInventory;
 
         /// <summary>
         /// Gets or sets the product type identifier
@@ -636,15 +632,6 @@ namespace Nop.Core.Domain.Catalog
         }
 
         /// <summary>
-        /// Gets or sets the collection of ProductManufacturer
-        /// </summary>
-        public virtual ICollection<ProductManufacturer> ProductManufacturers
-        {
-            get => _productManufacturers ?? (_productManufacturers = new List<ProductManufacturer>());
-            protected set => _productManufacturers = value;
-        }
-
-        /// <summary>
         /// Gets or sets the collection of ProductPicture
         /// </summary>
         public virtual ICollection<ProductPicture> ProductPictures
@@ -707,27 +694,5 @@ namespace Nop.Core.Domain.Catalog
             protected set => _tierPrices = value;
         }
 
-        /// <summary>
-        /// Gets or sets the collection of applied discounts
-        /// </summary>
-        public IList<Discount> AppliedDiscounts => DiscountProductMappings.Select(mapping => mapping.Discount).ToList();
-
-        /// <summary>
-        /// Gets or sets the discount-product mappings
-        /// </summary>
-        public virtual ICollection<DiscountProductMapping> DiscountProductMappings
-        {
-            get => _discountProductMappings ?? (_discountProductMappings = new List<DiscountProductMapping>());
-            set => _discountProductMappings = value;
-        }
-
-        /// <summary>
-        /// Gets or sets the collection of "ProductWarehouseInventory" records. We use it only when "UseMultipleWarehouses" is set to "true" and ManageInventoryMethod" to "ManageStock"
-        /// </summary>
-        public virtual ICollection<ProductWarehouseInventory> ProductWarehouseInventory
-        {
-            get => _productWarehouseInventory ?? (_productWarehouseInventory = new List<ProductWarehouseInventory>());
-            protected set => _productWarehouseInventory = value;
-        }
     }
 }

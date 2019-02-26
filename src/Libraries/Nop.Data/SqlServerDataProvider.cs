@@ -23,21 +23,9 @@ namespace Nop.Data
         public virtual void InitializeDatabase()
         {
             var context = EngineContext.Current.Resolve<IDbContext>();
-
-            //check some of table names to ensure that we have nopCommerce 2.00+ installed
-            var tableNamesToValidate = new List<string> { "Customer", "Discount", "Order", "Product", "ShoppingCartItem" };
-            var existingTableNames = context
-                .QueryFromSql<StringQueryType>("SELECT table_name AS Value FROM INFORMATION_SCHEMA.TABLES WHERE table_type = 'BASE TABLE'")
-                .Select(stringValue => stringValue.Value).ToList();
-            var createTables = !existingTableNames.Intersect(tableNamesToValidate, StringComparer.InvariantCultureIgnoreCase).Any();
-            if (!createTables)
-                return;
-
+            
             var fileProvider = EngineContext.Current.Resolve<INopFileProvider>();
 
-            //create tables
-            //EngineContext.Current.Resolve<IRelationalDatabaseCreator>().CreateTables();
-            //(context as DbContext).Database.EnsureCreated();
             context.ExecuteSqlScript(context.GenerateCreateScript());
 
             //create indexes

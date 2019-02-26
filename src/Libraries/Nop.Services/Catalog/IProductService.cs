@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using Nop.Core;
 using Nop.Core.Domain.Catalog;
 using Nop.Core.Domain.Customers;
-using Nop.Core.Domain.Orders;
-using Nop.Core.Domain.Shipping;
 
 namespace Nop.Services.Catalog
 {
@@ -266,12 +264,6 @@ namespace Nop.Services.Catalog
         void UpdateHasTierPricesProperty(Product product);
 
         /// <summary>
-        /// Update HasDiscountsApplied property (used for performance optimization)
-        /// </summary>
-        /// <param name="product">Product</param>
-        void UpdateHasDiscountsApplied(Product product);
-
-        /// <summary>
         /// Gets number of products by vendor identifier
         /// </summary>
         /// <param name="vendorId">Vendor identifier</param>
@@ -414,15 +406,7 @@ namespace Nop.Services.Catalog
         /// <param name="quantity">Quantity, must be negative</param>
         /// <param name="message">Message for the stock quantity history</param>
         void BookReservedInventory(Product product, int warehouseId, int quantity, string message = "");
-
-        /// <summary>
-        /// Reverse booked inventory (if acceptable)
-        /// </summary>
-        /// <param name="product">product</param>
-        /// <param name="shipmentItem">Shipment item</param>
-        /// <returns>Quantity reversed</returns>
-        /// <param name="message">Message for the stock quantity history</param>
-        int ReverseBookedInventory(Product product, ShipmentItem shipmentItem, string message = "");
+        
 
         #endregion
 
@@ -514,14 +498,6 @@ namespace Nop.Services.Catalog
         /// </summary>
         /// <param name="crossSellProduct">Cross-sell product</param>
         void UpdateCrossSellProduct(CrossSellProduct crossSellProduct);
-
-        /// <summary>
-        /// Gets a cross-sells
-        /// </summary>
-        /// <param name="cart">Shopping cart</param>
-        /// <param name="numberOfProducts">Number of products to return</param>
-        /// <returns>Cross-sells</returns>
-        IList<Product> GetCrosssellProductsByShoppingCart(IList<ShoppingCartItem> cart, int numberOfProducts);
 
         /// <summary>
         /// Finds a cross-sell product item by specified identifiers
@@ -664,17 +640,7 @@ namespace Nop.Services.Catalog
         /// <param name="productReviews">Product reviews</param>
         void DeleteProductReviews(IList<ProductReview> productReviews);
 
-        #endregion
-
-        #region Product warehouse inventory
-
-        /// <summary>
-        /// Deletes a ProductWarehouseInventory
-        /// </summary>
-        /// <param name="pwi">ProductWarehouseInventory</param>
-        void DeleteProductWarehouseInventory(ProductWarehouseInventory pwi);
-
-        #endregion
+        #endregion        
 
         #region Stock quantity history
 

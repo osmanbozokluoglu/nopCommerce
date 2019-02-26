@@ -21,10 +21,6 @@ namespace Nop.Web.Areas.Admin.Infrastructure.Cache
         IConsumer<EntityInsertedEvent<Category>>,
         IConsumer<EntityUpdatedEvent<Category>>,
         IConsumer<EntityDeletedEvent<Category>>,
-        //manufacturers
-        IConsumer<EntityInsertedEvent<Manufacturer>>,
-        IConsumer<EntityUpdatedEvent<Manufacturer>>,
-        IConsumer<EntityDeletedEvent<Manufacturer>>,
         //vendors
         IConsumer<EntityInsertedEvent<Vendor>>,
         IConsumer<EntityUpdatedEvent<Vendor>>,
@@ -70,20 +66,6 @@ namespace Nop.Web.Areas.Admin.Infrastructure.Cache
         public void HandleEvent(EntityDeletedEvent<Category> eventMessage)
         {
             _cacheManager.RemoveByPattern(NopModelCacheDefaults.CategoriesListPatternKey);
-        }
-
-        //manufacturers
-        public void HandleEvent(EntityInsertedEvent<Manufacturer> eventMessage)
-        {
-            _cacheManager.RemoveByPattern(NopModelCacheDefaults.ManufacturersListPatternKey);
-        }
-        public void HandleEvent(EntityUpdatedEvent<Manufacturer> eventMessage)
-        {
-            _cacheManager.RemoveByPattern(NopModelCacheDefaults.ManufacturersListPatternKey);
-        }
-        public void HandleEvent(EntityDeletedEvent<Manufacturer> eventMessage)
-        {
-            _cacheManager.RemoveByPattern(NopModelCacheDefaults.ManufacturersListPatternKey);
         }
 
         //vendors

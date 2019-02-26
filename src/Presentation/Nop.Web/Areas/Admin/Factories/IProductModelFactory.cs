@@ -159,14 +159,7 @@ namespace Nop.Web.Areas.Admin.Factories
         /// <returns>Product tag model</returns>
         ProductTagModel PrepareProductTagModel(ProductTagModel model, ProductTag productTag, bool excludeProperties = false);
 
-        /// <summary>
-        /// Prepare paged product order list model
-        /// </summary>
-        /// <param name="searchModel">Product order search model</param>
-        /// <param name="product">Product</param>
-        /// <returns>Product order list model</returns>
-        ProductOrderListModel PrepareProductOrderListModel(ProductOrderSearchModel searchModel, Product product);
-        
+      
         /// <summary>
         /// Prepare bulk edit product search model
         /// </summary>
@@ -199,14 +192,6 @@ namespace Nop.Web.Areas.Admin.Factories
         /// <returns>Tier price model</returns>
         TierPriceModel PrepareTierPriceModel(TierPriceModel model,
             Product product, TierPrice tierPrice, bool excludeProperties = false);
-
-        /// <summary>
-        /// Prepare paged stock quantity history list model
-        /// </summary>
-        /// <param name="searchModel">Stock quantity history search model</param>
-        /// <param name="product">Product</param>
-        /// <returns>Stock quantity history list model</returns>
-        StockQuantityHistoryListModel PrepareStockQuantityHistoryListModel(StockQuantityHistorySearchModel searchModel, Product product);
 
         /// <summary>
         /// Prepare paged product attribute mapping list model

@@ -16,10 +16,10 @@ using Nop.Core.Domain.Gdpr;
 using Nop.Core.Domain.Localization;
 using Nop.Core.Domain.Media;
 using Nop.Core.Domain.News;
-using Nop.Core.Domain.Orders;
+
 using Nop.Core.Domain.Security;
 using Nop.Core.Domain.Seo;
-using Nop.Core.Domain.Shipping;
+
 using Nop.Core.Domain.Tax;
 using Nop.Core.Domain.Vendors;
 using Nop.Core.Infrastructure;
@@ -32,7 +32,6 @@ using Nop.Services.Localization;
 using Nop.Services.Logging;
 using Nop.Services.Media;
 using Nop.Services.Messages;
-using Nop.Services.Orders;
 using Nop.Services.Plugins;
 using Nop.Services.Security;
 using Nop.Services.Stores;
@@ -64,7 +63,6 @@ namespace Nop.Web.Areas.Admin.Controllers
         private readonly IMaintenanceService _maintenanceService;
         private readonly INopFileProvider _fileProvider;
         private readonly INotificationService _notificationService;
-        private readonly IOrderService _orderService;
         private readonly IPermissionService _permissionService;
         private readonly IPictureService _pictureService;
         private readonly ISettingModelFactory _settingModelFactory;
@@ -91,7 +89,6 @@ namespace Nop.Web.Areas.Admin.Controllers
             IMaintenanceService maintenanceService,
             INopFileProvider fileProvider,
             INotificationService notificationService,
-            IOrderService orderService,
             IPermissionService permissionService,
             IPictureService pictureService,
             ISettingModelFactory settingModelFactory,
@@ -114,7 +111,6 @@ namespace Nop.Web.Areas.Admin.Controllers
             this._maintenanceService = maintenanceService;
             this._fileProvider = fileProvider;
             this._notificationService = notificationService;
-            this._orderService = orderService;
             this._permissionService = permissionService;
             this._pictureService = pictureService;
             this._settingModelFactory = settingModelFactory;
@@ -363,82 +359,6 @@ namespace Nop.Web.Areas.Admin.Controllers
             _notificationService.SuccessNotification(_localizationService.GetResource("Admin.Configuration.Updated"));
 
             return RedirectToAction("News");
-        }
-
-        public virtual IActionResult Shipping()
-        {
-            if (!_permissionService.Authorize(StandardPermissionProvider.ManageSettings))
-                return AccessDeniedView();
-
-            //prepare model
-            var model = _settingModelFactory.PrepareShippingSettingsModel();
-
-            return View(model);
-        }
-        [HttpPost]
-        public virtual IActionResult Shipping(ShippingSettingsModel model)
-        {
-            if (!_permissionService.Authorize(StandardPermissionProvider.ManageSettings))
-                return AccessDeniedView();
-
-            //load settings for a chosen store scope
-            var storeScope = _storeContext.ActiveStoreScopeConfiguration;
-            var shippingSettings = _settingService.LoadSetting<ShippingSettings>(storeScope);
-            shippingSettings = model.ToSettings(shippingSettings);
-
-            //we do not clear cache after each setting update.
-            //this behavior can increase performance because cached settings will not be cleared 
-            //and loaded from database after each update
-            _settingService.SaveSettingOverridablePerStore(shippingSettings, x => x.ShipToSameAddress, model.ShipToSameAddress_OverrideForStore, storeScope, false);
-            _settingService.SaveSettingOverridablePerStore(shippingSettings, x => x.AllowPickUpInStore, model.AllowPickUpInStore_OverrideForStore, storeScope, false);
-            _settingService.SaveSettingOverridablePerStore(shippingSettings, x => x.DisplayPickupPointsOnMap, model.DisplayPickupPointsOnMap_OverrideForStore, storeScope, false);
-            _settingService.SaveSettingOverridablePerStore(shippingSettings, x => x.IgnoreAdditionalShippingChargeForPickUpInStore, model.IgnoreAdditionalShippingChargeForPickUpInStore_OverrideForStore, storeScope, false);
-            _settingService.SaveSettingOverridablePerStore(shippingSettings, x => x.GoogleMapsApiKey, model.GoogleMapsApiKey_OverrideForStore, storeScope, false);
-            _settingService.SaveSettingOverridablePerStore(shippingSettings, x => x.UseWarehouseLocation, model.UseWarehouseLocation_OverrideForStore, storeScope, false);
-            _settingService.SaveSettingOverridablePerStore(shippingSettings, x => x.NotifyCustomerAboutShippingFromMultipleLocations, model.NotifyCustomerAboutShippingFromMultipleLocations_OverrideForStore, storeScope, false);
-            _settingService.SaveSettingOverridablePerStore(shippingSettings, x => x.FreeShippingOverXEnabled, model.FreeShippingOverXEnabled_OverrideForStore, storeScope, false);
-            _settingService.SaveSettingOverridablePerStore(shippingSettings, x => x.FreeShippingOverXValue, model.FreeShippingOverXValue_OverrideForStore, storeScope, false);
-            _settingService.SaveSettingOverridablePerStore(shippingSettings, x => x.FreeShippingOverXIncludingTax, model.FreeShippingOverXIncludingTax_OverrideForStore, storeScope, false);
-            _settingService.SaveSettingOverridablePerStore(shippingSettings, x => x.EstimateShippingEnabled, model.EstimateShippingEnabled_OverrideForStore, storeScope, false);
-            _settingService.SaveSettingOverridablePerStore(shippingSettings, x => x.DisplayShipmentEventsToCustomers, model.DisplayShipmentEventsToCustomers_OverrideForStore, storeScope, false);
-            _settingService.SaveSettingOverridablePerStore(shippingSettings, x => x.DisplayShipmentEventsToStoreOwner, model.DisplayShipmentEventsToStoreOwner_OverrideForStore, storeScope, false);
-            _settingService.SaveSettingOverridablePerStore(shippingSettings, x => x.HideShippingTotal, model.HideShippingTotal_OverrideForStore, storeScope, false);
-            _settingService.SaveSettingOverridablePerStore(shippingSettings, x => x.BypassShippingMethodSelectionIfOnlyOne, model.BypassShippingMethodSelectionIfOnlyOne_OverrideForStore, storeScope, false);
-            _settingService.SaveSettingOverridablePerStore(shippingSettings, x => x.ConsiderAssociatedProductsDimensions, model.ConsiderAssociatedProductsDimensions_OverrideForStore, storeScope, false);
-
-            if (model.ShippingOriginAddress_OverrideForStore || storeScope == 0)
-            {
-                //update address
-                var addressId = _settingService.SettingExists(shippingSettings, x => x.ShippingOriginAddressId, storeScope) ?
-                    shippingSettings.ShippingOriginAddressId : 0;
-                var originAddress = _addressService.GetAddressById(addressId) ??
-                    new Address
-                    {
-                        CreatedOnUtc = DateTime.UtcNow
-                    };
-                //update ID manually (in case we're in multi-store configuration mode it'll be set to the shared one)
-                model.ShippingOriginAddress.Id = addressId;
-                originAddress = model.ShippingOriginAddress.ToEntity(originAddress);
-                if (originAddress.Id > 0)
-                    _addressService.UpdateAddress(originAddress);
-                else
-                    _addressService.InsertAddress(originAddress);
-                shippingSettings.ShippingOriginAddressId = originAddress.Id;
-
-                _settingService.SaveSetting(shippingSettings, x => x.ShippingOriginAddressId, storeScope, false);
-            }
-            else if (storeScope > 0)
-                _settingService.DeleteSetting(shippingSettings, x => x.ShippingOriginAddressId, storeScope);
-
-            //now clear settings cache
-            _settingService.ClearCache();
-
-            //activity log
-            _customerActivityService.InsertActivity("EditSettings", _localizationService.GetResource("ActivityLog.EditSettings"));
-
-            _notificationService.SuccessNotification(_localizationService.GetResource("Admin.Configuration.Updated"));
-
-            return RedirectToAction("Shipping");
         }
 
         public virtual IActionResult Tax()
@@ -726,151 +646,6 @@ namespace Nop.Web.Areas.Admin.Controllers
             }
 
             return RedirectToAction("RewardPoints");
-        }
-
-        public virtual IActionResult Order()
-        {
-            if (!_permissionService.Authorize(StandardPermissionProvider.ManageSettings))
-                return AccessDeniedView();
-
-            //prepare model
-            var model = _settingModelFactory.PrepareOrderSettingsModel();
-
-            return View(model);
-        }
-        [HttpPost]
-        public virtual IActionResult Order(OrderSettingsModel model)
-        {
-            if (!_permissionService.Authorize(StandardPermissionProvider.ManageSettings))
-                return AccessDeniedView();
-
-            if (ModelState.IsValid)
-            {
-                //load settings for a chosen store scope
-                var storeScope = _storeContext.ActiveStoreScopeConfiguration;
-                var orderSettings = _settingService.LoadSetting<OrderSettings>(storeScope);
-                orderSettings = model.ToSettings(orderSettings);
-
-                //we do not clear cache after each setting update.
-                //this behavior can increase performance because cached settings will not be cleared 
-                //and loaded from database after each update
-                _settingService.SaveSettingOverridablePerStore(orderSettings, x => x.IsReOrderAllowed, model.IsReOrderAllowed_OverrideForStore, storeScope, false);
-                _settingService.SaveSettingOverridablePerStore(orderSettings, x => x.MinOrderSubtotalAmount, model.MinOrderSubtotalAmount_OverrideForStore, storeScope, false);
-                _settingService.SaveSettingOverridablePerStore(orderSettings, x => x.MinOrderSubtotalAmountIncludingTax, model.MinOrderSubtotalAmountIncludingTax_OverrideForStore, storeScope, false);
-                _settingService.SaveSettingOverridablePerStore(orderSettings, x => x.MinOrderTotalAmount, model.MinOrderTotalAmount_OverrideForStore, storeScope, false);
-                _settingService.SaveSettingOverridablePerStore(orderSettings, x => x.AutoUpdateOrderTotalsOnEditingOrder, model.AutoUpdateOrderTotalsOnEditingOrder_OverrideForStore, storeScope, false);
-                _settingService.SaveSettingOverridablePerStore(orderSettings, x => x.AnonymousCheckoutAllowed, model.AnonymousCheckoutAllowed_OverrideForStore, storeScope, false);
-                _settingService.SaveSettingOverridablePerStore(orderSettings, x => x.CheckoutDisabled, model.CheckoutDisabled_OverrideForStore, storeScope, false);
-                _settingService.SaveSettingOverridablePerStore(orderSettings, x => x.TermsOfServiceOnShoppingCartPage, model.TermsOfServiceOnShoppingCartPage_OverrideForStore, storeScope, false);
-                _settingService.SaveSettingOverridablePerStore(orderSettings, x => x.TermsOfServiceOnOrderConfirmPage, model.TermsOfServiceOnOrderConfirmPage_OverrideForStore, storeScope, false);
-                _settingService.SaveSettingOverridablePerStore(orderSettings, x => x.OnePageCheckoutEnabled, model.OnePageCheckoutEnabled_OverrideForStore, storeScope, false);
-                _settingService.SaveSettingOverridablePerStore(orderSettings, x => x.OnePageCheckoutDisplayOrderTotalsOnPaymentInfoTab, model.OnePageCheckoutDisplayOrderTotalsOnPaymentInfoTab_OverrideForStore, storeScope, false);
-                _settingService.SaveSettingOverridablePerStore(orderSettings, x => x.DisableBillingAddressCheckoutStep, model.DisableBillingAddressCheckoutStep_OverrideForStore, storeScope, false);
-                _settingService.SaveSettingOverridablePerStore(orderSettings, x => x.DisableOrderCompletedPage, model.DisableOrderCompletedPage_OverrideForStore, storeScope, false);
-                _settingService.SaveSettingOverridablePerStore(orderSettings, x => x.AttachPdfInvoiceToOrderPlacedEmail, model.AttachPdfInvoiceToOrderPlacedEmail_OverrideForStore, storeScope, false);
-                _settingService.SaveSettingOverridablePerStore(orderSettings, x => x.AttachPdfInvoiceToOrderPaidEmail, model.AttachPdfInvoiceToOrderPaidEmail_OverrideForStore, storeScope, false);
-                _settingService.SaveSettingOverridablePerStore(orderSettings, x => x.AttachPdfInvoiceToOrderCompletedEmail, model.AttachPdfInvoiceToOrderCompletedEmail_OverrideForStore, storeScope, false);
-                _settingService.SaveSettingOverridablePerStore(orderSettings, x => x.ReturnRequestsEnabled, model.ReturnRequestsEnabled_OverrideForStore, storeScope, false);
-                _settingService.SaveSettingOverridablePerStore(orderSettings, x => x.ReturnRequestsAllowFiles, model.ReturnRequestsAllowFiles_OverrideForStore, storeScope, false);
-                _settingService.SaveSettingOverridablePerStore(orderSettings, x => x.ReturnRequestNumberMask, model.ReturnRequestNumberMask_OverrideForStore, storeScope, false);
-                _settingService.SaveSettingOverridablePerStore(orderSettings, x => x.NumberOfDaysReturnRequestAvailable, model.NumberOfDaysReturnRequestAvailable_OverrideForStore, storeScope, false);
-                _settingService.SaveSettingOverridablePerStore(orderSettings, x => x.CustomOrderNumberMask, model.CustomOrderNumberMask_OverrideForStore, storeScope, false);
-                _settingService.SaveSettingOverridablePerStore(orderSettings, x => x.ExportWithProducts, model.ExportWithProducts_OverrideForStore, storeScope, false);
-                _settingService.SaveSettingOverridablePerStore(orderSettings, x => x.AllowAdminsToBuyCallForPriceProducts, model.AllowAdminsToBuyCallForPriceProducts_OverrideForStore, storeScope, false);
-                _settingService.SaveSettingOverridablePerStore(orderSettings, x => x.DeleteGiftCardUsageHistory, model.DeleteGiftCardUsageHistory_OverrideForStore, storeScope, false);
-                _settingService.SaveSetting(orderSettings, x => x.ActivateGiftCardsAfterCompletingOrder, 0, false);
-                _settingService.SaveSetting(orderSettings, x => x.DeactivateGiftCardsAfterCancellingOrder, 0, false);
-                _settingService.SaveSetting(orderSettings, x => x.DeactivateGiftCardsAfterDeletingOrder, 0, false);
-                _settingService.SaveSetting(orderSettings, x => x.CompleteOrderWhenDelivered, 0, false);
-
-                //now clear settings cache
-                _settingService.ClearCache();
-
-                //order ident
-                if (model.OrderIdent.HasValue)
-                {
-                    try
-                    {
-                        _maintenanceService.SetTableIdent<Order>(model.OrderIdent.Value);
-                    }
-                    catch (Exception exc)
-                    {
-                        _notificationService.ErrorNotification(exc.Message);
-                    }
-                }
-
-                //activity log
-                _customerActivityService.InsertActivity("EditSettings", _localizationService.GetResource("ActivityLog.EditSettings"));
-
-                _notificationService.SuccessNotification(_localizationService.GetResource("Admin.Configuration.Updated"));
-            }
-            else
-            {
-                //if we got this far, something failed, redisplay form
-                foreach (var modelState in ModelState.Values)
-                    foreach (var error in modelState.Errors)
-                        _notificationService.ErrorNotification(error.ErrorMessage);
-            }
-
-            //selected tab
-            SaveSelectedTabName();
-
-            return RedirectToAction("Order");
-        }
-
-        public virtual IActionResult ShoppingCart()
-        {
-            if (!_permissionService.Authorize(StandardPermissionProvider.ManageSettings))
-                return AccessDeniedView();
-
-            //prepare model
-            var model = _settingModelFactory.PrepareShoppingCartSettingsModel();
-
-            return View(model);
-        }
-        [HttpPost]
-        public virtual IActionResult ShoppingCart(ShoppingCartSettingsModel model)
-        {
-            if (!_permissionService.Authorize(StandardPermissionProvider.ManageSettings))
-                return AccessDeniedView();
-
-            //load settings for a chosen store scope
-            var storeScope = _storeContext.ActiveStoreScopeConfiguration;
-            var shoppingCartSettings = _settingService.LoadSetting<ShoppingCartSettings>(storeScope);
-            shoppingCartSettings = model.ToSettings(shoppingCartSettings);
-
-            //we do not clear cache after each setting update.
-            //this behavior can increase performance because cached settings will not be cleared 
-            //and loaded from database after each update
-            _settingService.SaveSettingOverridablePerStore(shoppingCartSettings, x => x.DisplayCartAfterAddingProduct, model.DisplayCartAfterAddingProduct_OverrideForStore, storeScope, false);
-            _settingService.SaveSettingOverridablePerStore(shoppingCartSettings, x => x.DisplayWishlistAfterAddingProduct, model.DisplayWishlistAfterAddingProduct_OverrideForStore, storeScope, false);
-            _settingService.SaveSettingOverridablePerStore(shoppingCartSettings, x => x.MaximumShoppingCartItems, model.MaximumShoppingCartItems_OverrideForStore, storeScope, false);
-            _settingService.SaveSettingOverridablePerStore(shoppingCartSettings, x => x.MaximumWishlistItems, model.MaximumWishlistItems_OverrideForStore, storeScope, false);
-            _settingService.SaveSettingOverridablePerStore(shoppingCartSettings, x => x.AllowOutOfStockItemsToBeAddedToWishlist, model.AllowOutOfStockItemsToBeAddedToWishlist_OverrideForStore, storeScope, false);
-            _settingService.SaveSettingOverridablePerStore(shoppingCartSettings, x => x.MoveItemsFromWishlistToCart, model.MoveItemsFromWishlistToCart_OverrideForStore, storeScope, false);
-            _settingService.SaveSettingOverridablePerStore(shoppingCartSettings, x => x.CartsSharedBetweenStores, model.CartsSharedBetweenStores_OverrideForStore, storeScope, false);
-            _settingService.SaveSettingOverridablePerStore(shoppingCartSettings, x => x.ShowProductImagesOnShoppingCart, model.ShowProductImagesOnShoppingCart_OverrideForStore, storeScope, false);
-            _settingService.SaveSettingOverridablePerStore(shoppingCartSettings, x => x.ShowProductImagesOnWishList, model.ShowProductImagesOnWishList_OverrideForStore, storeScope, false);
-            _settingService.SaveSettingOverridablePerStore(shoppingCartSettings, x => x.ShowDiscountBox, model.ShowDiscountBox_OverrideForStore, storeScope, false);
-            _settingService.SaveSettingOverridablePerStore(shoppingCartSettings, x => x.ShowGiftCardBox, model.ShowGiftCardBox_OverrideForStore, storeScope, false);
-            _settingService.SaveSettingOverridablePerStore(shoppingCartSettings, x => x.CrossSellsNumber, model.CrossSellsNumber_OverrideForStore, storeScope, false);
-            _settingService.SaveSettingOverridablePerStore(shoppingCartSettings, x => x.EmailWishlistEnabled, model.EmailWishlistEnabled_OverrideForStore, storeScope, false);
-            _settingService.SaveSettingOverridablePerStore(shoppingCartSettings, x => x.AllowAnonymousUsersToEmailWishlist, model.AllowAnonymousUsersToEmailWishlist_OverrideForStore, storeScope, false);
-            _settingService.SaveSettingOverridablePerStore(shoppingCartSettings, x => x.MiniShoppingCartEnabled, model.MiniShoppingCartEnabled_OverrideForStore, storeScope, false);
-            _settingService.SaveSettingOverridablePerStore(shoppingCartSettings, x => x.ShowProductImagesInMiniShoppingCart, model.ShowProductImagesInMiniShoppingCart_OverrideForStore, storeScope, false);
-            _settingService.SaveSettingOverridablePerStore(shoppingCartSettings, x => x.MiniShoppingCartProductNumber, model.MiniShoppingCartProductNumber_OverrideForStore, storeScope, false);
-            _settingService.SaveSettingOverridablePerStore(shoppingCartSettings, x => x.AllowCartItemEditing, model.AllowCartItemEditing_OverrideForStore, storeScope, false);
-            _settingService.SaveSettingOverridablePerStore(shoppingCartSettings, x => x.GroupTierPricesForDistinctShoppingCartItems, model.GroupTierPricesForDistinctShoppingCartItems_OverrideForStore, storeScope, false);
-
-            //now clear settings cache
-            _settingService.ClearCache();
-
-            //activity log
-            _customerActivityService.InsertActivity("EditSettings", _localizationService.GetResource("ActivityLog.EditSettings"));
-
-            _notificationService.SuccessNotification(_localizationService.GetResource("Admin.Configuration.Updated"));
-
-            return RedirectToAction("ShoppingCart");
         }
 
         public virtual IActionResult Media()
@@ -1492,36 +1267,6 @@ namespace Nop.Web.Areas.Admin.Controllers
                 var oldEncryptionPrivateKey = securitySettings.EncryptionKey;
                 if (oldEncryptionPrivateKey == newEncryptionPrivateKey)
                     throw new NopException(_localizationService.GetResource("Admin.Configuration.Settings.GeneralCommon.EncryptionKey.TheSame"));
-
-                //update encrypted order info
-                var orders = _orderService.SearchOrders();
-                foreach (var order in orders)
-                {
-                    var decryptedCardType = _encryptionService.DecryptText(order.CardType, oldEncryptionPrivateKey);
-                    var decryptedCardName = _encryptionService.DecryptText(order.CardName, oldEncryptionPrivateKey);
-                    var decryptedCardNumber = _encryptionService.DecryptText(order.CardNumber, oldEncryptionPrivateKey);
-                    var decryptedMaskedCreditCardNumber = _encryptionService.DecryptText(order.MaskedCreditCardNumber, oldEncryptionPrivateKey);
-                    var decryptedCardCvv2 = _encryptionService.DecryptText(order.CardCvv2, oldEncryptionPrivateKey);
-                    var decryptedCardExpirationMonth = _encryptionService.DecryptText(order.CardExpirationMonth, oldEncryptionPrivateKey);
-                    var decryptedCardExpirationYear = _encryptionService.DecryptText(order.CardExpirationYear, oldEncryptionPrivateKey);
-
-                    var encryptedCardType = _encryptionService.EncryptText(decryptedCardType, newEncryptionPrivateKey);
-                    var encryptedCardName = _encryptionService.EncryptText(decryptedCardName, newEncryptionPrivateKey);
-                    var encryptedCardNumber = _encryptionService.EncryptText(decryptedCardNumber, newEncryptionPrivateKey);
-                    var encryptedMaskedCreditCardNumber = _encryptionService.EncryptText(decryptedMaskedCreditCardNumber, newEncryptionPrivateKey);
-                    var encryptedCardCvv2 = _encryptionService.EncryptText(decryptedCardCvv2, newEncryptionPrivateKey);
-                    var encryptedCardExpirationMonth = _encryptionService.EncryptText(decryptedCardExpirationMonth, newEncryptionPrivateKey);
-                    var encryptedCardExpirationYear = _encryptionService.EncryptText(decryptedCardExpirationYear, newEncryptionPrivateKey);
-
-                    order.CardType = encryptedCardType;
-                    order.CardName = encryptedCardName;
-                    order.CardNumber = encryptedCardNumber;
-                    order.MaskedCreditCardNumber = encryptedMaskedCreditCardNumber;
-                    order.CardCvv2 = encryptedCardCvv2;
-                    order.CardExpirationMonth = encryptedCardExpirationMonth;
-                    order.CardExpirationYear = encryptedCardExpirationYear;
-                    _orderService.UpdateOrder(order);
-                }
 
                 //update password information
                 //optimization - load only passwords with PasswordFormat.Encrypted

@@ -14,7 +14,6 @@ namespace Nop.Web.Controllers
 
         private readonly IBlogService _blogService;
         private readonly ICategoryService _categoryService;
-        private readonly IManufacturerService _manufacturerService;
         private readonly INewsService _newsService;
         private readonly IProductTagService _productTagService;
         private readonly IProductService _productService;
@@ -28,7 +27,6 @@ namespace Nop.Web.Controllers
 
         public BackwardCompatibility2XController(IBlogService blogService,
             ICategoryService categoryService,
-            IManufacturerService manufacturerService,
             INewsService newsService,
             IProductTagService productTagService,
             IProductService productService,
@@ -38,7 +36,6 @@ namespace Nop.Web.Controllers
         {
             this._blogService = blogService;
             this._categoryService = categoryService;
-            this._manufacturerService = manufacturerService;
             this._newsService = newsService;
             this._productTagService = productTagService;
             this._productService = productService;
@@ -69,16 +66,6 @@ namespace Nop.Web.Controllers
                 return RedirectToRoutePermanent("HomePage");
 
             return RedirectToRoutePermanent("Category", new { SeName = _urlRecordService.GetSeName(category) });
-        }
-
-        //in versions 2.00-2.65 we had ID in manufacturer URLs
-        public virtual IActionResult RedirectManufacturerById(int manufacturerId)
-        {
-            var manufacturer = _manufacturerService.GetManufacturerById(manufacturerId);
-            if (manufacturer == null)
-                return RedirectToRoutePermanent("HomePage");
-
-            return RedirectToRoutePermanent("Manufacturer", new { SeName = _urlRecordService.GetSeName(manufacturer) });
         }
 
         //in versions 2.00-2.70 we had ID in news URLs

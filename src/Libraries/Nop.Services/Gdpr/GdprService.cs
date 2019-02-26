@@ -15,7 +15,6 @@ using Nop.Services.Events;
 using Nop.Services.Forums;
 using Nop.Services.Messages;
 using Nop.Services.News;
-using Nop.Services.Orders;
 using Nop.Services.Stores;
 
 namespace Nop.Services.Gdpr
@@ -40,7 +39,6 @@ namespace Nop.Services.Gdpr
         private readonly IProductService _productService;
         private readonly IRepository<GdprConsent> _gdprConsentRepository;
         private readonly IRepository<GdprLog> _gdprLogRepository;
-        private readonly IShoppingCartService _shoppingCartService;
         private readonly IStoreService _storeService;
 
         #endregion
@@ -60,7 +58,6 @@ namespace Nop.Services.Gdpr
             IProductService productService,
             IRepository<GdprConsent> gdprConsentRepository,
             IRepository<GdprLog> gdprLogRepository,
-            IShoppingCartService shoppingCartService,
             IStoreService storeService)
         {
             this._addressService = addressService;
@@ -76,7 +73,6 @@ namespace Nop.Services.Gdpr
             this._productService = productService;
             this._gdprConsentRepository = gdprConsentRepository;
             this._gdprLogRepository = gdprLogRepository;
-            this._shoppingCartService = shoppingCartService;
             this._storeService = storeService;
         }
 
@@ -350,11 +346,7 @@ namespace Nop.Services.Gdpr
             var forumSubscriptions = _forumService.GetAllSubscriptions(customer.Id);
             foreach (var forumSubscription in forumSubscriptions)
                 _forumService.DeleteSubscription(forumSubscription);
-
-            //shopping cart items
-            foreach (var sci in customer.ShoppingCartItems)
-                _shoppingCartService.DeleteShoppingCartItem(sci);
-
+            
             //private messages (sent)
             foreach (var pm in _forumService.GetAllPrivateMessages(0, customer.Id, 0, null, null, null, null))
                 _forumService.DeletePrivateMessage(pm);

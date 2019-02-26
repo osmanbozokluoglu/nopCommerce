@@ -8,26 +8,20 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Primitives;
 using Nop.Core;
 using Nop.Core.Domain.Catalog;
-using Nop.Core.Domain.Discounts;
 using Nop.Core.Domain.Media;
-using Nop.Core.Domain.Orders;
 using Nop.Core.Domain.Vendors;
 using Nop.Core.Infrastructure;
 using Nop.Services.Catalog;
 using Nop.Services.Common;
 using Nop.Services.Configuration;
 using Nop.Services.Customers;
-using Nop.Services.Discounts;
 using Nop.Services.ExportImport;
 using Nop.Services.Localization;
 using Nop.Services.Logging;
 using Nop.Services.Media;
 using Nop.Services.Messages;
-using Nop.Services.Orders;
 using Nop.Services.Security;
 using Nop.Services.Seo;
-using Nop.Services.Shipping;
-using Nop.Services.Stores;
 using Nop.Web.Areas.Admin.Factories;
 using Nop.Web.Areas.Admin.Infrastructure.Mapper.Extensions;
 using Nop.Web.Areas.Admin.Models.Catalog;
@@ -47,14 +41,12 @@ namespace Nop.Web.Areas.Admin.Controllers
         private readonly ICopyProductService _copyProductService;
         private readonly ICustomerActivityService _customerActivityService;
         private readonly ICustomerService _customerService;
-        private readonly IDiscountService _discountService;
         private readonly IDownloadService _downloadService;
         private readonly IExportManager _exportManager;
         private readonly IImportManager _importManager;
         private readonly ILanguageService _languageService;
         private readonly ILocalizationService _localizationService;
         private readonly ILocalizedEntityService _localizedEntityService;
-        private readonly IManufacturerService _manufacturerService;
         private readonly INopFileProvider _fileProvider;
         private readonly INotificationService _notificationService;
         private readonly IPdfService _pdfService;
@@ -66,8 +58,6 @@ namespace Nop.Web.Areas.Admin.Controllers
         private readonly IProductService _productService;
         private readonly IProductTagService _productTagService;
         private readonly ISettingService _settingService;
-        private readonly IShippingService _shippingService;
-        private readonly IShoppingCartService _shoppingCartService;
         private readonly ISpecificationAttributeService _specificationAttributeService;
         private readonly IUrlRecordService _urlRecordService;
         private readonly IWorkContext _workContext;
@@ -83,14 +73,12 @@ namespace Nop.Web.Areas.Admin.Controllers
             ICopyProductService copyProductService,
             ICustomerActivityService customerActivityService,
             ICustomerService customerService,
-            IDiscountService discountService,
             IDownloadService downloadService,
             IExportManager exportManager,
             IImportManager importManager,
             ILanguageService languageService,
             ILocalizationService localizationService,
             ILocalizedEntityService localizedEntityService,
-            IManufacturerService manufacturerService,
             INopFileProvider fileProvider,
             INotificationService notificationService,
             IPdfService pdfService,
@@ -102,8 +90,6 @@ namespace Nop.Web.Areas.Admin.Controllers
             IProductService productService,
             IProductTagService productTagService,
             ISettingService settingService,
-            IShippingService shippingService,
-            IShoppingCartService shoppingCartService,
             ISpecificationAttributeService specificationAttributeService,
             IUrlRecordService urlRecordService,
             IWorkContext workContext,
@@ -115,14 +101,12 @@ namespace Nop.Web.Areas.Admin.Controllers
             this._copyProductService = copyProductService;
             this._customerActivityService = customerActivityService;
             this._customerService = customerService;
-            this._discountService = discountService;
             this._downloadService = downloadService;
             this._exportManager = exportManager;
             this._importManager = importManager;
             this._languageService = languageService;
             this._localizationService = localizationService;
             this._localizedEntityService = localizedEntityService;
-            this._manufacturerService = manufacturerService;
             this._fileProvider = fileProvider;
             this._notificationService = notificationService;
             this._pdfService = pdfService;
@@ -134,8 +118,6 @@ namespace Nop.Web.Areas.Admin.Controllers
             this._productService = productService;
             this._productTagService = productTagService;
             this._settingService = settingService;
-            this._shippingService = shippingService;
-            this._shoppingCartService = shoppingCartService;
             this._specificationAttributeService = specificationAttributeService;
             this._urlRecordService = urlRecordService;
             this._workContext = workContext;
@@ -278,62 +260,6 @@ namespace Nop.Web.Areas.Admin.Controllers
                     });
                 }
             }
-        }
-
-        protected virtual void SaveManufacturerMappings(Product product, ProductModel model)
-        {
-            var existingProductManufacturers = _manufacturerService.GetProductManufacturersByProductId(product.Id, true);
-
-            //delete manufacturers
-            foreach (var existingProductManufacturer in existingProductManufacturers)
-                if (!model.SelectedManufacturerIds.Contains(existingProductManufacturer.ManufacturerId))
-                    _manufacturerService.DeleteProductManufacturer(existingProductManufacturer);
-
-            //add manufacturers
-            foreach (var manufacturerId in model.SelectedManufacturerIds)
-            {
-                if (_manufacturerService.FindProductManufacturer(existingProductManufacturers, product.Id, manufacturerId) == null)
-                {
-                    //find next display order
-                    var displayOrder = 1;
-                    var existingManufacturerMapping = _manufacturerService.GetProductManufacturersByManufacturerId(manufacturerId, showHidden: true);
-                    if (existingManufacturerMapping.Any())
-                        displayOrder = existingManufacturerMapping.Max(x => x.DisplayOrder) + 1;
-                    _manufacturerService.InsertProductManufacturer(new ProductManufacturer
-                    {
-                        ProductId = product.Id,
-                        ManufacturerId = manufacturerId,
-                        DisplayOrder = displayOrder
-                    });
-                }
-            }
-        }
-
-        protected virtual void SaveDiscountMappings(Product product, ProductModel model)
-        {
-            var allDiscounts = _discountService.GetAllDiscounts(DiscountType.AssignedToSkus, showHidden: true);
-
-            foreach (var discount in allDiscounts)
-            {
-                if (model.SelectedDiscountIds != null && model.SelectedDiscountIds.Contains(discount.Id))
-                {
-                    //new discount
-                    if (product.DiscountProductMappings.Count(mapping => mapping.DiscountId == discount.Id) == 0)
-                        product.DiscountProductMappings.Add(new DiscountProductMapping { Discount = discount });
-                }
-                else
-                {
-                    //remove discount
-                    if (product.DiscountProductMappings.Count(mapping => mapping.DiscountId == discount.Id) > 0)
-                    {
-                        product.DiscountProductMappings
-                            .Remove(product.DiscountProductMappings.FirstOrDefault(mapping => mapping.DiscountId == discount.Id));
-                    }
-                }
-            }
-
-            _productService.UpdateProduct(product);
-            _productService.UpdateHasDiscountsApplied(product);
         }
 
         protected virtual string GetAttributesXmlForProductAttributeCombination(IFormCollection form, List<string> warnings, int productId)
@@ -498,104 +424,6 @@ namespace Nop.Web.Areas.Admin.Controllers
             return result.ToArray();
         }
 
-        protected virtual void SaveProductWarehouseInventory(Product product, ProductModel model)
-        {
-            if (product == null)
-                throw new ArgumentNullException(nameof(product));
-
-            if (model.ManageInventoryMethodId != (int)ManageInventoryMethod.ManageStock)
-                return;
-
-            if (!model.UseMultipleWarehouses)
-                return;
-
-            var warehouses = _shippingService.GetAllWarehouses();
-
-            var formData = Request.Form.ToDictionary(x => x.Key, x => x.Value.ToString());
-
-            foreach (var warehouse in warehouses)
-            {
-                //parse stock quantity
-                var stockQuantity = 0;
-                foreach (var formKey in formData.Keys)
-                {
-                    if (!formKey.Equals($"warehouse_qty_{warehouse.Id}", StringComparison.InvariantCultureIgnoreCase))
-                        continue;
-
-                    int.TryParse(formData[formKey], out stockQuantity);
-                    break;
-                }
-
-                //parse reserved quantity
-                var reservedQuantity = 0;
-                foreach (var formKey in formData.Keys)
-                    if (formKey.Equals($"warehouse_reserved_{warehouse.Id}", StringComparison.InvariantCultureIgnoreCase))
-                    {
-                        int.TryParse(formData[formKey], out reservedQuantity);
-                        break;
-                    }
-
-                //parse "used" field
-                var used = false;
-                foreach (var formKey in formData.Keys)
-                    if (formKey.Equals($"warehouse_used_{warehouse.Id}", StringComparison.InvariantCultureIgnoreCase))
-                    {
-                        int.TryParse(formData[formKey], out var tmp);
-                        used = tmp == warehouse.Id;
-                        break;
-                    }
-
-                //quantity change history message
-                var message = $"{_localizationService.GetResource("Admin.StockQuantityHistory.Messages.MultipleWarehouses")} {_localizationService.GetResource("Admin.StockQuantityHistory.Messages.Edit")}";
-
-                var existingPwI = product.ProductWarehouseInventory.FirstOrDefault(x => x.WarehouseId == warehouse.Id);
-                if (existingPwI != null)
-                {
-                    if (used)
-                    {
-                        var previousStockQuantity = existingPwI.StockQuantity;
-
-                        //update existing record
-                        existingPwI.StockQuantity = stockQuantity;
-                        existingPwI.ReservedQuantity = reservedQuantity;
-                        _productService.UpdateProduct(product);
-
-                        //quantity change history
-                        _productService.AddStockQuantityHistoryEntry(product, existingPwI.StockQuantity - previousStockQuantity, existingPwI.StockQuantity,
-                            existingPwI.WarehouseId, message);
-                    }
-                    else
-                    {
-                        //delete. no need to store record for qty 0
-                        _productService.DeleteProductWarehouseInventory(existingPwI);
-
-                        //quantity change history
-                        _productService.AddStockQuantityHistoryEntry(product, -existingPwI.StockQuantity, 0, existingPwI.WarehouseId, message);
-                    }
-                }
-                else
-                {
-                    if (!used)
-                        continue;
-
-                    //no need to insert a record for qty 0
-                    existingPwI = new ProductWarehouseInventory
-                    {
-                        WarehouseId = warehouse.Id,
-                        ProductId = product.Id,
-                        StockQuantity = stockQuantity,
-                        ReservedQuantity = reservedQuantity
-                    };
-                    product.ProductWarehouseInventory.Add(existingPwI);
-                    _productService.UpdateProduct(product);
-
-                    //quantity change history
-                    _productService.AddStockQuantityHistoryEntry(product, existingPwI.StockQuantity, existingPwI.StockQuantity,
-                        existingPwI.WarehouseId, message);
-                }
-            }
-        }
-
         protected virtual void SaveConditionAttributes(ProductAttributeMapping productAttributeMapping, ProductAttributeConditionModel model)
         {
             string attributesXml = null;
@@ -695,12 +523,6 @@ namespace Nop.Web.Areas.Admin.Controllers
                 if (existingCombination != null)
                     continue;
 
-                //new one
-                var warnings = new List<string>();
-                warnings.AddRange(_shoppingCartService.GetShoppingCartItemAttributeWarnings(_workContext.CurrentCustomer,
-                    ShoppingCartType.ShoppingCart, product, 1, attributesXml, true, true));
-                if (warnings.Count != 0)
-                    continue;
 
                 //save combination
                 var combination = new ProductAttributeCombination
@@ -830,23 +652,16 @@ namespace Nop.Web.Areas.Admin.Controllers
                 //categories
                 SaveCategoryMappings(product, model);
 
-                //manufacturers
-                SaveManufacturerMappings(product, model);
-
                 //ACL (customer roles)
                 SaveProductAcl(product, model);
 
                 //stores
                 _productService.UpdateProductStoreMappings(product, model.SelectedStoreIds);
 
-                //discounts
-                SaveDiscountMappings(product, model);
 
                 //tags
                 _productTagService.UpdateProductTags(product, ParseProductTags(model.ProductTags));
 
-                //warehouses
-                SaveProductWarehouseInventory(product, model);
 
                 //quantity change history
                 _productService.AddStockQuantityHistoryEntry(product, product.StockQuantity, product.StockQuantity, product.WarehouseId,
@@ -952,23 +767,15 @@ namespace Nop.Web.Areas.Admin.Controllers
                 //tags
                 _productTagService.UpdateProductTags(product, ParseProductTags(model.ProductTags));
 
-                //warehouses
-                SaveProductWarehouseInventory(product, model);
 
                 //categories
                 SaveCategoryMappings(product, model);
-
-                //manufacturers
-                SaveManufacturerMappings(product, model);
 
                 //ACL (customer roles)
                 SaveProductAcl(product, model);
 
                 //stores
                 _productService.UpdateProductStoreMappings(product, model.SelectedStoreIds);
-
-                //discounts
-                SaveDiscountMappings(product, model);
 
                 //picture seo names
                 UpdatePictureSeoNames(product);
@@ -1001,38 +808,6 @@ namespace Nop.Web.Areas.Admin.Controllers
                         _downloadService.DeleteDownload(prevSampleDownload);
                 }
 
-                //quantity change history
-                if (previousWarehouseId != product.WarehouseId)
-                {
-                    //warehouse is changed 
-                    //compose a message
-                    var oldWarehouseMessage = string.Empty;
-                    if (previousWarehouseId > 0)
-                    {
-                        var oldWarehouse = _shippingService.GetWarehouseById(previousWarehouseId);
-                        if (oldWarehouse != null)
-                            oldWarehouseMessage = string.Format(_localizationService.GetResource("Admin.StockQuantityHistory.Messages.EditWarehouse.Old"), oldWarehouse.Name);
-                    }
-
-                    var newWarehouseMessage = string.Empty;
-                    if (product.WarehouseId > 0)
-                    {
-                        var newWarehouse = _shippingService.GetWarehouseById(product.WarehouseId);
-                        if (newWarehouse != null)
-                            newWarehouseMessage = string.Format(_localizationService.GetResource("Admin.StockQuantityHistory.Messages.EditWarehouse.New"), newWarehouse.Name);
-                    }
-
-                    var message = string.Format(_localizationService.GetResource("Admin.StockQuantityHistory.Messages.EditWarehouse"), oldWarehouseMessage, newWarehouseMessage);
-
-                    //record history
-                    _productService.AddStockQuantityHistoryEntry(product, -previousStockQuantity, 0, previousWarehouseId, message);
-                    _productService.AddStockQuantityHistoryEntry(product, product.StockQuantity, product.StockQuantity, product.WarehouseId, message);
-                }
-                else
-                {
-                    _productService.AddStockQuantityHistoryEntry(product, product.StockQuantity - previousStockQuantity, product.StockQuantity,
-                        product.WarehouseId, _localizationService.GetResource("Admin.StockQuantityHistory.Messages.Edit"));
-                }
 
                 //activity log
                 _customerActivityService.InsertActivity("EditProduct",
@@ -1979,29 +1754,6 @@ namespace Nop.Web.Areas.Admin.Controllers
 
         #endregion
 
-        #region Purchased with order
-
-        [HttpPost]
-        public virtual IActionResult PurchasedWithOrders(ProductOrderSearchModel searchModel)
-        {
-            if (!_permissionService.Authorize(StandardPermissionProvider.ManageProducts))
-                return AccessDeniedKendoGridJson();
-
-            //try to get a product with the specified id
-            var product = _productService.GetProductById(searchModel.ProductId)
-                ?? throw new ArgumentException("No product found with the specified id");
-
-            //a vendor should have access only to his products
-            if (_workContext.CurrentVendor != null && product.VendorId != _workContext.CurrentVendor.Id)
-                return Content("This is not your product");
-
-            //prepare model
-            var model = _productModelFactory.PrepareProductOrderListModel(searchModel, product);
-
-            return Json(model);
-        }
-
-        #endregion
 
         #region Export / Import
 
@@ -3151,9 +2903,6 @@ namespace Nop.Web.Areas.Admin.Controllers
             var warnings = new List<string>();
             var attributesXml = GetAttributesXmlForProductAttributeCombination(model.Form, warnings, product.Id);
 
-            warnings.AddRange(_shoppingCartService.GetShoppingCartItemAttributeWarnings(_workContext.CurrentCustomer,
-                ShoppingCartType.ShoppingCart, product, 1, attributesXml, true));
-
             //check whether the same attribute combination already exists
             var existingCombination = _productAttributeParser.FindProductAttributeCombination(product, attributesXml);
             if (existingCombination != null)
@@ -3294,9 +3043,7 @@ namespace Nop.Web.Areas.Admin.Controllers
             var warnings = new List<string>();
             var attributesXml = GetAttributesXmlForProductAttributeCombination(model.Form, warnings, product.Id);
 
-            warnings.AddRange(_shoppingCartService.GetShoppingCartItemAttributeWarnings(_workContext.CurrentCustomer,
-                ShoppingCartType.ShoppingCart, product, 1, attributesXml, true));
-
+          
             //check whether the same attribute combination already exists
             var existingCombination = _productAttributeParser.FindProductAttributeCombination(product, attributesXml);
             if (existingCombination != null)
@@ -3380,28 +3127,6 @@ namespace Nop.Web.Areas.Admin.Controllers
 
         #endregion
 
-        #region Stock quantity history
-
-        [HttpPost]
-        public virtual IActionResult StockQuantityHistory(StockQuantityHistorySearchModel searchModel)
-        {
-            if (!_permissionService.Authorize(StandardPermissionProvider.ManageProducts))
-                return AccessDeniedKendoGridJson();
-
-            var product = _productService.GetProductById(searchModel.ProductId)
-                ?? throw new ArgumentException("No product found with the specified id");
-
-            //a vendor should have access only to his products
-            if (_workContext.CurrentVendor != null && product.VendorId != _workContext.CurrentVendor.Id)
-                return Content("This is not your product");
-
-            //prepare model
-            var model = _productModelFactory.PrepareStockQuantityHistoryListModel(searchModel, product);
-
-            return Json(model);
-        }
-
-        #endregion
 
         #endregion
     }

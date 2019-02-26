@@ -6,14 +6,13 @@ using Nop.Core;
 using Nop.Core.Domain.Catalog;
 using Nop.Core.Domain.Customers;
 using Nop.Core.Domain.Localization;
-using Nop.Core.Domain.Orders;
+
 using Nop.Core.Domain.Security;
 using Nop.Services.Catalog;
 using Nop.Services.Events;
 using Nop.Services.Localization;
 using Nop.Services.Logging;
 using Nop.Services.Messages;
-using Nop.Services.Orders;
 using Nop.Services.Security;
 using Nop.Services.Seo;
 using Nop.Services.Stores;
@@ -40,7 +39,6 @@ namespace Nop.Web.Controllers
         private readonly ICustomerActivityService _customerActivityService;
         private readonly IEventPublisher _eventPublisher;
         private readonly ILocalizationService _localizationService;
-        private readonly IOrderService _orderService;
         private readonly IPermissionService _permissionService;
         private readonly IProductModelFactory _productModelFactory;
         private readonly IProductService _productService;
@@ -52,7 +50,6 @@ namespace Nop.Web.Controllers
         private readonly IWorkContext _workContext;
         private readonly IWorkflowMessageService _workflowMessageService;
         private readonly LocalizationSettings _localizationSettings;
-        private readonly ShoppingCartSettings _shoppingCartSettings;
 
         #endregion
 
@@ -65,7 +62,6 @@ namespace Nop.Web.Controllers
             ICustomerActivityService customerActivityService,
             IEventPublisher eventPublisher,
             ILocalizationService localizationService,
-            IOrderService orderService,
             IPermissionService permissionService,
             IProductModelFactory productModelFactory,
             IProductService productService,
@@ -76,8 +72,7 @@ namespace Nop.Web.Controllers
             IWebHelper webHelper,
             IWorkContext workContext,
             IWorkflowMessageService workflowMessageService,
-            LocalizationSettings localizationSettings,
-            ShoppingCartSettings shoppingCartSettings)
+            LocalizationSettings localizationSettings)
         {
             this._captchaSettings = captchaSettings;
             this._catalogSettings = catalogSettings;
@@ -86,7 +81,6 @@ namespace Nop.Web.Controllers
             this._customerActivityService = customerActivityService;
             this._eventPublisher = eventPublisher;
             this._localizationService = localizationService;
-            this._orderService = orderService;
             this._permissionService = permissionService;
             this._productModelFactory = productModelFactory;
             this._productService = productService;
@@ -98,7 +92,6 @@ namespace Nop.Web.Controllers
             this._workContext = workContext;
             this._workflowMessageService = workflowMessageService;
             this._localizationSettings = localizationSettings;
-            this._shoppingCartSettings = shoppingCartSettings;
         }
 
         #endregion
@@ -137,26 +130,6 @@ namespace Nop.Web.Controllers
                 return RedirectToRoute("Product", new { SeName = _urlRecordService.GetSeName(parentGroupedProduct) });
             }
 
-            //update existing shopping cart or wishlist  item?
-            ShoppingCartItem updatecartitem = null;
-            if (_shoppingCartSettings.AllowCartItemEditing && updatecartitemid > 0)
-            {
-                var cart = _workContext.CurrentCustomer.ShoppingCartItems
-                    .LimitPerStore(_storeContext.CurrentStore.Id)
-                    .ToList();
-                updatecartitem = cart.FirstOrDefault(x => x.Id == updatecartitemid);
-                //not found?
-                if (updatecartitem == null)
-                {
-                    return RedirectToRoute("Product", new { SeName = _urlRecordService.GetSeName(product) });
-                }
-                //is it this product?
-                if (product.Id != updatecartitem.ProductId)
-                {
-                    return RedirectToRoute("Product", new { SeName = _urlRecordService.GetSeName(product) });
-                }
-            }
-
             //save as recently viewed
             _recentlyViewedProductsService.AddProductToRecentlyViewedList(product.Id);
 
@@ -176,7 +149,8 @@ namespace Nop.Web.Controllers
                 string.Format(_localizationService.GetResource("ActivityLog.PublicStore.ViewProduct"), product.Name), product);
 
             //model
-            var model = _productModelFactory.PrepareProductDetailsModel(product, updatecartitem, false);
+            //todo:
+            object model = null;// _productModelFactory.PrepareProductDetailsModel(product, null, false);
             //template
             var productTemplateViewPath = _productModelFactory.PrepareProductTemplateViewPath(product);
 
@@ -280,15 +254,6 @@ namespace Nop.Web.Controllers
             if (_workContext.CurrentCustomer.IsGuest() && !_catalogSettings.AllowAnonymousUsersToReviewProduct)
                 ModelState.AddModelError("", _localizationService.GetResource("Reviews.OnlyRegisteredUsersCanWriteReviews"));
 
-            if (_catalogSettings.ProductReviewPossibleOnlyAfterPurchasing)
-            {
-                var hasCompletedOrders = _orderService.SearchOrders(customerId: _workContext.CurrentCustomer.Id,
-                    productId: productId,
-                    osIds: new List<int> { (int)OrderStatus.Complete },
-                    pageSize: 1).Any();
-                if (!hasCompletedOrders)
-                    ModelState.AddModelError(string.Empty, _localizationService.GetResource("Reviews.ProductReviewPossibleOnlyAfterPurchasing"));
-            }
 
             //default value
             model.AddProductReview.Rating = _catalogSettings.DefaultProductRatingValue;
@@ -324,15 +289,6 @@ namespace Nop.Web.Controllers
                 ModelState.AddModelError("", _localizationService.GetResource("Reviews.OnlyRegisteredUsersCanWriteReviews"));
             }
 
-            if (_catalogSettings.ProductReviewPossibleOnlyAfterPurchasing)
-            {
-                var hasCompletedOrders = _orderService.SearchOrders(customerId: _workContext.CurrentCustomer.Id,
-                    productId: productId,
-                    osIds: new List<int> { (int)OrderStatus.Complete },
-                    pageSize: 1).Any();
-                if (!hasCompletedOrders)
-                    ModelState.AddModelError(string.Empty, _localizationService.GetResource("Reviews.ProductReviewPossibleOnlyAfterPurchasing"));
-            }
 
             if (ModelState.IsValid)
             {

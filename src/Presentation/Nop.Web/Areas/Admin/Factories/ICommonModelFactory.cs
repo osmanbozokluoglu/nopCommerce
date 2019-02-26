@@ -68,11 +68,5 @@ namespace Nop.Web.Areas.Admin.Factories
         /// <param name="searchModel">Popular search term search model</param>
         /// <returns>Popular search term list model</returns>
         PopularSearchTermListModel PreparePopularSearchTermListModel(PopularSearchTermSearchModel searchModel);
-
-        /// <summary>
-        /// Prepare common statistics model
-        /// </summary>
-        /// <returns>Common statistics model</returns>
-        CommonStatisticsModel PrepareCommonStatisticsModel();
     }
 }

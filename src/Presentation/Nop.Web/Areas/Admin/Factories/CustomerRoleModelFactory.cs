@@ -138,9 +138,6 @@ namespace Nop.Web.Areas.Admin.Factories
             //prepare available categories
             _baseAdminModelFactory.PrepareCategories(searchModel.AvailableCategories);
 
-            //prepare available manufacturers
-            _baseAdminModelFactory.PrepareManufacturers(searchModel.AvailableManufacturers);
-
             //prepare available stores
             _baseAdminModelFactory.PrepareStores(searchModel.AvailableStores);
 

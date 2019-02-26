@@ -24,10 +24,8 @@ using Nop.Services.Helpers;
 using Nop.Services.Localization;
 using Nop.Services.Logging;
 using Nop.Services.Messages;
-using Nop.Services.Orders;
 using Nop.Services.Security;
 using Nop.Services.Stores;
-using Nop.Services.Tax;
 using Nop.Web.Areas.Admin.Factories;
 using Nop.Web.Areas.Admin.Infrastructure.Mapper.Extensions;
 using Nop.Web.Areas.Admin.Models.Customers;
@@ -65,10 +63,8 @@ namespace Nop.Web.Areas.Admin.Controllers
         private readonly INotificationService _notificationService;
         private readonly IPermissionService _permissionService;
         private readonly IQueuedEmailService _queuedEmailService;
-        private readonly IRewardPointService _rewardPointService;
         private readonly IStoreContext _storeContext;
         private readonly IStoreService _storeService;
-        private readonly ITaxService _taxService;
         private readonly IWorkContext _workContext;
         private readonly IWorkflowMessageService _workflowMessageService;
         private readonly TaxSettings _taxSettings;
@@ -101,10 +97,8 @@ namespace Nop.Web.Areas.Admin.Controllers
             INotificationService notificationService,
             IPermissionService permissionService,
             IQueuedEmailService queuedEmailService,
-            IRewardPointService rewardPointService,
             IStoreContext storeContext,
             IStoreService storeService,
-            ITaxService taxService,
             IWorkContext workContext,
             IWorkflowMessageService workflowMessageService,
             TaxSettings taxSettings)
@@ -133,10 +127,8 @@ namespace Nop.Web.Areas.Admin.Controllers
             this._notificationService = notificationService;
             this._permissionService = permissionService;
             this._queuedEmailService = queuedEmailService;
-            this._rewardPointService = rewardPointService;
             this._storeContext = storeContext;
             this._storeService = storeService;
-            this._taxService = taxService;
             this._workContext = workContext;
             this._workflowMessageService = workflowMessageService;
             this._taxSettings = taxSettings;
@@ -579,29 +571,6 @@ namespace Nop.Web.Areas.Admin.Controllers
                             customer.Username = model.Username;
                     }
 
-                    //VAT number
-                    if (_taxSettings.EuVatEnabled)
-                    {
-                        var prevVatNumber = _genericAttributeService.GetAttribute<string>(customer, NopCustomerDefaults.VatNumberAttribute);
-
-                        _genericAttributeService.SaveAttribute(customer, NopCustomerDefaults.VatNumberAttribute, model.VatNumber);
-                        //set VAT number status
-                        if (!string.IsNullOrEmpty(model.VatNumber))
-                        {
-                            if (!model.VatNumber.Equals(prevVatNumber, StringComparison.InvariantCultureIgnoreCase))
-                            {
-                                _genericAttributeService.SaveAttribute(customer,
-                                    NopCustomerDefaults.VatNumberStatusIdAttribute,
-                                    (int)_taxService.GetVatNumberStatus(model.VatNumber));
-                            }
-                        }
-                        else
-                        {
-                            _genericAttributeService.SaveAttribute(customer,
-                                NopCustomerDefaults.VatNumberStatusIdAttribute,
-                                (int)VatNumberStatus.Empty);
-                        }
-                    }
 
                     //vendor
                     customer.VendorId = model.VendorId;
@@ -1084,61 +1053,6 @@ namespace Nop.Web.Areas.Admin.Controllers
 
         #endregion
 
-        #region Reward points history
-
-        [HttpPost]
-        public virtual IActionResult RewardPointsHistorySelect(CustomerRewardPointsSearchModel searchModel)
-        {
-            if (!_permissionService.Authorize(StandardPermissionProvider.ManageCustomers))
-                return AccessDeniedKendoGridJson();
-
-            //try to get a customer with the specified id
-            var customer = _customerService.GetCustomerById(searchModel.CustomerId)
-                ?? throw new ArgumentException("No customer found with the specified id");
-
-            //prepare model
-            var model = _customerModelFactory.PrepareRewardPointsListModel(searchModel, customer);
-
-            return Json(model);
-        }
-
-        public virtual IActionResult RewardPointsHistoryAdd(AddRewardPointsToCustomerModel model)
-        {
-            if (!_permissionService.Authorize(StandardPermissionProvider.ManageCustomers))
-                return AccessDeniedView();
-
-            //prevent adding a new row with zero value
-            if (model.Points == 0)
-                return Json(new { Result = false, Error = JavaScriptEncoder.Default.Encode(_localizationService.GetResource("Admin.Customers.Customers.RewardPoints.AddingZeroValueNotAllowed")) });
-
-            //try to get a customer with the specified id
-            var customer = _customerService.GetCustomerById(model.CustomerId);
-            if (customer == null)
-                return Json(new { Result = false });
-
-            //check whether delay is set
-            DateTime? activatingDate = null;
-            if (!model.ActivatePointsImmediately && model.ActivationDelay > 0)
-            {
-                var delayPeriod = (RewardPointsActivatingDelayPeriod)model.ActivationDelayPeriodId;
-                var delayInHours = delayPeriod.ToHours(model.ActivationDelay);
-                activatingDate = DateTime.UtcNow.AddHours(delayInHours);
-            }
-
-            //whether points validity is set
-            DateTime? endDate = null;
-            if (model.PointsValidity > 0)
-                endDate = (activatingDate ?? DateTime.UtcNow).AddDays(model.PointsValidity.Value);
-
-            //add reward points
-            _rewardPointService.AddRewardPointsHistoryEntry(customer, model.Points, model.StoreId, model.Message,
-                activatingDate: activatingDate, endDate: endDate);
-
-            return Json(new { Result = true, Message = JavaScriptEncoder.Default.Encode(_localizationService.GetResource("Admin.Customers.Customers.SomeComment")) });
-        }
-
-        #endregion
-
         #region Addresses
 
         [HttpPost]
@@ -1307,26 +1221,7 @@ namespace Nop.Web.Areas.Admin.Controllers
         }
 
         #endregion
-
-        #region Orders
-
-        [HttpPost]
-        public virtual IActionResult OrderList(CustomerOrderSearchModel searchModel)
-        {
-            if (!_permissionService.Authorize(StandardPermissionProvider.ManageCustomers))
-                return AccessDeniedKendoGridJson();
-
-            //try to get a customer with the specified id
-            var customer = _customerService.GetCustomerById(searchModel.CustomerId)
-                ?? throw new ArgumentException("No customer found with the specified id");
-
-            //prepare model
-            var model = _customerModelFactory.PrepareCustomerOrderListModel(searchModel, customer);
-
-            return Json(model);
-        }
-
-        #endregion
+       
 
         #region Customer
 
@@ -1416,26 +1311,6 @@ namespace Nop.Web.Areas.Admin.Controllers
 
         #endregion
 
-        #region Current shopping cart/ wishlist
-
-        [HttpPost]
-        public virtual IActionResult GetCartList(CustomerShoppingCartSearchModel searchModel)
-        {
-            if (!_permissionService.Authorize(StandardPermissionProvider.ManageCustomers))
-                return AccessDeniedKendoGridJson();
-
-            //try to get a customer with the specified id
-            var customer = _customerService.GetCustomerById(searchModel.CustomerId)
-                ?? throw new ArgumentException("No customer found with the specified id");
-
-            //prepare model
-            var model = _customerModelFactory.PrepareCustomerShoppingCartListModel(searchModel, customer);
-
-            return Json(model);
-        }
-
-        #endregion
-
         #region Activity log
 
         [HttpPost]
@@ -1450,26 +1325,6 @@ namespace Nop.Web.Areas.Admin.Controllers
 
             //prepare model
             var model = _customerModelFactory.PrepareCustomerActivityLogListModel(searchModel, customer);
-
-            return Json(model);
-        }
-
-        #endregion
-
-        #region Back in stock subscriptions
-
-        [HttpPost]
-        public virtual IActionResult BackInStockSubscriptionList(CustomerBackInStockSubscriptionSearchModel searchModel)
-        {
-            if (!_permissionService.Authorize(StandardPermissionProvider.ManageCustomers))
-                return AccessDeniedKendoGridJson();
-
-            //try to get a customer with the specified id
-            var customer = _customerService.GetCustomerById(searchModel.CustomerId)
-                ?? throw new ArgumentException("No customer found with the specified id");
-
-            //prepare model
-            var model = _customerModelFactory.PrepareCustomerBackInStockSubscriptionListModel(searchModel, customer);
 
             return Json(model);
         }
@@ -1545,33 +1400,6 @@ namespace Nop.Web.Areas.Admin.Controllers
             catch (Exception exc)
             {
                 _notificationService.ErrorNotification(exc.Message);
-                return RedirectToAction("Edit", new { id = customer.Id });
-            }
-        }
-
-        public virtual IActionResult GdprExport(int id)
-        {
-            if (!_permissionService.Authorize(StandardPermissionProvider.ManageCustomers))
-                return AccessDeniedView();
-
-            //try to get a customer with the specified id
-            var customer = _customerService.GetCustomerById(id);
-            if (customer == null)
-                return RedirectToAction("List");
-
-            try
-            {
-                //log
-                //_gdprService.InsertLog(customer, 0, GdprRequestType.ExportData, _localizationService.GetResource("Gdpr.Exported"));
-                //export
-                //export
-                var bytes = _exportManager.ExportCustomerGdprInfoToXlsx(customer, _storeContext.CurrentStore.Id);
-
-                return File(bytes, MimeTypes.TextXlsx, $"customerdata-{customer.Id}.xlsx");
-            }
-            catch (Exception exc)
-            {
-                _notificationService.ErrorNotification(exc);
                 return RedirectToAction("Edit", new { id = customer.Id });
             }
         }

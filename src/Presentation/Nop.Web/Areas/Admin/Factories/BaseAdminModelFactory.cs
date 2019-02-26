@@ -4,12 +4,8 @@ using System.Linq;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Nop.Core.Caching;
 using Nop.Core.Domain.Catalog;
-using Nop.Core.Domain.Discounts;
 using Nop.Core.Domain.Gdpr;
 using Nop.Core.Domain.Logging;
-using Nop.Core.Domain.Orders;
-using Nop.Core.Domain.Payments;
-using Nop.Core.Domain.Shipping;
 using Nop.Core.Domain.Tax;
 using Nop.Core.Plugins;
 using Nop.Services;
@@ -21,10 +17,7 @@ using Nop.Services.Localization;
 using Nop.Services.Logging;
 using Nop.Services.Messages;
 using Nop.Services.Plugins;
-using Nop.Services.Shipping;
-using Nop.Services.Shipping.Date;
 using Nop.Services.Stores;
-using Nop.Services.Tax;
 using Nop.Services.Topics;
 using Nop.Services.Vendors;
 using Nop.Web.Areas.Admin.Helpers;
@@ -44,20 +37,15 @@ namespace Nop.Web.Areas.Admin.Factories
         private readonly ICurrencyService _currencyService;
         private readonly ICustomerActivityService _customerActivityService;
         private readonly ICustomerService _customerService;
-        private readonly IDateRangeService _dateRangeService;
         private readonly IDateTimeHelper _dateTimeHelper;
         private readonly IEmailAccountService _emailAccountService;
         private readonly ILanguageService _languageService;
         private readonly ILocalizationService _localizationService;
-        private readonly IManufacturerService _manufacturerService;
-        private readonly IManufacturerTemplateService _manufacturerTemplateService;
         private readonly IPluginService _pluginService;
         private readonly IProductTemplateService _productTemplateService;
-        private readonly IShippingService _shippingService;
         private readonly IStateProvinceService _stateProvinceService;
         private readonly IStaticCacheManager _cacheManager;
         private readonly IStoreService _storeService;
-        private readonly ITaxCategoryService _taxCategoryService;
         private readonly ITopicTemplateService _topicTemplateService;
         private readonly IVendorService _vendorService;
 
@@ -71,20 +59,15 @@ namespace Nop.Web.Areas.Admin.Factories
             ICurrencyService currencyService,
             ICustomerActivityService customerActivityService,
             ICustomerService customerService,
-            IDateRangeService dateRangeService,
             IDateTimeHelper dateTimeHelper,
             IEmailAccountService emailAccountService,
             ILanguageService languageService,
             ILocalizationService localizationService,
-            IManufacturerService manufacturerService,
-            IManufacturerTemplateService manufacturerTemplateService,
             IPluginService pluginService,
             IProductTemplateService productTemplateService,
-            IShippingService shippingService,
             IStateProvinceService stateProvinceService,
             IStaticCacheManager cacheManager,
             IStoreService storeService,
-            ITaxCategoryService taxCategoryService,
             ITopicTemplateService topicTemplateService,
             IVendorService vendorService)
         {
@@ -94,20 +77,15 @@ namespace Nop.Web.Areas.Admin.Factories
             this._currencyService = currencyService;
             this._customerActivityService = customerActivityService;
             this._customerService = customerService;
-            this._dateRangeService = dateRangeService;
             this._dateTimeHelper = dateTimeHelper;
             this._emailAccountService = emailAccountService;
             this._languageService = languageService;
             this._localizationService = localizationService;
-            this._manufacturerService = manufacturerService;
-            this._manufacturerTemplateService = manufacturerTemplateService;
             this._pluginService = pluginService;
             this._productTemplateService = productTemplateService;
-            this._shippingService = shippingService;
             this._stateProvinceService = stateProvinceService;
             this._cacheManager = cacheManager;
             this._storeService = storeService;
-            this._taxCategoryService = taxCategoryService;
             this._topicTemplateService = topicTemplateService;
             this._vendorService = vendorService;
         }
@@ -166,73 +144,7 @@ namespace Nop.Web.Areas.Admin.Factories
             //insert special item for the default value
             PrepareDefaultItem(items, withSpecialDefaultItem, defaultItemText);
         }
-
-        /// <summary>
-        /// Prepare available order statuses
-        /// </summary>
-        /// <param name="items">Order status items</param>
-        /// <param name="withSpecialDefaultItem">Whether to insert the first special item for the default value</param>
-        /// <param name="defaultItemText">Default item text; pass null to use default value of the default item text</param>
-        public virtual void PrepareOrderStatuses(IList<SelectListItem> items, bool withSpecialDefaultItem = true, string defaultItemText = null)
-        {
-            if (items == null)
-                throw new ArgumentNullException(nameof(items));
-
-            //prepare available order statuses
-            var availableStatusItems = OrderStatus.Pending.ToSelectList(false);
-            foreach (var statusItem in availableStatusItems)
-            {
-                items.Add(statusItem);
-            }
-
-            //insert special item for the default value
-            PrepareDefaultItem(items, withSpecialDefaultItem, defaultItemText);
-        }
-
-        /// <summary>
-        /// Prepare available payment statuses
-        /// </summary>
-        /// <param name="items">Payment status items</param>
-        /// <param name="withSpecialDefaultItem">Whether to insert the first special item for the default value</param>
-        /// <param name="defaultItemText">Default item text; pass null to use default value of the default item text</param>
-        public virtual void PreparePaymentStatuses(IList<SelectListItem> items, bool withSpecialDefaultItem = true, string defaultItemText = null)
-        {
-            if (items == null)
-                throw new ArgumentNullException(nameof(items));
-
-            //prepare available payment statuses
-            var availableStatusItems = PaymentStatus.Pending.ToSelectList(false);
-            foreach (var statusItem in availableStatusItems)
-            {
-                items.Add(statusItem);
-            }
-
-            //insert special item for the default value
-            PrepareDefaultItem(items, withSpecialDefaultItem, defaultItemText);
-        }
-
-        /// <summary>
-        /// Prepare available shipping statuses
-        /// </summary>
-        /// <param name="items">Shipping status items</param>
-        /// <param name="withSpecialDefaultItem">Whether to insert the first special item for the default value</param>
-        /// <param name="defaultItemText">Default item text; pass null to use default value of the default item text</param>
-        public virtual void PrepareShippingStatuses(IList<SelectListItem> items, bool withSpecialDefaultItem = true, string defaultItemText = null)
-        {
-            if (items == null)
-                throw new ArgumentNullException(nameof(items));
-
-            //prepare available shipping statuses
-            var availableStatusItems = ShippingStatus.NotYetShipped.ToSelectList(false);
-            foreach (var statusItem in availableStatusItems)
-            {
-                items.Add(statusItem);
-            }
-
-            //insert special item for the default value
-            PrepareDefaultItem(items, withSpecialDefaultItem, defaultItemText);
-        }
-
+        
         /// <summary>
         /// Prepare available countries
         /// </summary>
@@ -376,29 +288,6 @@ namespace Nop.Web.Areas.Admin.Factories
         }
 
         /// <summary>
-        /// Prepare available tax categories
-        /// </summary>
-        /// <param name="items">Tax category items</param>
-        /// <param name="withSpecialDefaultItem">Whether to insert the first special item for the default value</param>
-        /// <param name="defaultItemText">Default item text; pass null to use default value of the default item text</param>
-        public virtual void PrepareTaxCategories(IList<SelectListItem> items, bool withSpecialDefaultItem = true, string defaultItemText = null)
-        {
-            if (items == null)
-                throw new ArgumentNullException(nameof(items));
-
-            //prepare available tax categories
-            var availableTaxCategories = _taxCategoryService.GetAllTaxCategories();
-            foreach (var taxCategory in availableTaxCategories)
-            {
-                items.Add(new SelectListItem { Value = taxCategory.Id.ToString(), Text = taxCategory.Name });
-            }
-
-            //insert special item for the default value
-            PrepareDefaultItem(items, withSpecialDefaultItem,
-                defaultItemText ?? _localizationService.GetResource("Admin.Configuration.Settings.Tax.TaxCategories.None"));
-        }
-
-        /// <summary>
         /// Prepare available categories
         /// </summary>
         /// <param name="items">Category items</param>
@@ -414,28 +303,6 @@ namespace Nop.Web.Areas.Admin.Factories
             foreach (var categoryItem in availableCategoryItems)
             {
                 items.Add(categoryItem);
-            }
-
-            //insert special item for the default value
-            PrepareDefaultItem(items, withSpecialDefaultItem, defaultItemText);
-        }
-
-        /// <summary>
-        /// Prepare available manufacturers
-        /// </summary>
-        /// <param name="items">Manufacturer items</param>
-        /// <param name="withSpecialDefaultItem">Whether to insert the first special item for the default value</param>
-        /// <param name="defaultItemText">Default item text; pass null to use default value of the default item text</param>
-        public virtual void PrepareManufacturers(IList<SelectListItem> items, bool withSpecialDefaultItem = true, string defaultItemText = null)
-        {
-            if (items == null)
-                throw new ArgumentNullException(nameof(items));
-
-            //prepare available manufacturers
-            var availableManufacturerItems = SelectListHelper.GetManufacturerList(_manufacturerService, _cacheManager, true);
-            foreach (var manufacturerItem in availableManufacturerItems)
-            {
-                items.Add(manufacturerItem);
             }
 
             //insert special item for the default value
@@ -531,28 +398,6 @@ namespace Nop.Web.Areas.Admin.Factories
         }
 
         /// <summary>
-        /// Prepare available shopping cart types
-        /// </summary>
-        /// <param name="items">Shopping cart type items</param>
-        /// <param name="withSpecialDefaultItem">Whether to insert the first special item for the default value</param>
-        /// <param name="defaultItemText">Default item text; pass null to use default value of the default item text</param>
-        public virtual void PrepareShoppingCartTypes(IList<SelectListItem> items, bool withSpecialDefaultItem = true, string defaultItemText = null)
-        {
-            if (items == null)
-                throw new ArgumentNullException(nameof(items));
-
-            //prepare available shopping cart types
-            var availableShoppingCartTypeItems = ShoppingCartType.ShoppingCart.ToSelectList(false);
-            foreach (var shoppingCartTypeItem in availableShoppingCartTypeItems)
-            {
-                items.Add(shoppingCartTypeItem);
-            }
-
-            //insert special item for the default value
-            PrepareDefaultItem(items, withSpecialDefaultItem, defaultItemText);
-        }
-
-        /// <summary>
         /// Prepare available tax display types
         /// </summary>
         /// <param name="items">Tax display type items</param>
@@ -597,28 +442,6 @@ namespace Nop.Web.Areas.Admin.Factories
         }
 
         /// <summary>
-        /// Prepare available discount types
-        /// </summary>
-        /// <param name="items">Discount type items</param>
-        /// <param name="withSpecialDefaultItem">Whether to insert the first special item for the default value</param>
-        /// <param name="defaultItemText">Default item text; pass null to use default value of the default item text</param>
-        public virtual void PrepareDiscountTypes(IList<SelectListItem> items, bool withSpecialDefaultItem = true, string defaultItemText = null)
-        {
-            if (items == null)
-                throw new ArgumentNullException(nameof(items));
-
-            //prepare available discount types
-            var availableDiscountTypeItems = DiscountType.AssignedToOrderTotal.ToSelectList(false);
-            foreach (var discountTypeItem in availableDiscountTypeItems)
-            {
-                items.Add(discountTypeItem);
-            }
-
-            //insert special item for the default value
-            PrepareDefaultItem(items, withSpecialDefaultItem, defaultItemText);
-        }
-
-        /// <summary>
         /// Prepare available log levels
         /// </summary>
         /// <param name="items">Log level items</param>
@@ -634,29 +457,6 @@ namespace Nop.Web.Areas.Admin.Factories
             foreach (var logLevelItem in availableLogLevelItems)
             {
                 items.Add(logLevelItem);
-            }
-
-            //insert special item for the default value
-            PrepareDefaultItem(items, withSpecialDefaultItem, defaultItemText);
-        }
-
-        /// <summary>
-        /// Prepare available manufacturer templates
-        /// </summary>
-        /// <param name="items">Manufacturer template items</param>
-        /// <param name="withSpecialDefaultItem">Whether to insert the first special item for the default value</param>
-        /// <param name="defaultItemText">Default item text; pass null to use default value of the default item text</param>
-        public virtual void PrepareManufacturerTemplates(IList<SelectListItem> items,
-            bool withSpecialDefaultItem = true, string defaultItemText = null)
-        {
-            if (items == null)
-                throw new ArgumentNullException(nameof(items));
-
-            //prepare available manufacturer templates
-            var availableTemplates = _manufacturerTemplateService.GetAllManufacturerTemplates();
-            foreach (var template in availableTemplates)
-            {
-                items.Add(new SelectListItem { Value = template.Id.ToString(), Text = template.Name });
             }
 
             //insert special item for the default value
@@ -709,29 +509,6 @@ namespace Nop.Web.Areas.Admin.Factories
         }
 
         /// <summary>
-        /// Prepare available return request statuses
-        /// </summary>
-        /// <param name="items">Return request status items</param>
-        /// <param name="withSpecialDefaultItem">Whether to insert the first special item for the default value</param>
-        /// <param name="defaultItemText">Default item text; pass null to use default value of the default item text</param>
-        public virtual void PrepareReturnRequestStatuses(IList<SelectListItem> items,
-            bool withSpecialDefaultItem = true, string defaultItemText = null)
-        {
-            if (items == null)
-                throw new ArgumentNullException(nameof(items));
-
-            //prepare available return request statuses
-            var availableStatusItems = ReturnRequestStatus.Pending.ToSelectList(false);
-            foreach (var statusItem in availableStatusItems)
-            {
-                items.Add(statusItem);
-            }
-
-            //insert special item for the default value
-            PrepareDefaultItem(items, withSpecialDefaultItem, defaultItemText);
-        }
-
-        /// <summary>
         /// Prepare available product templates
         /// </summary>
         /// <param name="items">Product template items</param>
@@ -769,73 +546,6 @@ namespace Nop.Web.Areas.Admin.Factories
             foreach (var template in availableTemplates)
             {
                 items.Add(new SelectListItem { Value = template.Id.ToString(), Text = template.Name });
-            }
-
-            //insert special item for the default value
-            PrepareDefaultItem(items, withSpecialDefaultItem, defaultItemText);
-        }
-
-        /// <summary>
-        /// Prepare available warehouses
-        /// </summary>
-        /// <param name="items">Warehouse items</param>
-        /// <param name="withSpecialDefaultItem">Whether to insert the first special item for the default value</param>
-        /// <param name="defaultItemText">Default item text; pass null to use default value of the default item text</param>
-        public virtual void PrepareWarehouses(IList<SelectListItem> items, bool withSpecialDefaultItem = true, string defaultItemText = null)
-        {
-            if (items == null)
-                throw new ArgumentNullException(nameof(items));
-
-            //prepare available warehouses
-            var availableWarehouses = _shippingService.GetAllWarehouses();
-            foreach (var warehouse in availableWarehouses)
-            {
-                items.Add(new SelectListItem { Value = warehouse.Id.ToString(), Text = warehouse.Name });
-            }
-
-            //insert special item for the default value
-            PrepareDefaultItem(items, withSpecialDefaultItem, defaultItemText);
-        }
-
-        /// <summary>
-        /// Prepare available delivery dates
-        /// </summary>
-        /// <param name="items">Delivery date items</param>
-        /// <param name="withSpecialDefaultItem">Whether to insert the first special item for the default value</param>
-        /// <param name="defaultItemText">Default item text; pass null to use default value of the default item text</param>
-        public virtual void PrepareDeliveryDates(IList<SelectListItem> items, bool withSpecialDefaultItem = true, string defaultItemText = null)
-        {
-            if (items == null)
-                throw new ArgumentNullException(nameof(items));
-
-            //prepare available delivery dates
-            var availableDeliveryDates = _dateRangeService.GetAllDeliveryDates();
-            foreach (var date in availableDeliveryDates)
-            {
-                items.Add(new SelectListItem { Value = date.Id.ToString(), Text = date.Name });
-            }
-
-            //insert special item for the default value
-            PrepareDefaultItem(items, withSpecialDefaultItem, defaultItemText);
-        }
-
-        /// <summary>
-        /// Prepare available product availability ranges
-        /// </summary>
-        /// <param name="items">Product availability range items</param>
-        /// <param name="withSpecialDefaultItem">Whether to insert the first special item for the default value</param>
-        /// <param name="defaultItemText">Default item text; pass null to use default value of the default item text</param>
-        public virtual void PrepareProductAvailabilityRanges(IList<SelectListItem> items,
-            bool withSpecialDefaultItem = true, string defaultItemText = null)
-        {
-            if (items == null)
-                throw new ArgumentNullException(nameof(items));
-
-            //prepare available product availability ranges
-            var availableProductAvailabilityRanges = _dateRangeService.GetAllProductAvailabilityRanges();
-            foreach (var range in availableProductAvailabilityRanges)
-            {
-                items.Add(new SelectListItem { Value = range.Id.ToString(), Text = range.Name });
             }
 
             //insert special item for the default value

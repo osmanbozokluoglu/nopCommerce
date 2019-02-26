@@ -38,7 +38,6 @@ namespace Nop.Web.Areas.Admin.Factories
         private readonly AdminAreaSettings _adminAreaSettings;
         private readonly ICommonModelFactory _commonModelFactory;
         private readonly IHttpContextAccessor _httpContextAccessor;
-        private readonly IOrderModelFactory _orderModelFactory;
         private readonly ISettingService _settingService;
         private readonly IStaticCacheManager _cacheManager;
         private readonly IWebHelper _webHelper;
@@ -51,7 +50,6 @@ namespace Nop.Web.Areas.Admin.Factories
         public HomeModelFactory(AdminAreaSettings adminAreaSettings,
             ICommonModelFactory commonModelFactory,
             IHttpContextAccessor httpContextAccessor,
-            IOrderModelFactory orderModelFactory,
             ISettingService settingService,
             IStaticCacheManager cacheManager,
             IWebHelper webHelper,
@@ -60,7 +58,6 @@ namespace Nop.Web.Areas.Admin.Factories
             this._adminAreaSettings = adminAreaSettings;
             this._commonModelFactory = commonModelFactory;
             this._httpContextAccessor = httpContextAccessor;
-            this._orderModelFactory = orderModelFactory;
             this._settingService = settingService;
             this._cacheManager = cacheManager;
             this._webHelper = webHelper;
@@ -85,8 +82,6 @@ namespace Nop.Web.Areas.Admin.Factories
 
             //prepare nested search models
             _commonModelFactory.PreparePopularSearchTermSearchModel(model.PopularSearchTerms);
-            _orderModelFactory.PrepareBestsellerBriefSearchModel(model.BestsellersByAmount);
-            _orderModelFactory.PrepareBestsellerBriefSearchModel(model.BestsellersByQuantity);
 
             return model;
         }

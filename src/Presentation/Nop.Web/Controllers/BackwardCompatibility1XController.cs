@@ -20,7 +20,6 @@ namespace Nop.Web.Controllers
         private readonly ICategoryService _categoryService;
         private readonly ICustomerService _customerService;
         private readonly IForumService _forumService;
-        private readonly IManufacturerService _manufacturerService;
         private readonly INewsService _newsService;
         private readonly IProductService _productService;
         private readonly IProductTagService _productTagService;
@@ -36,7 +35,6 @@ namespace Nop.Web.Controllers
             ICategoryService categoryService,
             ICustomerService customerService,
             IForumService forumService,
-            IManufacturerService manufacturerService,
             INewsService newsService,
             IProductService productService,
             IProductTagService productTagService,
@@ -48,7 +46,6 @@ namespace Nop.Web.Controllers
             this._categoryService = categoryService;
             this._customerService = customerService;
             this._forumService = forumService;
-            this._manufacturerService = manufacturerService;
             this._newsService = newsService;
             this._productService = productService;
             this._productTagService = productTagService;
@@ -79,10 +76,6 @@ namespace Nop.Web.Controllers
                 case "category":
                     {
                         return RedirectCategory(_webHelper.QueryString<string>("categoryid"), false);
-                    }
-                case "manufacturer":
-                    {
-                        return RedirectManufacturer(_webHelper.QueryString<string>("manufacturerid"), false);
                     }
                 case "producttag":
                     {
@@ -182,16 +175,6 @@ namespace Nop.Web.Controllers
             return RedirectToRoutePermanent("Category", new { SeName = _urlRecordService.GetSeName(category) });
         }
 
-        public virtual IActionResult RedirectManufacturer(string id, bool idIncludesSename = true)
-        {
-            //we can't use dash in MVC
-            var manufacturerId = idIncludesSename ? Convert.ToInt32(id.Split(new[] { '-' })[0]) : Convert.ToInt32(id);
-            var manufacturer = _manufacturerService.GetManufacturerById(manufacturerId);
-            if (manufacturer == null)
-                return RedirectToRoutePermanent("HomePage");
-
-            return RedirectToRoutePermanent("Manufacturer", new { SeName = _urlRecordService.GetSeName(manufacturer) });
-        }
 
         public virtual IActionResult RedirectProductTag(string id, bool idIncludesSename = true)
         {

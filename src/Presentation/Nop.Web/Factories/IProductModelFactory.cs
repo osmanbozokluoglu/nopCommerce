@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using Nop.Core.Domain.Catalog;
-using Nop.Core.Domain.Orders;
+
 using Nop.Web.Models.Catalog;
 
 namespace Nop.Web.Factories
@@ -32,14 +32,6 @@ namespace Nop.Web.Factories
             int? productThumbPictureSize = null, bool prepareSpecificationAttributes = false,
             bool forceRedirectionAfterAddingToCart = false);
 
-        /// <summary>
-        /// Prepare the product details model
-        /// </summary>
-        /// <param name="product">Product</param>
-        /// <param name="updatecartitem">Updated shopping cart item</param>
-        /// <param name="isAssociatedProduct">Whether the product is associated</param>
-        /// <returns>Product details model</returns>
-        ProductDetailsModel PrepareProductDetailsModel(Product product, ShoppingCartItem updatecartitem = null, bool isAssociatedProduct = false);
 
         /// <summary>
         /// Prepare the product reviews model

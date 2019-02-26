@@ -9,8 +9,8 @@ using Nop.Core.Data;
 using Nop.Core.Data.Extensions;
 using Nop.Core.Domain.Common;
 using Nop.Core.Domain.Customers;
-using Nop.Core.Domain.Orders;
-using Nop.Core.Domain.Shipping;
+
+
 using Nop.Core.Domain.Tax;
 using Nop.Core.Infrastructure;
 using Nop.Data;
@@ -109,7 +109,7 @@ namespace Nop.Services.Customers
             string firstName = null, string lastName = null,
             int dayOfBirth = 0, int monthOfBirth = 0,
             string company = null, string phone = null, string zipPostalCode = null,
-            string ipAddress = null, bool loadOnlyWithShoppingCart = false, ShoppingCartType? sct = null,
+            string ipAddress = null, bool loadOnlyWithShoppingCart = false,
             int pageIndex = 0, int pageSize = int.MaxValue, bool getOnlyTotalCount = false)
         {
             var query = _customerRepository.Table;
@@ -233,17 +233,6 @@ namespace Nop.Services.Customers
             if (!string.IsNullOrWhiteSpace(ipAddress) && CommonHelper.IsValidIpAddress(ipAddress))
             {
                 query = query.Where(w => w.LastIpAddress == ipAddress);
-            }
-
-            if (loadOnlyWithShoppingCart)
-            {
-                int? sctId = null;
-                if (sct.HasValue)
-                    sctId = (int)sct.Value;
-
-                query = sct.HasValue ?
-                    query.Where(c => c.ShoppingCartItems.Any(x => x.ShoppingCartTypeId == sctId)) :
-                    query.Where(c => c.ShoppingCartItems.Any());
             }
 
             query = query.OrderByDescending(c => c.CreatedOnUtc);
@@ -467,60 +456,6 @@ namespace Nop.Services.Customers
 
             //event notification
             _eventPublisher.EntityUpdated(customer);
-        }
-
-        /// <summary>
-        /// Reset data required for checkout
-        /// </summary>
-        /// <param name="customer">Customer</param>
-        /// <param name="storeId">Store identifier</param>
-        /// <param name="clearCouponCodes">A value indicating whether to clear coupon code</param>
-        /// <param name="clearCheckoutAttributes">A value indicating whether to clear selected checkout attributes</param>
-        /// <param name="clearRewardPoints">A value indicating whether to clear "Use reward points" flag</param>
-        /// <param name="clearShippingMethod">A value indicating whether to clear selected shipping method</param>
-        /// <param name="clearPaymentMethod">A value indicating whether to clear selected payment method</param>
-        public virtual void ResetCheckoutData(Customer customer, int storeId,
-            bool clearCouponCodes = false, bool clearCheckoutAttributes = false,
-            bool clearRewardPoints = true, bool clearShippingMethod = true,
-            bool clearPaymentMethod = true)
-        {
-            if (customer == null)
-                throw new ArgumentNullException();
-
-            //clear entered coupon codes
-            if (clearCouponCodes)
-            {
-                _genericAttributeService.SaveAttribute<string>(customer, NopCustomerDefaults.DiscountCouponCodeAttribute, null);
-                _genericAttributeService.SaveAttribute<string>(customer, NopCustomerDefaults.GiftCardCouponCodesAttribute, null);
-            }
-
-            //clear checkout attributes
-            if (clearCheckoutAttributes)
-            {
-                _genericAttributeService.SaveAttribute<string>(customer, NopCustomerDefaults.CheckoutAttributes, null, storeId);
-            }
-
-            //clear reward points flag
-            if (clearRewardPoints)
-            {
-                _genericAttributeService.SaveAttribute(customer, NopCustomerDefaults.UseRewardPointsDuringCheckoutAttribute, false, storeId);
-            }
-
-            //clear selected shipping method
-            if (clearShippingMethod)
-            {
-                _genericAttributeService.SaveAttribute<ShippingOption>(customer, NopCustomerDefaults.SelectedShippingOptionAttribute, null, storeId);
-                _genericAttributeService.SaveAttribute<ShippingOption>(customer, NopCustomerDefaults.OfferedShippingOptionsAttribute, null, storeId);
-                _genericAttributeService.SaveAttribute<PickupPoint>(customer, NopCustomerDefaults.SelectedPickupPointAttribute, null, storeId);
-            }
-
-            //clear selected payment method
-            if (clearPaymentMethod)
-            {
-                _genericAttributeService.SaveAttribute<string>(customer, NopCustomerDefaults.SelectedPaymentMethodAttribute, null, storeId);
-            }
-
-            UpdateCustomer(customer);
         }
 
         /// <summary>
@@ -1182,6 +1117,11 @@ namespace Nop.Services.Customers
             });
 
             return currentLifetime >= _customerSettings.PasswordLifetime;
+        }
+
+        public void ResetCheckoutData(Customer customer, int storeId, bool clearCouponCodes = false, bool clearCheckoutAttributes = false, bool clearRewardPoints = true, bool clearShippingMethod = true, bool clearPaymentMethod = true)
+        {
+            throw new NotImplementedException();
         }
 
         #endregion

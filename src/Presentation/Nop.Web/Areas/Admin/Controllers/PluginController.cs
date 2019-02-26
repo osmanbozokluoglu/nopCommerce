@@ -5,8 +5,6 @@ using Microsoft.AspNetCore.Mvc;
 using Nop.Core;
 using Nop.Core.Domain.Cms;
 using Nop.Core.Domain.Customers;
-using Nop.Core.Domain.Payments;
-using Nop.Core.Domain.Shipping;
 using Nop.Core.Domain.Tax;
 using Nop.Core.Plugins;
 using Nop.Services.Authentication.External;
@@ -16,12 +14,9 @@ using Nop.Services.Events;
 using Nop.Services.Localization;
 using Nop.Services.Logging;
 using Nop.Services.Messages;
-using Nop.Services.Payments;
 using Nop.Services.Plugins;
 using Nop.Services.Security;
-using Nop.Services.Shipping;
-using Nop.Services.Shipping.Pickup;
-using Nop.Services.Tax;
+
 using Nop.Services.Themes;
 using Nop.Web.Areas.Admin.Factories;
 using Nop.Web.Areas.Admin.Models.Plugins;
@@ -39,18 +34,14 @@ namespace Nop.Web.Areas.Admin.Controllers
         private readonly IExternalAuthenticationService _externalAuthenticationService;
         private readonly ILocalizationService _localizationService;
         private readonly INotificationService _notificationService;
-        private readonly IPaymentService _paymentService;
         private readonly IPermissionService _permissionService;
         private readonly IPluginModelFactory _pluginModelFactory;
         private readonly IPluginService _pluginService;
         private readonly ISettingService _settingService;
-        private readonly IShippingService _shippingService;
         private readonly IUploadService _uploadService;
         private readonly IWebHelper _webHelper;
         private readonly IWidgetService _widgetService;
         private readonly IWorkContext _workContext;
-        private readonly PaymentSettings _paymentSettings;
-        private readonly ShippingSettings _shippingSettings;
         private readonly TaxSettings _taxSettings;
         private readonly WidgetSettings _widgetSettings;
 
@@ -64,18 +55,14 @@ namespace Nop.Web.Areas.Admin.Controllers
             IExternalAuthenticationService externalAuthenticationService,
             ILocalizationService localizationService,
             INotificationService notificationService,
-            IPaymentService paymentService,
             IPermissionService permissionService,
             IPluginModelFactory pluginModelFactory,
             IPluginService pluginService,
             ISettingService settingService,
-            IShippingService shippingService,
             IUploadService uploadService,
             IWebHelper webHelper,
             IWidgetService widgetService,
             IWorkContext workContext,
-            PaymentSettings paymentSettings,
-            ShippingSettings shippingSettings,
             TaxSettings taxSettings,
             WidgetSettings widgetSettings)
         {
@@ -85,18 +72,14 @@ namespace Nop.Web.Areas.Admin.Controllers
             this._externalAuthenticationService = externalAuthenticationService;
             this._localizationService = localizationService;
             this._notificationService = notificationService;
-            this._paymentService = paymentService;
             this._permissionService = permissionService;
             this._pluginModelFactory = pluginModelFactory;
             this._pluginService = pluginService;
             this._settingService = settingService;
-            this._shippingService = shippingService;
             this._uploadService = uploadService;
             this._webHelper = webHelper;
             this._widgetService = widgetService;
             this._workContext = workContext;
-            this._paymentSettings = paymentSettings;
-            this._shippingSettings = shippingSettings;
             this._taxSettings = taxSettings;
             this._widgetSettings = widgetSettings;
         }
@@ -404,70 +387,6 @@ namespace Nop.Web.Areas.Admin.Controllers
 
                 switch (pluginInstance)
                 {
-                    case IPaymentMethod paymentMethod:
-                        if (_paymentService.IsPaymentMethodActive(paymentMethod) && !model.IsEnabled)
-                        {
-                            //mark as disabled
-                            _paymentSettings.ActivePaymentMethodSystemNames.Remove(pluginDescriptor.SystemName);
-                            _settingService.SaveSetting(_paymentSettings);
-                            break;
-                        }
-
-                        if (!_paymentService.IsPaymentMethodActive(paymentMethod) && model.IsEnabled)
-                        {
-                            //mark as enabled
-                            _paymentSettings.ActivePaymentMethodSystemNames.Add(pluginDescriptor.SystemName);
-                            _settingService.SaveSetting(_paymentSettings);
-                        }
-
-                        break;
-                    case IShippingRateComputationMethod shippingRateComputationMethod:
-                        if (_shippingService.IsShippingRateComputationMethodActive(shippingRateComputationMethod) && !model.IsEnabled)
-                        {
-                            //mark as disabled
-                            _shippingSettings.ActiveShippingRateComputationMethodSystemNames.Remove(pluginDescriptor.SystemName);
-                            _settingService.SaveSetting(_shippingSettings);
-                            break;
-                        }
-
-                        if (!_shippingService.IsShippingRateComputationMethodActive(shippingRateComputationMethod) && model.IsEnabled)
-                        {
-                            //mark as enabled
-                            _shippingSettings.ActiveShippingRateComputationMethodSystemNames.Add(pluginDescriptor.SystemName);
-                            _settingService.SaveSetting(_shippingSettings);
-                        }
-
-                        break;
-                    case IPickupPointProvider pickupPointProvider:
-                        if (_shippingService.IsPickupPointProviderActive(pickupPointProvider) && !model.IsEnabled)
-                        {
-                            //mark as disabled
-                            _shippingSettings.ActivePickupPointProviderSystemNames.Remove(pluginDescriptor.SystemName);
-                            _settingService.SaveSetting(_shippingSettings);
-                            break;
-                        }
-
-                        if (!_shippingService.IsPickupPointProviderActive(pickupPointProvider) && model.IsEnabled)
-                        {
-                            //mark as enabled
-                            _shippingSettings.ActivePickupPointProviderSystemNames.Add(pluginDescriptor.SystemName);
-                            _settingService.SaveSetting(_shippingSettings);
-                        }
-
-                        break;
-                    case ITaxProvider _:
-                        if (!model.IsEnabled)
-                        {
-                            //mark as disabled
-                            _taxSettings.ActiveTaxProviderSystemName = string.Empty;
-                            _settingService.SaveSetting(_taxSettings);
-                            break;
-                        }
-
-                        //mark as enabled
-                        _taxSettings.ActiveTaxProviderSystemName = model.SystemName;
-                        _settingService.SaveSetting(_taxSettings);
-                        break;
                     case IExternalAuthenticationMethod externalAuthenticationMethod:
                         if (_externalAuthenticationService.IsExternalAuthenticationMethodActive(externalAuthenticationMethod) && !model.IsEnabled)
                         {

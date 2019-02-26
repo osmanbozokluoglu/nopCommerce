@@ -15,7 +15,7 @@ using Nop.Core.Domain.Catalog;
 using Nop.Core.Domain.Common;
 using Nop.Core.Domain.Customers;
 using Nop.Core.Domain.Directory;
-using Nop.Core.Domain.Orders;
+
 using Nop.Core.Domain.Tax;
 using Nop.Core.Infrastructure;
 using Nop.Core.Plugins;
@@ -27,14 +27,9 @@ using Nop.Services.Customers;
 using Nop.Services.Directory;
 using Nop.Services.Helpers;
 using Nop.Services.Localization;
-using Nop.Services.Orders;
-using Nop.Services.Payments;
 using Nop.Services.Plugins;
 using Nop.Services.Seo;
-using Nop.Services.Shipping;
-using Nop.Services.Shipping.Pickup;
 using Nop.Services.Stores;
-using Nop.Services.Tax;
 using Nop.Web.Areas.Admin.Infrastructure.Mapper.Extensions;
 using Nop.Web.Areas.Admin.Models.Common;
 using Nop.Web.Areas.Admin.Models.Localization;
@@ -77,13 +72,9 @@ namespace Nop.Web.Areas.Admin.Factories
         private readonly IMaintenanceService _maintenanceService;
         private readonly IMeasureService _measureService;
         private readonly INopFileProvider _fileProvider;
-        private readonly IOrderService _orderService;
-        private readonly IPaymentService _paymentService;
         private readonly IPluginService _pluginService;
         private readonly IProductService _productService;
-        private readonly IReturnRequestService _returnRequestService;
         private readonly ISearchTermService _searchTermService;
-        private readonly IShippingService _shippingService;
         private readonly IStoreContext _storeContext;
         private readonly IStoreService _storeService;
         private readonly IUrlHelperFactory _urlHelperFactory;
@@ -112,13 +103,9 @@ namespace Nop.Web.Areas.Admin.Factories
             ILocalizationService localizationService,
             IMaintenanceService maintenanceService,
             IMeasureService measureService,
-            IOrderService orderService,
-            IPaymentService paymentService,
             IPluginService pluginService,
             IProductService productService,
-            IReturnRequestService returnRequestService,
             ISearchTermService searchTermService,
-            IShippingService shippingService,
             IStoreContext storeContext,
             IStoreService storeService,
             IUrlHelperFactory urlHelperFactory,
@@ -143,13 +130,9 @@ namespace Nop.Web.Areas.Admin.Factories
             this._localizationService = localizationService;
             this._maintenanceService = maintenanceService;
             this._measureService = measureService;
-            this._orderService = orderService;
-            this._paymentService = paymentService;
             this._pluginService = pluginService;
             this._productService = productService;
-            this._returnRequestService = returnRequestService;
             this._searchTermService = searchTermService;
-            this._shippingService = shippingService;
             this._storeContext = storeContext;
             this._storeService = storeService;
             this._urlHelperFactory = urlHelperFactory;
@@ -380,33 +363,6 @@ namespace Nop.Web.Areas.Admin.Factories
         }
 
         /// <summary>
-        /// Prepare payment methods warning model
-        /// </summary>
-        /// <param name="models">List of system warning models</param>
-        protected virtual void PreparePaymentMethodsWarningModel(IList<SystemWarningModel> models)
-        {
-            if (models == null)
-                throw new ArgumentNullException(nameof(models));
-
-            //check whether payment methods activated
-            if (_paymentService.LoadActivePaymentMethods().Any())
-            {
-                models.Add(new SystemWarningModel
-                {
-                    Level = SystemWarningLevel.Pass,
-                    Text = _localizationService.GetResource("Admin.System.Warnings.PaymentMethods.OK")
-                });
-                return;
-            }
-
-            models.Add(new SystemWarningModel
-            {
-                Level = SystemWarningLevel.Fail,
-                Text = _localizationService.GetResource("Admin.System.Warnings.PaymentMethods.NoActive")
-            });
-        }
-
-        /// <summary>
         /// Prepare plugins warning model
         /// </summary>
         /// <param name="models">List of system warning models</param>
@@ -565,24 +521,6 @@ namespace Nop.Web.Areas.Admin.Factories
 
                 switch (plugin)
                 {
-                    case IPaymentMethod paymentMethod:
-                        isEnabled = _paymentService.IsPaymentMethodActive(paymentMethod);
-                        break;
-
-                    case IShippingRateComputationMethod shippingRateComputationMethod:
-                        isEnabled =
-                            _shippingService.IsShippingRateComputationMethodActive(shippingRateComputationMethod);
-                        break;
-
-                    case IPickupPointProvider pickupPointProvider:
-                        isEnabled = _shippingService.IsPickupPointProviderActive(pickupPointProvider);
-                        break;
-
-                    case ITaxProvider _:
-                        isEnabled = plugin.PluginDescriptor.SystemName
-                            .Equals(_taxSettings.ActiveTaxProviderSystemName, StringComparison.InvariantCultureIgnoreCase);
-                        break;
-
                     case IExternalAuthenticationMethod externalAuthenticationMethod:
                         isEnabled = _externalAuthenticationService.IsExternalAuthenticationMethodActive(externalAuthenticationMethod);
                         break;
@@ -703,9 +641,6 @@ namespace Nop.Web.Areas.Admin.Factories
 
             //base dimension weight
             PrepareBaseDimensionWarningModel(models);
-
-            //payment methods
-            PreparePaymentMethodsWarningModel(models);
 
             //incompatible plugins
             PreparePluginsWarningModel(models);
@@ -921,32 +856,6 @@ namespace Nop.Web.Areas.Admin.Factories
                 }),
                 Total = searchTermRecordLines.TotalCount
             };
-
-            return model;
-        }
-
-        /// <summary>
-        /// Prepare common statistics model
-        /// </summary>
-        /// <returns>Common statistics model</returns>
-        public virtual CommonStatisticsModel PrepareCommonStatisticsModel()
-        {
-            var model = new CommonStatisticsModel
-            {
-                NumberOfOrders = _orderService.SearchOrders(pageIndex: 0, pageSize: 1, getOnlyTotalCount: true).TotalCount
-            };
-
-            var customerRoleIds = new[] { _customerService.GetCustomerRoleBySystemName(NopCustomerDefaults.RegisteredRoleName).Id };
-            model.NumberOfCustomers = _customerService.GetAllCustomers(customerRoleIds: customerRoleIds,
-                pageIndex: 0, pageSize: 1, getOnlyTotalCount: true).TotalCount;
-
-            var returnRequestStatus = ReturnRequestStatus.Pending;
-            model.NumberOfPendingReturnRequests = _returnRequestService.SearchReturnRequests(rs: returnRequestStatus,
-                pageIndex: 0, pageSize: 1, getOnlyTotalCount: true).TotalCount;
-
-            model.NumberOfLowStockProducts =
-                _productService.GetLowStockProducts(getOnlyTotalCount: true).TotalCount +
-                _productService.GetLowStockProductCombinations(getOnlyTotalCount: true).TotalCount;
 
             return model;
         }

@@ -16,7 +16,6 @@ namespace Nop.Web.Areas.Admin.Factories
         #region Fields
 
         private readonly ICategoryTemplateService _categoryTemplateService;
-        private readonly IManufacturerTemplateService _manufacturerTemplateService;
         private readonly IProductTemplateService _productTemplateService;
         private readonly ITopicTemplateService _topicTemplateService;
 
@@ -25,12 +24,10 @@ namespace Nop.Web.Areas.Admin.Factories
         #region Ctor
 
         public TemplateModelFactory(ICategoryTemplateService categoryTemplateService,
-            IManufacturerTemplateService manufacturerTemplateService,
             IProductTemplateService productTemplateService,
             ITopicTemplateService topicTemplateService)
         {
             this._categoryTemplateService = categoryTemplateService;
-            this._manufacturerTemplateService = manufacturerTemplateService;
             this._productTemplateService = productTemplateService;
             this._topicTemplateService = topicTemplateService;
         }
@@ -51,7 +48,6 @@ namespace Nop.Web.Areas.Admin.Factories
 
             //prepare nested search models
             PrepareCategoryTemplateSearchModel(model.TemplatesCategory);
-            PrepareManufacturerTemplateSearchModel(model.TemplatesManufacturer);
             PrepareProductTemplateSearchModel(model.TemplatesProduct);
             PrepareTopicTemplateSearchModel(model.TemplatesTopic);
 
@@ -98,46 +94,6 @@ namespace Nop.Web.Areas.Admin.Factories
             return model;
         }
 
-        /// <summary>
-        /// Prepare manufacturer template search model
-        /// </summary>
-        /// <param name="searchModel">Manufacturer template search model</param>
-        /// <returns>Manufacturer template search model</returns>
-        public virtual ManufacturerTemplateSearchModel PrepareManufacturerTemplateSearchModel(ManufacturerTemplateSearchModel searchModel)
-        {
-            if (searchModel == null)
-                throw new ArgumentNullException(nameof(searchModel));
-
-            //prepare page parameters
-            searchModel.SetGridPageSize();
-
-            return searchModel;
-        }
-
-        /// <summary>
-        /// Prepare paged manufacturer template list model
-        /// </summary>
-        /// <param name="searchModel">Manufacturer template search model</param>
-        /// <returns>Manufacturer template list model</returns>
-        public virtual ManufacturerTemplateListModel PrepareManufacturerTemplateListModel(ManufacturerTemplateSearchModel searchModel)
-        {
-            if (searchModel == null)
-                throw new ArgumentNullException(nameof(searchModel));
-
-            //get manufacturer templates
-            var manufacturerTemplates = _manufacturerTemplateService.GetAllManufacturerTemplates();
-
-            //prepare grid model
-            var model = new ManufacturerTemplateListModel
-            {
-                //fill in model values from the entity
-                Data = manufacturerTemplates.PaginationByRequestModel(searchModel)
-                    .Select(template => template.ToModel<ManufacturerTemplateModel>()),
-                Total = manufacturerTemplates.Count
-            };
-
-            return model;
-        }
 
         /// <summary>
         /// Prepare product template search model

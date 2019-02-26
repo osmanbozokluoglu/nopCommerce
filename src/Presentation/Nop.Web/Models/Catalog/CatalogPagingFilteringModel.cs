@@ -194,63 +194,7 @@ namespace Nop.Web.Models.Catalog
                 return null;
             }
 
-            /// <summary>
-            /// Load price range filters
-            /// </summary>
-            /// <param name="priceRangeStr">Price range in string format</param>
-            /// <param name="webHelper">Web helper</param>
-            /// <param name="priceFormatter">Price formatter</param>
-            public virtual void LoadPriceRangeFilters(string priceRangeStr, IWebHelper webHelper, IPriceFormatter priceFormatter)
-            {
-                var priceRangeList = GetPriceRangeList(priceRangeStr);
-                if (priceRangeList.Any())
-                {
-                    this.Enabled = true;
-
-                    var selectedPriceRange = GetSelectedPriceRange(webHelper, priceRangeStr);
-
-                    this.Items = priceRangeList.ToList().Select(x =>
-                    {
-                        //from&to
-                        var item = new PriceRangeFilterItem();
-                        if (x.From.HasValue)
-                            item.From = priceFormatter.FormatPrice(x.From.Value, true, false);
-                        if (x.To.HasValue)
-                            item.To = priceFormatter.FormatPrice(x.To.Value, true, false);
-                        var fromQuery = string.Empty;
-                        if (x.From.HasValue)
-                            fromQuery = x.From.Value.ToString(new CultureInfo("en-US"));
-                        var toQuery = string.Empty;
-                        if (x.To.HasValue)
-                            toQuery = x.To.Value.ToString(new CultureInfo("en-US"));
-
-                        //is selected?
-                        if (selectedPriceRange != null
-                            && selectedPriceRange.From == x.From
-                            && selectedPriceRange.To == x.To)
-                            item.Selected = true;
-
-                        //filter URL
-                        var url = webHelper.ModifyQueryString(webHelper.GetThisPageUrl(true), QUERYSTRINGPARAM, $"{fromQuery}-{toQuery}");
-                        url = ExcludeQueryStringParams(url, webHelper);
-                        item.FilterUrl = url;
-
-                        return item;
-                    }).ToList();
-
-                    if (selectedPriceRange != null)
-                    {
-                        //remove filter URL
-                        var url = webHelper.RemoveQueryString(webHelper.GetThisPageUrl(true), QUERYSTRINGPARAM);
-                        url = ExcludeQueryStringParams(url, webHelper);
-                        this.RemoveFilterUrl = url;
-                    }
-                }
-                else
-                {
-                    this.Enabled = false;
-                }
-            }
+          
             
             #endregion
 

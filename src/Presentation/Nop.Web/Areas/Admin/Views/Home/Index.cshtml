@@ -35,12 +35,12 @@
             {
                 <div class="row">
                     <div class="col-md-12">
-                        @await Component.InvokeAsync("CommonStatistics")
+                        @*@await Component.InvokeAsync("CommonStatistics")*@
                     </div>
                 </div>
             }
             @await Component.InvokeAsync("AdminWidget", new { widgetZone = AdminWidgetZones.DashboardCommonstatisticsAfter })
-            @if (!Model.IsLoggedInAsVendor && (canManageOrders || canManageCustomers))
+            @*@if (!Model.IsLoggedInAsVendor && (canManageOrders || canManageCustomers))
             {
                 <div class="row">
                     @if (!Model.IsLoggedInAsVendor && canManageOrders)
@@ -56,9 +56,9 @@
                         </div>
                     }
                 </div>
-            }
+            }*@
             @await Component.InvokeAsync("AdminWidget", new { widgetZone = AdminWidgetZones.DashboardCustomerorderchartsAfter })
-            @if (!Model.IsLoggedInAsVendor && canManageOrders)
+            @*@if (!Model.IsLoggedInAsVendor && canManageOrders)
             {
                 <div class="row">
                     <div class="col-md-8">
@@ -68,9 +68,9 @@
                         @await Html.PartialAsync("_OrderIncompleteReport")
                     </div>
                 </div>
-            }
+            }*@
             @await Component.InvokeAsync("AdminWidget", new { widgetZone = AdminWidgetZones.DashboardOrderreportsAfter })
-            @if (!Model.IsLoggedInAsVendor && (canManageOrders || canManageProducts))
+            @*@if (!Model.IsLoggedInAsVendor && (canManageOrders || canManageProducts))
             {
                 <div class="row">
                     @if (canManageOrders)
@@ -86,9 +86,9 @@
                         }
                     </div>
                 </div>
-            }
+            }*@
             @await Component.InvokeAsync("AdminWidget", new { widgetZone = AdminWidgetZones.DashboardLatestordersSearchtermsAfter })
-            @if (canManageOrders)
+            @*@if (canManageOrders)
             {
                 <div class="row">
                     <div class="col-md-6">
@@ -98,7 +98,7 @@
                         @await Html.PartialAsync("_BestsellersBriefReportByAmount", Model.BestsellersByAmount)
                     </div>
                 </div>
-            }
+            }*@
             @await Component.InvokeAsync("AdminWidget", new { widgetZone = AdminWidgetZones.DashboardBottom })
         </div>
     </div>

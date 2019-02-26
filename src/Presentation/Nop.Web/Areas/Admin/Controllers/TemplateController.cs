@@ -18,7 +18,6 @@ namespace Nop.Web.Areas.Admin.Controllers
         #region Fields
 
         private readonly ICategoryTemplateService _categoryTemplateService;
-        private readonly IManufacturerTemplateService _manufacturerTemplateService;
         private readonly IPermissionService _permissionService;
         private readonly IProductTemplateService _productTemplateService;
         private readonly ITemplateModelFactory _templateModelFactory;
@@ -29,14 +28,12 @@ namespace Nop.Web.Areas.Admin.Controllers
         #region Ctor
 
         public TemplateController(ICategoryTemplateService categoryTemplateService,
-            IManufacturerTemplateService manufacturerTemplateService,
             IPermissionService permissionService,
             IProductTemplateService productTemplateService,
             ITemplateModelFactory templateModelFactory,
             ITopicTemplateService topicTemplateService)
         {
             this._categoryTemplateService = categoryTemplateService;
-            this._manufacturerTemplateService = manufacturerTemplateService;
             this._permissionService = permissionService;
             this._productTemplateService = productTemplateService;
             this._templateModelFactory = templateModelFactory;
@@ -123,73 +120,7 @@ namespace Nop.Web.Areas.Admin.Controllers
         }
 
         #endregion
-
-        #region Manufacturer templates        
-
-        [HttpPost]
-        public virtual IActionResult ManufacturerTemplates(ManufacturerTemplateSearchModel searchModel)
-        {
-            if (!_permissionService.Authorize(StandardPermissionProvider.ManageMaintenance))
-                return AccessDeniedKendoGridJson();
-
-            //prepare model
-            var model = _templateModelFactory.PrepareManufacturerTemplateListModel(searchModel);
-
-            return Json(model);
-        }
-
-        [HttpPost]
-        public virtual IActionResult ManufacturerTemplateUpdate(ManufacturerTemplateModel model)
-        {
-            if (!_permissionService.Authorize(StandardPermissionProvider.ManageMaintenance))
-                return AccessDeniedView();
-
-            if (!ModelState.IsValid)
-                return Json(new DataSourceResult { Errors = ModelState.SerializeErrors() });
-
-            //try to get a manufacturer template with the specified id
-            var template = _manufacturerTemplateService.GetManufacturerTemplateById(model.Id)
-                ?? throw new ArgumentException("No template found with the specified id");
-
-            template = model.ToEntity(template);
-            _manufacturerTemplateService.UpdateManufacturerTemplate(template);
-
-            return new NullJsonResult();
-        }
-
-        [HttpPost]
-        public virtual IActionResult ManufacturerTemplateAdd(ManufacturerTemplateModel model)
-        {
-            if (!_permissionService.Authorize(StandardPermissionProvider.ManageMaintenance))
-                return AccessDeniedView();
-
-            if (!ModelState.IsValid)
-                return Json(new DataSourceResult { Errors = ModelState.SerializeErrors() });
-
-            var template = new ManufacturerTemplate();
-            template = model.ToEntity(template);
-            _manufacturerTemplateService.InsertManufacturerTemplate(template);
-
-            return new NullJsonResult();
-        }
-
-        [HttpPost]
-        public virtual IActionResult ManufacturerTemplateDelete(int id)
-        {
-            if (!_permissionService.Authorize(StandardPermissionProvider.ManageMaintenance))
-                return AccessDeniedView();
-
-            //try to get a manufacturer template with the specified id
-            var template = _manufacturerTemplateService.GetManufacturerTemplateById(id)
-                ?? throw new ArgumentException("No template found with the specified id");
-
-            _manufacturerTemplateService.DeleteManufacturerTemplate(template);
-
-            return new NullJsonResult();
-        }
-
-        #endregion
-
+        
         #region Product templates
                 
         [HttpPost]

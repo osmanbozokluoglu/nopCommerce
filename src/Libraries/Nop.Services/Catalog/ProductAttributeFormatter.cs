@@ -4,12 +4,11 @@ using System.Text;
 using Nop.Core;
 using Nop.Core.Domain.Catalog;
 using Nop.Core.Domain.Customers;
-using Nop.Core.Domain.Orders;
+
 using Nop.Core.Html;
 using Nop.Services.Directory;
 using Nop.Services.Localization;
 using Nop.Services.Media;
-using Nop.Services.Tax;
 
 namespace Nop.Services.Catalog
 {
@@ -23,13 +22,9 @@ namespace Nop.Services.Catalog
         private readonly ICurrencyService _currencyService;
         private readonly IDownloadService _downloadService;
         private readonly ILocalizationService _localizationService;
-        private readonly IPriceCalculationService _priceCalculationService;
-        private readonly IPriceFormatter _priceFormatter;
         private readonly IProductAttributeParser _productAttributeParser;
-        private readonly ITaxService _taxService;
         private readonly IWebHelper _webHelper;
         private readonly IWorkContext _workContext;
-        private readonly ShoppingCartSettings _shoppingCartSettings;
 
         #endregion
 
@@ -38,24 +33,16 @@ namespace Nop.Services.Catalog
         public ProductAttributeFormatter(ICurrencyService currencyService,
             IDownloadService downloadService,
             ILocalizationService localizationService,
-            IPriceCalculationService priceCalculationService,
-            IPriceFormatter priceFormatter,
             IProductAttributeParser productAttributeParser,
-            ITaxService taxService,
             IWebHelper webHelper,
-            IWorkContext workContext,
-            ShoppingCartSettings shoppingCartSettings)
+            IWorkContext workContext)
         {
             this._currencyService = currencyService;
             this._downloadService = downloadService;
             this._localizationService = localizationService;
-            this._priceCalculationService = priceCalculationService;
-            this._priceFormatter = priceFormatter;
             this._productAttributeParser = productAttributeParser;
-            this._taxService = taxService;
             this._webHelper = webHelper;
             this._workContext = workContext;
-            this._shoppingCartSettings = shoppingCartSettings;
         }
 
         #endregion
@@ -187,32 +174,10 @@ namespace Nop.Services.Catalog
                                 }
                                 else
                                 {
-                                    var attributeValuePriceAdjustment = _priceCalculationService.GetProductAttributeValuePriceAdjustment(attributeValue, customer);
-                                    var priceAdjustmentBase = _taxService.GetProductPrice(product, attributeValuePriceAdjustment, customer, out var _);
-                                    var priceAdjustment = _currencyService.ConvertFromPrimaryStoreCurrency(priceAdjustmentBase, _workContext.WorkingCurrency);
-
-                                    if (priceAdjustmentBase > decimal.Zero)
-                                    {
-                                        formattedAttribute += string.Format(
-                                                _localizationService.GetResource("FormattedAttributes.PriceAdjustment"),
-                                                "+", _priceFormatter.FormatPrice(priceAdjustment, false, false), string.Empty);
-                                    }
-                                    else if (priceAdjustmentBase < decimal.Zero)
-                                    {
-                                        formattedAttribute += string.Format(
-                                                _localizationService.GetResource("FormattedAttributes.PriceAdjustment"),
-                                                "-", _priceFormatter.FormatPrice(-priceAdjustment, false, false), string.Empty);
-                                    }
+                                    //todo
                                 }
                             }
 
-                            //display quantity
-                            if (_shoppingCartSettings.RenderAssociatedAttributeValueQuantity && attributeValue.AttributeValueType == AttributeValueType.AssociatedToProduct)
-                            {
-                                //render only when more than 1
-                                if (attributeValue.Quantity > 1)
-                                    formattedAttribute += string.Format(_localizationService.GetResource("ProductAttributes.Quantity"), attributeValue.Quantity);
-                            }
 
                             //encode (if required)
                             if (htmlEncode)

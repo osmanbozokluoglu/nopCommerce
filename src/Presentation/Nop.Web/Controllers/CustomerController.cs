@@ -30,8 +30,6 @@ using Nop.Services.Localization;
 using Nop.Services.Logging;
 using Nop.Services.Media;
 using Nop.Services.Messages;
-using Nop.Services.Orders;
-using Nop.Services.Tax;
 using Nop.Web.Extensions;
 using Nop.Web.Factories;
 using Nop.Web.Framework;
@@ -72,15 +70,10 @@ namespace Nop.Web.Controllers
         private readonly IExternalAuthenticationService _externalAuthenticationService;
         private readonly IGdprService _gdprService;
         private readonly IGenericAttributeService _genericAttributeService;
-        private readonly IGiftCardService _giftCardService;
         private readonly ILocalizationService _localizationService;
         private readonly INewsLetterSubscriptionService _newsLetterSubscriptionService;
-        private readonly IOrderService _orderService;
         private readonly IPictureService _pictureService;
-        private readonly IPriceFormatter _priceFormatter;
-        private readonly IShoppingCartService _shoppingCartService;
         private readonly IStoreContext _storeContext;
-        private readonly ITaxService _taxService;
         private readonly IWebHelper _webHelper;
         private readonly IWorkContext _workContext;
         private readonly IWorkflowMessageService _workflowMessageService;
@@ -117,15 +110,10 @@ namespace Nop.Web.Controllers
             IExternalAuthenticationService externalAuthenticationService,
             IGdprService gdprService,
             IGenericAttributeService genericAttributeService,
-            IGiftCardService giftCardService,
             ILocalizationService localizationService,
             INewsLetterSubscriptionService newsLetterSubscriptionService,
-            IOrderService orderService,
             IPictureService pictureService,
-            IPriceFormatter priceFormatter,
-            IShoppingCartService shoppingCartService,
             IStoreContext storeContext,
-            ITaxService taxService,
             IWebHelper webHelper,
             IWorkContext workContext,
             IWorkflowMessageService workflowMessageService,
@@ -158,15 +146,10 @@ namespace Nop.Web.Controllers
             this._externalAuthenticationService = externalAuthenticationService;
             this._gdprService = gdprService;
             this._genericAttributeService = genericAttributeService;
-            this._giftCardService = giftCardService;
             this._localizationService = localizationService;
             this._newsLetterSubscriptionService = newsLetterSubscriptionService;
-            this._orderService = orderService;
             this._pictureService = pictureService;
-            this._priceFormatter = priceFormatter;
-            this._shoppingCartService = shoppingCartService;
             this._storeContext = storeContext;
-            this._taxService = taxService;
             this._webHelper = webHelper;
             this._workContext = workContext;
             this._workflowMessageService = workflowMessageService;
@@ -305,9 +288,6 @@ namespace Nop.Web.Controllers
                             var customer = _customerSettings.UsernamesEnabled
                                 ? _customerService.GetCustomerByUsername(model.Username)
                                 : _customerService.GetCustomerByEmail(model.Email);
-
-                            //migrate shopping cart
-                            _shoppingCartService.MigrateShoppingCart(_workContext.CurrentCustomer, customer, true);
 
                             //sign in new customer
                             _authenticationService.SignIn(customer, model.RememberMe);
@@ -622,17 +602,6 @@ namespace Nop.Web.Controllers
                     if (_dateTimeSettings.AllowCustomersToSetTimeZone)
                     {
                         _genericAttributeService.SaveAttribute(customer, NopCustomerDefaults.TimeZoneIdAttribute, model.TimeZoneId);
-                    }
-                    //VAT number
-                    if (_taxSettings.EuVatEnabled)
-                    {
-                        _genericAttributeService.SaveAttribute(customer, NopCustomerDefaults.VatNumberAttribute, model.VatNumber);
-
-                        var vatNumberStatus = _taxService.GetVatNumberStatus(model.VatNumber, out string _, out string vatAddress);
-                        _genericAttributeService.SaveAttribute(customer, NopCustomerDefaults.VatNumberStatusIdAttribute, (int)vatNumberStatus);
-                        //send VAT number admin notification
-                        if (!string.IsNullOrEmpty(model.VatNumber) && _taxSettings.EuVatEmailAdminWhenNewVatSubmitted)
-                            _workflowMessageService.SendNewVatSubmittedStoreOwnerNotification(customer, model.VatNumber, vatAddress, _localizationSettings.DefaultAdminLanguageId);
                     }
 
                     //form fields
@@ -1000,23 +969,6 @@ namespace Nop.Web.Controllers
                     {
                         _genericAttributeService.SaveAttribute(customer, NopCustomerDefaults.TimeZoneIdAttribute,
                             model.TimeZoneId);
-                    }
-                    //VAT number
-                    if (_taxSettings.EuVatEnabled)
-                    {
-                        var prevVatNumber = _genericAttributeService.GetAttribute<string>(customer, NopCustomerDefaults.VatNumberAttribute);
-
-                        _genericAttributeService.SaveAttribute(customer, NopCustomerDefaults.VatNumberAttribute,
-                            model.VatNumber);
-                        if (prevVatNumber != model.VatNumber)
-                        {
-                            var vatNumberStatus = _taxService.GetVatNumberStatus(model.VatNumber, out string _, out string vatAddress);
-                            _genericAttributeService.SaveAttribute(customer, NopCustomerDefaults.VatNumberStatusIdAttribute, (int)vatNumberStatus);
-                            //send VAT number admin notification
-                            if (!string.IsNullOrEmpty(model.VatNumber) && _taxSettings.EuVatEmailAdminWhenNewVatSubmitted)
-                                _workflowMessageService.SendNewVatSubmittedStoreOwnerNotification(customer,
-                                    model.VatNumber, vatAddress, _localizationSettings.DefaultAdminLanguageId);
-                        }
                     }
 
                     //form fields
@@ -1398,37 +1350,6 @@ namespace Nop.Web.Controllers
 
         #endregion
 
-        #region My account / Downloadable products
-
-        [HttpsRequirement(SslRequirement.Yes)]
-        public virtual IActionResult DownloadableProducts()
-        {
-            if (!_workContext.CurrentCustomer.IsRegistered())
-                return Challenge();
-
-            if (_customerSettings.HideDownloadableProductsTab)
-                return RedirectToRoute("CustomerInfo");
-
-            var model = _customerModelFactory.PrepareCustomerDownloadableProductsModel();
-            return View(model);
-        }
-
-        public virtual IActionResult UserAgreement(Guid orderItemId)
-        {
-            var orderItem = _orderService.GetOrderItemByGuid(orderItemId);
-            if (orderItem == null)
-                return RedirectToRoute("HomePage");
-
-            var product = orderItem.Product;
-            if (product == null || !product.HasUserAgreement)
-                return RedirectToRoute("HomePage");
-
-            var model = _customerModelFactory.PrepareUserAgreementModel(orderItem, product);
-            return View(model);
-        }
-
-        #endregion
-
         #region My account / Change password
 
         [HttpsRequirement(SslRequirement.Yes)]
@@ -1587,26 +1508,6 @@ namespace Nop.Web.Controllers
 
         [HttpPost, ActionName("GdprTools")]
         [PublicAntiForgery]
-        [FormValueRequired("export-data")]
-        public virtual IActionResult GdprToolsExport()
-        {
-            if (!_workContext.CurrentCustomer.IsRegistered())
-                return Challenge();
-
-            if (!_gdprSettings.GdprEnabled)
-                return RedirectToRoute("CustomerInfo");
-
-            //log
-            _gdprService.InsertLog(_workContext.CurrentCustomer, 0, GdprRequestType.ExportData, _localizationService.GetResource("Gdpr.Exported"));
-
-            //export
-            var bytes = _exportManager.ExportCustomerGdprInfoToXlsx(_workContext.CurrentCustomer, _storeContext.CurrentStore.Id);
-
-            return File(bytes, MimeTypes.TextXlsx, "customerdata.xlsx");
-        }
-
-        [HttpPost, ActionName("GdprTools")]
-        [PublicAntiForgery]
         [FormValueRequired("delete-account")]
         public virtual IActionResult GdprToolsDelete()
         {
@@ -1621,53 +1522,6 @@ namespace Nop.Web.Controllers
 
             var model = _customerModelFactory.PrepareGdprToolsModel();
             model.Result = _localizationService.GetResource("Gdpr.DeleteRequested.Success");
-            return View(model);
-        }
-
-        #endregion
-
-        #region Check gift card balance
-
-        //check gift card balance page
-        [HttpsRequirement(SslRequirement.Yes)]
-        //available even when a store is closed
-        [CheckAccessClosedStore(true)]
-        public virtual IActionResult CheckGiftCardBalance()
-        {
-            if (!(_captchaSettings.Enabled && _customerSettings.AllowCustomersToCheckGiftCardBalance))
-            {
-                return RedirectToRoute("CustomerInfo");
-            }
-
-            var model = _customerModelFactory.PrepareCheckGiftCardBalanceModel();
-            return View(model);
-        }
-
-        [HttpPost, ActionName("CheckGiftCardBalance")]
-        [FormValueRequired("checkbalancegiftcard")]
-        [ValidateCaptcha]
-        public virtual IActionResult CheckBalance(CheckGiftCardBalanceModel model, bool captchaValid)
-        {
-            //validate CAPTCHA
-            if (_captchaSettings.Enabled && !captchaValid)
-            {
-                ModelState.AddModelError("", _captchaSettings.GetWrongCaptchaMessage(_localizationService));
-            }
-
-            if (ModelState.IsValid)
-            {
-                var giftCard = _giftCardService.GetAllGiftCards(giftCardCouponCode: model.GiftCardCode).FirstOrDefault();
-                if (giftCard != null && _giftCardService.IsGiftCardValid(giftCard))
-                {
-                    var remainingAmount = _currencyService.ConvertFromPrimaryStoreCurrency(_giftCardService.GetGiftCardRemainingAmount(giftCard), _workContext.WorkingCurrency);
-                    model.Result = _priceFormatter.FormatPrice(remainingAmount, true, false);
-                }
-                else
-                {
-                    model.Message = _localizationService.GetResource("CheckGiftCardBalance.GiftCardCouponCode.Invalid");
-                }
-            }
-
             return View(model);
         }
 

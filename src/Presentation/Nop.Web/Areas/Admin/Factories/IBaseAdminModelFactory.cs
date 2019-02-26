@@ -17,30 +17,6 @@ namespace Nop.Web.Areas.Admin.Factories
         void PrepareActivityLogTypes(IList<SelectListItem> items, bool withSpecialDefaultItem = true, string defaultItemText = null);
 
         /// <summary>
-        /// Prepare available order statuses
-        /// </summary>
-        /// <param name="items">Order status items</param>
-        /// <param name="withSpecialDefaultItem">Whether to insert the first special item for the default value</param>
-        /// <param name="defaultItemText">Default item text; pass null to use default value of the default item text</param>
-        void PrepareOrderStatuses(IList<SelectListItem> items, bool withSpecialDefaultItem = true, string defaultItemText = null);
-
-        /// <summary>
-        /// Prepare available payment statuses
-        /// </summary>
-        /// <param name="items">Payment status items</param>
-        /// <param name="withSpecialDefaultItem">Whether to insert the first special item for the default value</param>
-        /// <param name="defaultItemText">Default item text; pass null to use default value of the default item text</param>
-        void PreparePaymentStatuses(IList<SelectListItem> items, bool withSpecialDefaultItem = true, string defaultItemText = null);
-
-        /// <summary>
-        /// Prepare available shipping statuses
-        /// </summary>
-        /// <param name="items">Shipping status items</param>
-        /// <param name="withSpecialDefaultItem">Whether to insert the first special item for the default value</param>
-        /// <param name="defaultItemText">Default item text; pass null to use default value of the default item text</param>
-        void PrepareShippingStatuses(IList<SelectListItem> items, bool withSpecialDefaultItem = true, string defaultItemText = null);
-
-        /// <summary>
         /// Prepare available countries
         /// </summary>
         /// <param name="items">Country items</param>
@@ -91,14 +67,6 @@ namespace Nop.Web.Areas.Admin.Factories
         void PrepareEmailAccounts(IList<SelectListItem> items, bool withSpecialDefaultItem = true, string defaultItemText = null);
 
         /// <summary>
-        /// Prepare available tax categories
-        /// </summary>
-        /// <param name="items">Tax category items</param>
-        /// <param name="withSpecialDefaultItem">Whether to insert the first special item for the default value</param>
-        /// <param name="defaultItemText">Default item text; pass null to use default value of the default item text</param>
-        void PrepareTaxCategories(IList<SelectListItem> items, bool withSpecialDefaultItem = true, string defaultItemText = null);
-
-        /// <summary>
         /// Prepare available categories
         /// </summary>
         /// <param name="items">Category items</param>
@@ -106,13 +74,6 @@ namespace Nop.Web.Areas.Admin.Factories
         /// <param name="defaultItemText">Default item text; pass null to use default value of the default item text</param>
         void PrepareCategories(IList<SelectListItem> items, bool withSpecialDefaultItem = true, string defaultItemText = null);
 
-        /// <summary>
-        /// Prepare available manufacturers
-        /// </summary>
-        /// <param name="items">Manufacturer items</param>
-        /// <param name="withSpecialDefaultItem">Whether to insert the first special item for the default value</param>
-        /// <param name="defaultItemText">Default item text; pass null to use default value of the default item text</param>
-        void PrepareManufacturers(IList<SelectListItem> items, bool withSpecialDefaultItem = true, string defaultItemText = null);
 
         /// <summary>
         /// Prepare available vendors
@@ -147,14 +108,6 @@ namespace Nop.Web.Areas.Admin.Factories
         void PrepareTimeZones(IList<SelectListItem> items, bool withSpecialDefaultItem = true, string defaultItemText = null);
 
         /// <summary>
-        /// Prepare available shopping cart types
-        /// </summary>
-        /// <param name="items">Shopping cart type items</param>
-        /// <param name="withSpecialDefaultItem">Whether to insert the first special item for the default value</param>
-        /// <param name="defaultItemText">Default item text; pass null to use default value of the default item text</param>
-        void PrepareShoppingCartTypes(IList<SelectListItem> items, bool withSpecialDefaultItem = true, string defaultItemText = null);
-
-        /// <summary>
         /// Prepare available tax display types
         /// </summary>
         /// <param name="items">Tax display type items</param>
@@ -171,29 +124,12 @@ namespace Nop.Web.Areas.Admin.Factories
         void PrepareCurrencies(IList<SelectListItem> items, bool withSpecialDefaultItem = true, string defaultItemText = null);
 
         /// <summary>
-        /// Prepare available discount types
-        /// </summary>
-        /// <param name="items">Discount type items</param>
-        /// <param name="withSpecialDefaultItem">Whether to insert the first special item for the default value</param>
-        /// <param name="defaultItemText">Default item text; pass null to use default value of the default item text</param>
-        void PrepareDiscountTypes(IList<SelectListItem> items, bool withSpecialDefaultItem = true, string defaultItemText = null);
-
-        /// <summary>
         /// Prepare available log levels
         /// </summary>
         /// <param name="items">Log level items</param>
         /// <param name="withSpecialDefaultItem">Whether to insert the first special item for the default value</param>
         /// <param name="defaultItemText">Default item text; pass null to use default value of the default item text</param>
         void PrepareLogLevels(IList<SelectListItem> items, bool withSpecialDefaultItem = true, string defaultItemText = null);
-
-        /// <summary>
-        /// Prepare available manufacturer templates
-        /// </summary>
-        /// <param name="items">Manufacturer template items</param>
-        /// <param name="withSpecialDefaultItem">Whether to insert the first special item for the default value</param>
-        /// <param name="defaultItemText">Default item text; pass null to use default value of the default item text</param>
-        void PrepareManufacturerTemplates(IList<SelectListItem> items,
-            bool withSpecialDefaultItem = true, string defaultItemText = null);
 
         /// <summary>
         /// Prepare available load plugin modes
@@ -211,15 +147,7 @@ namespace Nop.Web.Areas.Admin.Factories
         /// <param name="defaultItemText">Default item text; pass null to use default value of the default item text</param>
         void PreparePluginGroups(IList<SelectListItem> items, bool withSpecialDefaultItem = true, string defaultItemText = null);
 
-        /// <summary>
-        /// Prepare available return request statuses
-        /// </summary>
-        /// <param name="items">Return request status items</param>
-        /// <param name="withSpecialDefaultItem">Whether to insert the first special item for the default value</param>
-        /// <param name="defaultItemText">Default item text; pass null to use default value of the default item text</param>
-        void PrepareReturnRequestStatuses(IList<SelectListItem> items,
-            bool withSpecialDefaultItem = true, string defaultItemText = null);
-
+       
         /// <summary>
         /// Prepare available product templates
         /// </summary>
@@ -235,31 +163,6 @@ namespace Nop.Web.Areas.Admin.Factories
         /// <param name="withSpecialDefaultItem">Whether to insert the first special item for the default value</param>
         /// <param name="defaultItemText">Default item text; pass null to use default value of the default item text</param>
         void PrepareTopicTemplates(IList<SelectListItem> items, bool withSpecialDefaultItem = true, string defaultItemText = null);
-
-        /// <summary>
-        /// Prepare available warehouses
-        /// </summary>
-        /// <param name="items">Warehouse items</param>
-        /// <param name="withSpecialDefaultItem">Whether to insert the first special item for the default value</param>
-        /// <param name="defaultItemText">Default item text; pass null to use default value of the default item text</param>
-        void PrepareWarehouses(IList<SelectListItem> items, bool withSpecialDefaultItem = true, string defaultItemText = null);
-
-        /// <summary>
-        /// Prepare available delivery dates
-        /// </summary>
-        /// <param name="items">Delivery date items</param>
-        /// <param name="withSpecialDefaultItem">Whether to insert the first special item for the default value</param>
-        /// <param name="defaultItemText">Default item text; pass null to use default value of the default item text</param>
-        void PrepareDeliveryDates(IList<SelectListItem> items, bool withSpecialDefaultItem = true, string defaultItemText = null);
-
-        /// <summary>
-        /// Prepare available product availability ranges
-        /// </summary>
-        /// <param name="items">Product availability range items</param>
-        /// <param name="withSpecialDefaultItem">Whether to insert the first special item for the default value</param>
-        /// <param name="defaultItemText">Default item text; pass null to use default value of the default item text</param>
-        void PrepareProductAvailabilityRanges(IList<SelectListItem> items,
-            bool withSpecialDefaultItem = true, string defaultItemText = null);
 
         /// <summary>
         /// Prepare available GDPR request types

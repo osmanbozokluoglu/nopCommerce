@@ -90,38 +90,6 @@ namespace Nop.Web.Factories
 
         #endregion
 
-        #region Manufacturers
-
-        /// <summary>
-        /// Prepare manufacturer model
-        /// </summary>
-        /// <param name="manufacturer">Manufacturer identifier</param>
-        /// <param name="command">Catalog paging filtering command</param>
-        /// <returns>Manufacturer model</returns>
-        ManufacturerModel PrepareManufacturerModel(Manufacturer manufacturer, CatalogPagingFilteringModel command);
-
-        /// <summary>
-        /// Prepare manufacturer template view path
-        /// </summary>
-        /// <param name="templateId">Template identifier</param>
-        /// <returns>Manufacturer template view path</returns>
-        string PrepareManufacturerTemplateViewPath(int templateId);
-
-        /// <summary>
-        /// Prepare manufacturer all models
-        /// </summary>
-        /// <returns>List of manufacturer models</returns>
-        List<ManufacturerModel> PrepareManufacturerAllModels();
-
-        /// <summary>
-        /// Prepare manufacturer navigation model
-        /// </summary>
-        /// <param name="currentManufacturerId">Current manufacturer identifier</param>
-        /// <returns>Manufacturer navigation model</returns>
-        ManufacturerNavigationModel PrepareManufacturerNavigationModel(int currentManufacturerId);
-
-        #endregion
-
         #region Vendors
 
         /// <summary>

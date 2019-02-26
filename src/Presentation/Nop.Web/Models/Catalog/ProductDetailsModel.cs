@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Nop.Core.Domain.Catalog;
-using Nop.Core.Domain.Orders;
+
 using Nop.Web.Framework.Mvc.ModelBinding;
 using Nop.Web.Framework.Models;
 using Nop.Web.Models.Media;
@@ -25,7 +25,6 @@ namespace Nop.Web.Models.Catalog
             Breadcrumb = new ProductBreadcrumbModel();
             ProductTags = new List<ProductTagModel>();
             ProductSpecifications= new List<ProductSpecificationModel>();
-            ProductManufacturers = new List<ManufacturerBriefInfoModel>();
             ProductReviewOverview = new ProductReviewOverviewModel();
             TierPrices = new List<TierPriceModel>();
         }
@@ -93,8 +92,6 @@ namespace Nop.Web.Models.Catalog
 
         public IList<ProductSpecificationModel> ProductSpecifications { get; set; }
 
-        public IList<ManufacturerBriefInfoModel> ProductManufacturers { get; set; }
-
         public ProductReviewOverviewModel ProductReviewOverview { get; set; }
 
         public IList<TierPriceModel> TierPrices { get; set; }
@@ -156,7 +153,6 @@ namespace Nop.Web.Models.Catalog
 
             //updating existing shopping cart or wishlist item?
             public int UpdatedShoppingCartItemId { get; set; }
-            public ShoppingCartType? UpdateShoppingCartItemType { get; set; }
         }
 
         public partial class ProductPriceModel : BaseNopModel

@@ -10,7 +10,6 @@ using Nop.Services.Customers;
 using Nop.Services.Helpers;
 using Nop.Services.Localization;
 using Nop.Services.Messages;
-using Nop.Services.Orders;
 using Nop.Services.Security;
 using Nop.Services.Seo;
 using Nop.Web.Areas.Admin.Factories;
@@ -39,7 +38,6 @@ namespace Nop.Web.Areas.Admin.Controllers
         private readonly INopFileProvider _fileProvider;
         private readonly INotificationService _notificationService;
         private readonly IPermissionService _permissionService;
-        private readonly IShoppingCartService _shoppingCartService;
         private readonly IStaticCacheManager _cacheManager;
         private readonly IUrlRecordService _urlRecordService;
         private readonly IWebHelper _webHelper;
@@ -58,7 +56,6 @@ namespace Nop.Web.Areas.Admin.Controllers
             INopFileProvider fileProvider,
             INotificationService notificationService,
             IPermissionService permissionService,
-            IShoppingCartService shoppingCartService,
             IStaticCacheManager cacheManager,
             IUrlRecordService urlRecordService,
             IWebHelper webHelper,
@@ -73,7 +70,6 @@ namespace Nop.Web.Areas.Admin.Controllers
             this._fileProvider = fileProvider;
             this._notificationService = notificationService;
             this._permissionService = permissionService;
-            this._shoppingCartService = shoppingCartService;
             this._cacheManager = cacheManager;
             this._urlRecordService = urlRecordService;
             this._webHelper = webHelper;
@@ -135,18 +131,6 @@ namespace Nop.Web.Areas.Admin.Controllers
             return View(model);
         }
 
-        [HttpPost, ActionName("Maintenance")]
-        [FormValueRequired("delete-abondoned-carts")]
-        public virtual IActionResult MaintenanceDeleteAbandonedCarts(MaintenanceModel model)
-        {
-            if (!_permissionService.Authorize(StandardPermissionProvider.ManageMaintenance))
-                return AccessDeniedView();
-
-            var olderThanDateValue = _dateTimeHelper.ConvertToUtcTime(model.DeleteAbandonedCarts.OlderThan, _dateTimeHelper.CurrentTimeZone);
-
-            model.DeleteAbandonedCarts.NumberOfDeletedItems = _shoppingCartService.DeleteExpiredShoppingCartItems(olderThanDateValue);
-            return View(model);
-        }
 
         [HttpPost, ActionName("Maintenance")]
         [FormValueRequired("delete-exported-files")]

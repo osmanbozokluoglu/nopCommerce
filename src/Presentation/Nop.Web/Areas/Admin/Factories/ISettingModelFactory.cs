@@ -33,12 +33,6 @@ namespace Nop.Web.Areas.Admin.Factories
         NewsSettingsModel PrepareNewsSettingsModel();
 
         /// <summary>
-        /// Prepare shipping settings model
-        /// </summary>
-        /// <returns>Shipping settings model</returns>
-        ShippingSettingsModel PrepareShippingSettingsModel();
-
-        /// <summary>
         /// Prepare tax settings model
         /// </summary>
         /// <returns>Tax settings model</returns>
@@ -62,18 +56,6 @@ namespace Nop.Web.Areas.Admin.Factories
         /// </summary>
         /// <returns>Reward points settings model</returns>
         RewardPointsSettingsModel PrepareRewardPointsSettingsModel();
-
-        /// <summary>
-        /// Prepare order settings model
-        /// </summary>
-        /// <returns>Order settings model</returns>
-        OrderSettingsModel PrepareOrderSettingsModel();
-
-        /// <summary>
-        /// Prepare shopping cart settings model
-        /// </summary>
-        /// <returns>Shopping cart settings model</returns>
-        ShoppingCartSettingsModel PrepareShoppingCartSettingsModel();
 
         /// <summary>
         /// Prepare media settings model

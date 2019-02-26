@@ -55,46 +55,6 @@ namespace Nop.Web.Areas.Admin.Helpers
         }
 
         /// <summary>
-        /// Get manufacturer list
-        /// </summary>
-        /// <param name="manufacturerService">Manufacturer service</param>
-        /// <param name="cacheManager">Cache manager</param>
-        /// <param name="showHidden">A value indicating whether to show hidden records</param>
-        /// <returns>Manufacturer list</returns>
-        public static List<SelectListItem> GetManufacturerList(IManufacturerService manufacturerService, ICacheManager cacheManager, bool showHidden = false)
-        {
-            if (manufacturerService == null)
-                throw new ArgumentNullException(nameof(manufacturerService));
-
-            if (cacheManager == null)
-                throw new ArgumentNullException(nameof(cacheManager));
-
-            var cacheKey = string.Format(NopModelCacheDefaults.ManufacturersListKey, showHidden);
-            var listItems = cacheManager.Get(cacheKey, () =>
-            {
-                var manufacturers = manufacturerService.GetAllManufacturers(showHidden: showHidden);
-                return manufacturers.Select(m => new SelectListItem
-                {
-                    Text = m.Name,
-                    Value = m.Id.ToString()
-                });
-            });
-
-            var result = new List<SelectListItem>();
-            //clone the list to ensure that "selected" property is not set
-            foreach (var item in listItems)
-            {
-                result.Add(new SelectListItem
-                {
-                    Text = item.Text,
-                    Value = item.Value
-                });
-            }
-
-            return result;
-        }
-
-        /// <summary>
         /// Get vendor list
         /// </summary>
         /// <param name="vendorService">Vendor service</param>

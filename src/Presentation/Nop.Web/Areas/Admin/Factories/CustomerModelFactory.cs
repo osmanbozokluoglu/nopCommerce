@@ -10,9 +10,8 @@ using Nop.Core.Domain.Common;
 using Nop.Core.Domain.Customers;
 using Nop.Core.Domain.Gdpr;
 using Nop.Core.Domain.Media;
-using Nop.Core.Domain.Orders;
+
 using Nop.Core.Domain.Tax;
-using Nop.Services.Affiliates;
 using Nop.Services.Authentication.External;
 using Nop.Services.Catalog;
 using Nop.Services.Common;
@@ -24,13 +23,10 @@ using Nop.Services.Localization;
 using Nop.Services.Logging;
 using Nop.Services.Media;
 using Nop.Services.Messages;
-using Nop.Services.Orders;
 using Nop.Services.Stores;
-using Nop.Services.Tax;
 using Nop.Web.Areas.Admin.Infrastructure.Mapper.Extensions;
 using Nop.Web.Areas.Admin.Models.Common;
 using Nop.Web.Areas.Admin.Models.Customers;
-using Nop.Web.Areas.Admin.Models.ShoppingCart;
 using Nop.Web.Framework.Extensions;
 using Nop.Web.Framework.Factories;
 
@@ -50,7 +46,6 @@ namespace Nop.Web.Areas.Admin.Factories
         private readonly IAclSupportedModelFactory _aclSupportedModelFactory;
         private readonly IAddressAttributeFormatter _addressAttributeFormatter;
         private readonly IAddressAttributeModelFactory _addressAttributeModelFactory;
-        private readonly IAffiliateService _affiliateService;
         private readonly IBackInStockSubscriptionService _backInStockSubscriptionService;
         private readonly IBaseAdminModelFactory _baseAdminModelFactory;
         private readonly ICustomerActivityService _customerActivityService;
@@ -64,15 +59,10 @@ namespace Nop.Web.Areas.Admin.Factories
         private readonly IGeoLookupService _geoLookupService;
         private readonly ILocalizationService _localizationService;
         private readonly INewsLetterSubscriptionService _newsLetterSubscriptionService;
-        private readonly IOrderService _orderService;
         private readonly IPictureService _pictureService;
-        private readonly IPriceCalculationService _priceCalculationService;
-        private readonly IPriceFormatter _priceFormatter;
         private readonly IProductAttributeFormatter _productAttributeFormatter;
-        private readonly IRewardPointService _rewardPointService;
         private readonly IStoreContext _storeContext;
         private readonly IStoreService _storeService;
-        private readonly ITaxService _taxService;
         private readonly MediaSettings _mediaSettings;
         private readonly RewardPointsSettings _rewardPointsSettings;
         private readonly TaxSettings _taxSettings;
@@ -88,7 +78,6 @@ namespace Nop.Web.Areas.Admin.Factories
             IAclSupportedModelFactory aclSupportedModelFactory,
             IAddressAttributeFormatter addressAttributeFormatter,
             IAddressAttributeModelFactory addressAttributeModelFactory,
-            IAffiliateService affiliateService,
             IBackInStockSubscriptionService backInStockSubscriptionService,
             IBaseAdminModelFactory baseAdminModelFactory,
             ICustomerActivityService customerActivityService,
@@ -102,15 +91,10 @@ namespace Nop.Web.Areas.Admin.Factories
             IGeoLookupService geoLookupService,
             ILocalizationService localizationService,
             INewsLetterSubscriptionService newsLetterSubscriptionService,
-            IOrderService orderService,
             IPictureService pictureService,
-            IPriceCalculationService priceCalculationService,
-            IPriceFormatter priceFormatter,
             IProductAttributeFormatter productAttributeFormatter,
-            IRewardPointService rewardPointService,
             IStoreContext storeContext,
             IStoreService storeService,
-            ITaxService taxService,
             MediaSettings mediaSettings,
             RewardPointsSettings rewardPointsSettings,
             TaxSettings taxSettings)
@@ -122,7 +106,6 @@ namespace Nop.Web.Areas.Admin.Factories
             this._aclSupportedModelFactory = aclSupportedModelFactory;
             this._addressAttributeFormatter = addressAttributeFormatter;
             this._addressAttributeModelFactory = addressAttributeModelFactory;
-            this._affiliateService = affiliateService;
             this._backInStockSubscriptionService = backInStockSubscriptionService;
             this._baseAdminModelFactory = baseAdminModelFactory;
             this._customerActivityService = customerActivityService;
@@ -136,15 +119,10 @@ namespace Nop.Web.Areas.Admin.Factories
             this._geoLookupService = geoLookupService;
             this._localizationService = localizationService;
             this._newsLetterSubscriptionService = newsLetterSubscriptionService;
-            this._orderService = orderService;
             this._pictureService = pictureService;
-            this._priceCalculationService = priceCalculationService;
-            this._priceFormatter = priceFormatter;
             this._productAttributeFormatter = productAttributeFormatter;
-            this._rewardPointService = rewardPointService;
             this._storeContext = storeContext;
             this._storeService = storeService;
-            this._taxService = taxService;
             this._mediaSettings = mediaSettings;
             this._rewardPointsSettings = rewardPointsSettings;
             this._taxSettings = taxSettings;
@@ -392,28 +370,6 @@ namespace Nop.Web.Areas.Admin.Factories
         }
 
         /// <summary>
-        /// Prepare reward points search model
-        /// </summary>
-        /// <param name="searchModel">Reward points search model</param>
-        /// <param name="customer">Customer</param>
-        /// <returns>Reward points search model</returns>
-        protected virtual CustomerRewardPointsSearchModel PrepareRewardPointsSearchModel(CustomerRewardPointsSearchModel searchModel, Customer customer)
-        {
-            if (searchModel == null)
-                throw new ArgumentNullException(nameof(searchModel));
-
-            if (customer == null)
-                throw new ArgumentNullException(nameof(customer));
-
-            searchModel.CustomerId = customer.Id;
-
-            //prepare page parameters
-            searchModel.SetGridPageSize();
-
-            return searchModel;
-        }
-
-        /// <summary>
         /// Prepare customer address search model
         /// </summary>
         /// <param name="searchModel">Customer address search model</param>
@@ -436,84 +392,12 @@ namespace Nop.Web.Areas.Admin.Factories
         }
 
         /// <summary>
-        /// Prepare customer order search model
-        /// </summary>
-        /// <param name="searchModel">Customer order search model</param>
-        /// <param name="customer">Customer</param>
-        /// <returns>Customer order search model</returns>
-        protected virtual CustomerOrderSearchModel PrepareCustomerOrderSearchModel(CustomerOrderSearchModel searchModel, Customer customer)
-        {
-            if (searchModel == null)
-                throw new ArgumentNullException(nameof(searchModel));
-
-            if (customer == null)
-                throw new ArgumentNullException(nameof(customer));
-
-            searchModel.CustomerId = customer.Id;
-
-            //prepare page parameters
-            searchModel.SetGridPageSize();
-
-            return searchModel;
-        }
-
-        /// <summary>
-        /// Prepare customer shopping cart search model
-        /// </summary>
-        /// <param name="searchModel">Customer shopping cart search model</param>
-        /// <param name="customer">Customer</param>
-        /// <returns>Customer shopping cart search model</returns>
-        protected virtual CustomerShoppingCartSearchModel PrepareCustomerShoppingCartSearchModel(CustomerShoppingCartSearchModel searchModel,
-            Customer customer)
-        {
-            if (searchModel == null)
-                throw new ArgumentNullException(nameof(searchModel));
-
-            if (customer == null)
-                throw new ArgumentNullException(nameof(customer));
-
-            searchModel.CustomerId = customer.Id;
-
-            //prepare available shopping cart types (search shopping cart by default)
-            searchModel.ShoppingCartTypeId = (int)ShoppingCartType.ShoppingCart;
-            _baseAdminModelFactory.PrepareShoppingCartTypes(searchModel.AvailableShoppingCartTypes, false);
-
-            //prepare page parameters
-            searchModel.SetGridPageSize();
-
-            return searchModel;
-        }
-
-        /// <summary>
         /// Prepare customer activity log search model
         /// </summary>
         /// <param name="searchModel">Customer activity log search model</param>
         /// <param name="customer">Customer</param>
         /// <returns>Customer activity log search model</returns>
         protected virtual CustomerActivityLogSearchModel PrepareCustomerActivityLogSearchModel(CustomerActivityLogSearchModel searchModel, Customer customer)
-        {
-            if (searchModel == null)
-                throw new ArgumentNullException(nameof(searchModel));
-
-            if (customer == null)
-                throw new ArgumentNullException(nameof(customer));
-
-            searchModel.CustomerId = customer.Id;
-
-            //prepare page parameters
-            searchModel.SetGridPageSize();
-
-            return searchModel;
-        }
-
-        /// <summary>
-        /// Prepare customer back in stock subscriptions search model
-        /// </summary>
-        /// <param name="searchModel">Customer back in stock subscriptions search model</param>
-        /// <param name="customer">Customer</param>
-        /// <returns>Customer back in stock subscriptions search model</returns>
-        protected virtual CustomerBackInStockSubscriptionSearchModel PrepareCustomerBackInStockSubscriptionSearchModel(
-            CustomerBackInStockSubscriptionSearchModel searchModel, Customer customer)
         {
             if (searchModel == null)
                 throw new ArgumentNullException(nameof(searchModel));
@@ -685,14 +569,6 @@ namespace Nop.Web.Areas.Admin.Factories
                     model.RegisteredInStore = _storeService.GetAllStores()
                         .FirstOrDefault(store => store.Id == customer.RegisteredInStoreId)?.Name ?? string.Empty;
 
-                    //prepare model affiliate
-                    var affiliate = _affiliateService.GetAffiliateById(customer.AffiliateId);
-                    if (affiliate != null)
-                    {
-                        model.AffiliateId = affiliate.Id;
-                        model.AffiliateName = _affiliateService.GetAffiliateFullName(affiliate);
-                    }
-
                     //prepare model newsletter subscriptions
                     if (!string.IsNullOrEmpty(customer.Email))
                     {
@@ -710,12 +586,8 @@ namespace Nop.Web.Areas.Admin.Factories
                 PrepareAssociatedExternalAuthModels(model.AssociatedExternalAuthRecords, customer);
 
                 //prepare nested search models
-                PrepareRewardPointsSearchModel(model.CustomerRewardPointsSearchModel, customer);
                 PrepareCustomerAddressSearchModel(model.CustomerAddressSearchModel, customer);
-                PrepareCustomerOrderSearchModel(model.CustomerOrderSearchModel, customer);
-                PrepareCustomerShoppingCartSearchModel(model.CustomerShoppingCartSearchModel, customer);
                 PrepareCustomerActivityLogSearchModel(model.CustomerActivityLogSearchModel, customer);
-                PrepareCustomerBackInStockSubscriptionSearchModel(model.CustomerBackInStockSubscriptionSearchModel, customer);
             }
             else
             {
@@ -783,51 +655,6 @@ namespace Nop.Web.Areas.Admin.Factories
             return model;
         }
 
-        /// <summary>
-        /// Prepare paged reward points list model
-        /// </summary>
-        /// <param name="searchModel">Reward points search model</param>
-        /// <param name="customer">Customer</param>
-        /// <returns>Reward points list model</returns>
-        public virtual CustomerRewardPointsListModel PrepareRewardPointsListModel(CustomerRewardPointsSearchModel searchModel, Customer customer)
-        {
-            if (searchModel == null)
-                throw new ArgumentNullException(nameof(searchModel));
-
-            if (customer == null)
-                throw new ArgumentNullException(nameof(customer));
-
-            //get reward points history
-            var rewardPoints = _rewardPointService.GetRewardPointsHistory(customer.Id,
-                showNotActivated: true,
-                pageIndex: searchModel.Page - 1, pageSize: searchModel.PageSize);
-
-            //prepare list model
-            var model = new CustomerRewardPointsListModel
-            {
-                Data = rewardPoints.Select(historyEntry =>
-                {
-                    //fill in model values from the entity        
-                    var rewardPointsHistoryModel = historyEntry.ToModel<CustomerRewardPointsModel>();                    
-
-                    //convert dates to the user time
-                    var activatingDate = _dateTimeHelper.ConvertToUserTime(historyEntry.CreatedOnUtc, DateTimeKind.Utc);
-                    rewardPointsHistoryModel.CreatedOn = activatingDate;
-                    rewardPointsHistoryModel.PointsBalance = historyEntry.PointsBalance.HasValue ? historyEntry.PointsBalance.ToString() :
-                        string.Format(_localizationService.GetResource("Admin.Customers.Customers.RewardPoints.ActivatedLater"), activatingDate);
-                    rewardPointsHistoryModel.EndDate = !historyEntry.EndDateUtc.HasValue ? null :
-                        (DateTime?)_dateTimeHelper.ConvertToUserTime(historyEntry.EndDateUtc.Value, DateTimeKind.Utc);
-
-                    //fill in additional values (not existing in the entity)
-                    rewardPointsHistoryModel.StoreName = _storeService.GetStoreById(historyEntry.StoreId)?.Name ?? "Unknown";
-
-                    return rewardPointsHistoryModel;
-                }),
-                Total = rewardPoints.TotalCount
-            };
-
-            return model;
-        }
 
         /// <summary>
         /// Prepare paged customer address list model
@@ -901,93 +728,6 @@ namespace Nop.Web.Areas.Admin.Factories
         }
 
         /// <summary>
-        /// Prepare paged customer order list model
-        /// </summary>
-        /// <param name="searchModel">Customer order search model</param>
-        /// <param name="customer">Customer</param>
-        /// <returns>Customer order list model</returns>
-        public virtual CustomerOrderListModel PrepareCustomerOrderListModel(CustomerOrderSearchModel searchModel, Customer customer)
-        {
-            if (searchModel == null)
-                throw new ArgumentNullException(nameof(searchModel));
-
-            if (customer == null)
-                throw new ArgumentNullException(nameof(customer));
-
-            //get customer orders
-            var orders = _orderService.SearchOrders(customerId: customer.Id,
-                pageIndex: searchModel.Page - 1, pageSize: searchModel.PageSize);
-
-            //prepare list model
-            var model = new CustomerOrderListModel
-            {
-                Data = orders.Select(order =>
-                {
-                    //fill in model values from the entity
-                    var orderModel = order.ToModel<CustomerOrderModel>();
-
-                    //convert dates to the user time
-                    orderModel.CreatedOn = _dateTimeHelper.ConvertToUserTime(order.CreatedOnUtc, DateTimeKind.Utc);
-                    
-                    //fill in additional values (not existing in the entity)
-                    orderModel.StoreName = _storeService.GetStoreById(order.StoreId)?.Name ?? "Unknown";
-                    orderModel.OrderStatus = _localizationService.GetLocalizedEnum(order.OrderStatus);
-                    orderModel.PaymentStatus = _localizationService.GetLocalizedEnum(order.PaymentStatus);
-                    orderModel.ShippingStatus = _localizationService.GetLocalizedEnum(order.ShippingStatus);
-                    orderModel.OrderTotal = _priceFormatter.FormatPrice(order.OrderTotal, true, false);
-
-                    return orderModel;
-                }),
-                Total = orders.TotalCount
-            };
-
-            return model;
-        }
-
-        /// <summary>
-        /// Prepare paged customer shopping cart list model
-        /// </summary>
-        /// <param name="searchModel">Customer shopping cart search model</param>
-        /// <param name="customer">Customer</param>
-        /// <returns>Customer shopping cart list model</returns>
-        public virtual CustomerShoppingCartListModel PrepareCustomerShoppingCartListModel(CustomerShoppingCartSearchModel searchModel,
-            Customer customer)
-        {
-            if (searchModel == null)
-                throw new ArgumentNullException(nameof(searchModel));
-
-            if (customer == null)
-                throw new ArgumentNullException(nameof(customer));
-
-            //get customer shopping cart
-            var shoppingCart = customer.ShoppingCartItems.Where(item => item.ShoppingCartTypeId == searchModel.ShoppingCartTypeId).ToList();
-
-            //prepare list model
-            var model = new CustomerShoppingCartListModel
-            {
-                Data = shoppingCart.PaginationByRequestModel(searchModel).Select(item =>
-                {
-                    //fill in model values from the entity
-                    var shoppingCartItemModel = item.ToModel<ShoppingCartItemModel>();
-
-                    //fill in additional values (not existing in the entity)
-                    shoppingCartItemModel.ProductName = item.Product.Name;
-                    shoppingCartItemModel.Store = _storeService.GetStoreById(item.StoreId)?.Name ?? "Unknown";                    
-                    shoppingCartItemModel.AttributeInfo = _productAttributeFormatter.FormatAttributes(item.Product, item.AttributesXml);
-                    shoppingCartItemModel.UnitPrice = _priceFormatter.FormatPrice(_taxService.GetProductPrice(item.Product, _priceCalculationService.GetUnitPrice(item), out var _));
-                    shoppingCartItemModel.Total = _priceFormatter.FormatPrice(_taxService.GetProductPrice(item.Product, _priceCalculationService.GetSubTotal(item), out _));
-                    //convert dates to the user time
-                    shoppingCartItemModel.UpdatedOn = _dateTimeHelper.ConvertToUserTime(item.UpdatedOnUtc, DateTimeKind.Utc);
-
-                    return shoppingCartItemModel;
-                }),
-                Total = shoppingCart.Count
-            };
-
-            return model;
-        }
-
-        /// <summary>
         /// Prepare paged customer activity log list model
         /// </summary>
         /// <param name="searchModel">Customer activity log search model</param>
@@ -1022,49 +762,6 @@ namespace Nop.Web.Areas.Admin.Factories
                     return customerActivityLogModel;
                 }),
                 Total = activityLog.TotalCount
-            };
-
-            return model;
-        }
-
-        /// <summary>
-        /// Prepare paged customer back in stock subscriptions list model
-        /// </summary>
-        /// <param name="searchModel">Customer back in stock subscriptions search model</param>
-        /// <param name="customer">Customer</param>
-        /// <returns>Customer back in stock subscriptions list model</returns>
-        public virtual CustomerBackInStockSubscriptionListModel PrepareCustomerBackInStockSubscriptionListModel(
-            CustomerBackInStockSubscriptionSearchModel searchModel, Customer customer)
-        {
-            if (searchModel == null)
-                throw new ArgumentNullException(nameof(searchModel));
-
-            if (customer == null)
-                throw new ArgumentNullException(nameof(customer));
-
-            //get customer back in stock subscriptions
-            var subscriptions = _backInStockSubscriptionService.GetAllSubscriptionsByCustomerId(customer.Id,
-                pageIndex: searchModel.Page - 1, pageSize: searchModel.PageSize);
-
-            //prepare list model
-            var model = new CustomerBackInStockSubscriptionListModel
-            {
-                Data = subscriptions.Select(subscription =>
-                {
-
-                    //fill in model values from the entity
-                    var subscriptionModel = subscription.ToModel<CustomerBackInStockSubscriptionModel>();
-                    
-                    //convert dates to the user time
-                    subscriptionModel.CreatedOn = _dateTimeHelper.ConvertToUserTime(subscription.CreatedOnUtc, DateTimeKind.Utc);
-
-                    //fill in additional values (not existing in the entity)
-                    subscriptionModel.StoreName = _storeService.GetStoreById(subscription.StoreId)?.Name ?? "Unknown";
-                    subscriptionModel.ProductName = subscription.Product?.Name ?? "Unknown";
-
-                    return subscriptionModel;
-                }),
-                Total = subscriptions.TotalCount
             };
 
             return model;

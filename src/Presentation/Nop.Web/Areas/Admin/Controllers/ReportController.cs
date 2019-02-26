@@ -53,88 +53,7 @@ namespace Nop.Web.Areas.Admin.Controllers
             return Json(model);
         }
 
-        #endregion
-
-        #region Bestsellers
-
-        public virtual IActionResult Bestsellers()
-        {
-            if (!_permissionService.Authorize(StandardPermissionProvider.ManageOrders))
-                return AccessDeniedView();
-
-            //prepare model
-            var model = _reportModelFactory.PrepareBestsellerSearchModel(new BestsellerSearchModel());
-
-            return View(model);
-        }
-
-        [HttpPost]
-        public virtual IActionResult BestsellersList(BestsellerSearchModel searchModel)
-        {
-            if (!_permissionService.Authorize(StandardPermissionProvider.ManageOrders))
-                return AccessDeniedKendoGridJson();
-
-            //prepare model
-            var model = _reportModelFactory.PrepareBestsellerListModel(searchModel);
-
-            return Json(model);
-        }
-
-        #endregion
-
-        #region Never Sold
-
-        public virtual IActionResult NeverSold()
-        {
-            if (!_permissionService.Authorize(StandardPermissionProvider.ManageOrders))
-                return AccessDeniedView();
-
-            //prepare model
-            var model = _reportModelFactory.PrepareNeverSoldSearchModel(new NeverSoldReportSearchModel());
-
-            return View(model);
-        }
-
-        [HttpPost]
-        public virtual IActionResult NeverSoldList(NeverSoldReportSearchModel searchModel)
-        {
-            if (!_permissionService.Authorize(StandardPermissionProvider.ManageOrders))
-                return AccessDeniedKendoGridJson();
-
-            //prepare model
-            var model = _reportModelFactory.PrepareNeverSoldListModel(searchModel);
-
-            return Json(model);
-        }
-
-        #endregion
-
-        #region Country sales
-
-        public virtual IActionResult CountrySales()
-        {
-            if (!_permissionService.Authorize(StandardPermissionProvider.OrderCountryReport))
-                return AccessDeniedView();
-
-            //prepare model
-            var model = _reportModelFactory.PrepareCountrySalesSearchModel(new CountryReportSearchModel());
-
-            return View(model);
-        }
-
-        [HttpPost]
-        public virtual IActionResult CountrySalesList(CountryReportSearchModel searchModel)
-        {
-            if (!_permissionService.Authorize(StandardPermissionProvider.OrderCountryReport))
-                return AccessDeniedKendoGridJson();
-
-            //prepare model
-            var model = _reportModelFactory.PrepareCountrySalesListModel(searchModel);
-
-            return Json(model);
-        }
-
-        #endregion
+        #endregion        
 
         #region Customer reports
 
@@ -147,52 +66,6 @@ namespace Nop.Web.Areas.Admin.Controllers
             var model = _reportModelFactory.PrepareCustomerReportsSearchModel(new CustomerReportsSearchModel());
 
             return View(model);
-        }
-
-        public virtual IActionResult BestCustomersByOrderTotal()
-        {
-            if (!_permissionService.Authorize(StandardPermissionProvider.ManageCustomers))
-                return AccessDeniedView();
-
-            //prepare model
-            var model = _reportModelFactory.PrepareCustomerReportsSearchModel(new CustomerReportsSearchModel());
-
-            return View(model);
-        }
-
-        public virtual IActionResult BestCustomersByNumberOfOrders()
-        {
-            if (!_permissionService.Authorize(StandardPermissionProvider.ManageCustomers))
-                return AccessDeniedView();
-
-            //prepare model
-            var model = _reportModelFactory.PrepareCustomerReportsSearchModel(new CustomerReportsSearchModel());
-
-            return View(model);
-        }
-
-        [HttpPost]
-        public virtual IActionResult ReportBestCustomersByOrderTotalList(BestCustomersReportSearchModel searchModel)
-        {
-            if (!_permissionService.Authorize(StandardPermissionProvider.ManageCustomers))
-                return AccessDeniedKendoGridJson();
-
-            //prepare model
-            var model = _reportModelFactory.PrepareBestCustomersReportListModel(searchModel);
-
-            return Json(model);
-        }
-
-        [HttpPost]
-        public virtual IActionResult ReportBestCustomersByNumberOfOrdersList(BestCustomersReportSearchModel searchModel)
-        {
-            if (!_permissionService.Authorize(StandardPermissionProvider.ManageCustomers))
-                return AccessDeniedKendoGridJson();
-
-            //prepare model
-            var model = _reportModelFactory.PrepareBestCustomersReportListModel(searchModel);
-
-            return Json(model);
         }
 
         [HttpPost]

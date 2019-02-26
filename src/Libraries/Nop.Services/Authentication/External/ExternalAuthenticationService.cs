@@ -12,7 +12,6 @@ using Nop.Services.Events;
 using Nop.Services.Localization;
 using Nop.Services.Logging;
 using Nop.Services.Messages;
-using Nop.Services.Orders;
 using Nop.Services.Plugins;
 
 namespace Nop.Services.Authentication.External
@@ -35,7 +34,6 @@ namespace Nop.Services.Authentication.External
         private readonly ILocalizationService _localizationService;
         private readonly IPluginService _pluginService;
         private readonly IRepository<ExternalAuthenticationRecord> _externalAuthenticationRecordRepository;
-        private readonly IShoppingCartService _shoppingCartService;
         private readonly IStoreContext _storeContext;
         private readonly IWorkContext _workContext;
         private readonly IWorkflowMessageService _workflowMessageService;
@@ -56,7 +54,6 @@ namespace Nop.Services.Authentication.External
             ILocalizationService localizationService,
             IPluginService pluginService,
             IRepository<ExternalAuthenticationRecord> externalAuthenticationRecordRepository,
-            IShoppingCartService shoppingCartService,
             IStoreContext storeContext,
             IWorkContext workContext,
             IWorkflowMessageService workflowMessageService,
@@ -73,7 +70,6 @@ namespace Nop.Services.Authentication.External
             this._localizationService = localizationService;
             this._pluginService = pluginService;
             this._externalAuthenticationRecordRepository = externalAuthenticationRecordRepository;
-            this._shoppingCartService = shoppingCartService;
             this._storeContext = storeContext;
             this._workContext = workContext;
             this._workflowMessageService = workflowMessageService;
@@ -210,9 +206,6 @@ namespace Nop.Services.Authentication.External
         /// <returns>Result of an authentication</returns>
         protected virtual IActionResult LoginUser(Customer user, string returnUrl)
         {
-            //migrate shopping cart
-            _shoppingCartService.MigrateShoppingCart(_workContext.CurrentCustomer, user, true);
-
             //authenticate
             _authenticationService.SignIn(user, false);
 

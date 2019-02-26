@@ -5,14 +5,12 @@ using System.Text;
 using Nop.Core;
 using Nop.Core.Data;
 using Nop.Core.Domain;
-using Nop.Core.Domain.Affiliates;
 using Nop.Core.Domain.Blogs;
 using Nop.Core.Domain.Catalog;
 using Nop.Core.Domain.Cms;
 using Nop.Core.Domain.Common;
 using Nop.Core.Domain.Customers;
 using Nop.Core.Domain.Directory;
-using Nop.Core.Domain.Discounts;
 using Nop.Core.Domain.Forums;
 using Nop.Core.Domain.Gdpr;
 using Nop.Core.Domain.Localization;
@@ -20,12 +18,9 @@ using Nop.Core.Domain.Logging;
 using Nop.Core.Domain.Media;
 using Nop.Core.Domain.Messages;
 using Nop.Core.Domain.News;
-using Nop.Core.Domain.Orders;
-using Nop.Core.Domain.Payments;
 using Nop.Core.Domain.Polls;
 using Nop.Core.Domain.Security;
 using Nop.Core.Domain.Seo;
-using Nop.Core.Domain.Shipping;
 using Nop.Core.Domain.Stores;
 using Nop.Core.Domain.Tasks;
 using Nop.Core.Domain.Tax;
@@ -55,46 +50,30 @@ namespace Nop.Services.Installation
         private readonly IRepository<ActivityLog> _activityLogRepository;
         private readonly IRepository<ActivityLogType> _activityLogTypeRepository;
         private readonly IRepository<Address> _addressRepository;
-        private readonly IRepository<Affiliate> _affiliateRepository;
         private readonly IRepository<BlogPost> _blogPostRepository;
         private readonly IRepository<Category> _categoryRepository;
         private readonly IRepository<CategoryTemplate> _categoryTemplateRepository;
-        private readonly IRepository<CheckoutAttribute> _checkoutAttributeRepository;
         private readonly IRepository<Country> _countryRepository;
         private readonly IRepository<Currency> _currencyRepository;
         private readonly IRepository<Customer> _customerRepository;
         private readonly IRepository<CustomerPassword> _customerPasswordRepository;
         private readonly IRepository<CustomerRole> _customerRoleRepository;
-        private readonly IRepository<DeliveryDate> _deliveryDateRepository;
-        private readonly IRepository<Discount> _discountRepository;
         private readonly IRepository<EmailAccount> _emailAccountRepository;
         private readonly IRepository<Forum> _forumRepository;
         private readonly IRepository<ForumGroup> _forumGroupRepository;
-        private readonly IRepository<GiftCard> _giftCardRepository;
         private readonly IRepository<Language> _languageRepository;
-        private readonly IRepository<Manufacturer> _manufacturerRepository;
-        private readonly IRepository<ManufacturerTemplate> _manufacturerTemplateRepository;
         private readonly IRepository<MeasureDimension> _measureDimensionRepository;
         private readonly IRepository<MeasureWeight> _measureWeightRepository;
         private readonly IRepository<MessageTemplate> _messageTemplateRepository;
         private readonly IRepository<NewsItem> _newsItemRepository;
-        private readonly IRepository<Order> _orderRepository;
-        private readonly IRepository<OrderItem> _orderItemRepository;
-        private readonly IRepository<OrderNote> _orderNoteRepository;
         private readonly IRepository<Poll> _pollRepository;
         private readonly IRepository<Product> _productRepository;
         private readonly IRepository<ProductAttribute> _productAttributeRepository;
-        private readonly IRepository<ProductAvailabilityRange> _productAvailabilityRangeRepository;
         private readonly IRepository<ProductTag> _productTagRepository;
         private readonly IRepository<ProductTemplate> _productTemplateRepository;
         private readonly IRepository<RelatedProduct> _relatedProductRepository;
-        private readonly IRepository<ReturnRequestAction> _returnRequestActionRepository;
-        private readonly IRepository<ReturnRequestReason> _returnRequestReasonRepository;
         private readonly IRepository<ScheduleTask> _scheduleTaskRepository;
         private readonly IRepository<SearchTerm> _searchTermRepository;
-        private readonly IRepository<Shipment> _shipmentRepository;
-        private readonly IRepository<ShipmentItem> _shipmentItemRepository;
-        private readonly IRepository<ShippingMethod> _shippingMethodRepository;
         private readonly IRepository<SpecificationAttribute> _specificationAttributeRepository;
         private readonly IRepository<StateProvince> _stateProvinceRepository;
         private readonly IRepository<StockQuantityHistory> _stockQuantityHistoryRepository;
@@ -104,7 +83,6 @@ namespace Nop.Services.Installation
         private readonly IRepository<TopicTemplate> _topicTemplateRepository;
         private readonly IRepository<UrlRecord> _urlRecordRepository;
         private readonly IRepository<Vendor> _vendorRepository;
-        private readonly IRepository<Warehouse> _warehouseRepository;
         private readonly IWebHelper _webHelper;
 
 
@@ -117,46 +95,30 @@ namespace Nop.Services.Installation
             IRepository<ActivityLog> activityLogRepository,
             IRepository<ActivityLogType> activityLogTypeRepository,
             IRepository<Address> addressRepository,
-            IRepository<Affiliate> affiliateRepository,
             IRepository<BlogPost> blogPostRepository,
             IRepository<Category> categoryRepository,
             IRepository<CategoryTemplate> categoryTemplateRepository,
-            IRepository<CheckoutAttribute> checkoutAttributeRepository,
             IRepository<Country> countryRepository,
             IRepository<Currency> currencyRepository,
             IRepository<Customer> customerRepository,
             IRepository<CustomerPassword> customerPasswordRepository,
             IRepository<CustomerRole> customerRoleRepository,
-            IRepository<DeliveryDate> deliveryDateRepository,
-            IRepository<Discount> discountRepository,
             IRepository<EmailAccount> emailAccountRepository,
             IRepository<Forum> forumRepository,
             IRepository<ForumGroup> forumGroupRepository,
-            IRepository<GiftCard> giftCardRepository,
             IRepository<Language> languageRepository,
-            IRepository<Manufacturer> manufacturerRepository,
-            IRepository<ManufacturerTemplate> manufacturerTemplateRepository,
             IRepository<MeasureDimension> measureDimensionRepository,
             IRepository<MeasureWeight> measureWeightRepository,
             IRepository<MessageTemplate> messageTemplateRepository,
             IRepository<NewsItem> newsItemRepository,
-            IRepository<Order> orderRepository,
-            IRepository<OrderItem> orderItemRepository,
-            IRepository<OrderNote> orderNoteRepository,
             IRepository<Poll> pollRepository,
             IRepository<Product> productRepository,
             IRepository<ProductAttribute> productAttributeRepository,
-            IRepository<ProductAvailabilityRange> productAvailabilityRangeRepository,
             IRepository<ProductTag> productTagRepository,
             IRepository<ProductTemplate> productTemplateRepository,
             IRepository<RelatedProduct> relatedProductRepository,
-            IRepository<ReturnRequestAction> returnRequestActionRepository,
-            IRepository<ReturnRequestReason> returnRequestReasonRepository,
             IRepository<ScheduleTask> scheduleTaskRepository,
             IRepository<SearchTerm> searchTermRepository,
-            IRepository<Shipment> shipmentRepository,
-            IRepository<ShipmentItem> shipmentItemRepository,
-            IRepository<ShippingMethod> shippingMethodRepository,
             IRepository<SpecificationAttribute> specificationAttributeRepository,
             IRepository<StateProvince> stateProvinceRepository,
             IRepository<StockQuantityHistory> stockQuantityHistoryRepository,
@@ -166,7 +128,6 @@ namespace Nop.Services.Installation
             IRepository<TopicTemplate> topicTemplateRepository,
             IRepository<UrlRecord> urlRecordRepository,
             IRepository<Vendor> vendorRepository,
-            IRepository<Warehouse> warehouseRepository,
             IWebHelper webHelper)
         {
             this._genericAttributeService = genericAttributeService;
@@ -174,46 +135,30 @@ namespace Nop.Services.Installation
             this._activityLogRepository = activityLogRepository;
             this._activityLogTypeRepository = activityLogTypeRepository;
             this._addressRepository = addressRepository;
-            this._affiliateRepository = affiliateRepository;
             this._blogPostRepository = blogPostRepository;
             this._categoryRepository = categoryRepository;
             this._categoryTemplateRepository = categoryTemplateRepository;
-            this._checkoutAttributeRepository = checkoutAttributeRepository;
             this._countryRepository = countryRepository;
             this._currencyRepository = currencyRepository;
             this._customerPasswordRepository = customerPasswordRepository;
             this._customerRepository = customerRepository;
             this._customerRoleRepository = customerRoleRepository;
-            this._deliveryDateRepository = deliveryDateRepository;
-            this._discountRepository = discountRepository;
             this._emailAccountRepository = emailAccountRepository;
             this._forumGroupRepository = forumGroupRepository;
             this._forumRepository = forumRepository;
-            this._giftCardRepository = giftCardRepository;
             this._languageRepository = languageRepository;
-            this._manufacturerRepository = manufacturerRepository;
-            this._manufacturerTemplateRepository = manufacturerTemplateRepository;
             this._measureDimensionRepository = measureDimensionRepository;
             this._measureWeightRepository = measureWeightRepository;
             this._messageTemplateRepository = messageTemplateRepository;
             this._newsItemRepository = newsItemRepository;
-            this._orderItemRepository = orderItemRepository;
-            this._orderNoteRepository = orderNoteRepository;
-            this._orderRepository = orderRepository;
             this._pollRepository = pollRepository;
             this._productAttributeRepository = productAttributeRepository;
-            this._productAvailabilityRangeRepository = productAvailabilityRangeRepository;
             this._productRepository = productRepository;
             this._productTagRepository = productTagRepository;
             this._productTemplateRepository = productTemplateRepository;
             this._relatedProductRepository = relatedProductRepository;
-            this._returnRequestActionRepository = returnRequestActionRepository;
-            this._returnRequestReasonRepository = returnRequestReasonRepository;
             this._scheduleTaskRepository = scheduleTaskRepository;
             this._searchTermRepository = searchTermRepository;
-            this._shipmentItemRepository = shipmentItemRepository;
-            this._shipmentRepository = shipmentRepository;
-            this._shippingMethodRepository = shippingMethodRepository;
             this._specificationAttributeRepository = specificationAttributeRepository;
             this._stateProvinceRepository = stateProvinceRepository;
             this._stockQuantityHistoryRepository = stockQuantityHistoryRepository;
@@ -223,7 +168,6 @@ namespace Nop.Services.Installation
             this._topicTemplateRepository = topicTemplateRepository;
             this._urlRecordRepository = urlRecordRepository;
             this._vendorRepository = vendorRepository;
-            this._warehouseRepository = warehouseRepository;
             this._webHelper = webHelper;
         }
 
@@ -4030,79 +3974,6 @@ namespace Nop.Services.Installation
             _countryRepository.Insert(countries);
         }
 
-        protected virtual void InstallShippingMethods()
-        {
-            var shippingMethods = new List<ShippingMethod>
-            {
-                new ShippingMethod
-                {
-                    Name = "Ground",
-                    Description =
-                        "Shipping by land transport",
-                    DisplayOrder = 1
-                },
-                new ShippingMethod
-                {
-                    Name = "Next Day Air",
-                    Description = "The one day air shipping",
-                    DisplayOrder = 2
-                },
-                new ShippingMethod
-                {
-                    Name = "2nd Day Air",
-                    Description = "The two day air shipping",
-                    DisplayOrder = 3
-                }
-            };
-            _shippingMethodRepository.Insert(shippingMethods);
-        }
-
-        protected virtual void InstallDeliveryDates()
-        {
-            var deliveryDates = new List<DeliveryDate>
-            {
-                new DeliveryDate
-                {
-                    Name = "1-2 days",
-                    DisplayOrder = 1
-                },
-                new DeliveryDate
-                {
-                    Name = "3-5 days",
-                    DisplayOrder = 5
-                },
-                new DeliveryDate
-                {
-                    Name = "1 week",
-                    DisplayOrder = 10
-                }
-            };
-            _deliveryDateRepository.Insert(deliveryDates);
-        }
-
-        protected virtual void InstallProductAvailabilityRanges()
-        {
-            var productAvailabilityRanges = new List<ProductAvailabilityRange>
-            {
-                new ProductAvailabilityRange
-                {
-                    Name = "2-4 days",
-                    DisplayOrder = 1
-                },
-                new ProductAvailabilityRange
-                {
-                    Name = "7-10 days",
-                    DisplayOrder = 2
-                },
-                new ProductAvailabilityRange
-                {
-                    Name = "2 week",
-                    DisplayOrder = 3
-                }
-            };
-            _productAvailabilityRangeRepository.Insert(productAvailabilityRanges);
-        }
-
         protected virtual void InstallCustomersAndUsers(string defaultUserEmail, string defaultUserPassword)
         {
             var crAdministrators = new CustomerRole
@@ -4496,784 +4367,6 @@ namespace Nop.Services.Installation
             //backgroundTaskUser.CustomerRoles.Add(crGuests);
             backgroundTaskUser.AddCustomerRoleMapping(new CustomerCustomerRoleMapping { CustomerRole = crGuests });
             _customerRepository.Insert(backgroundTaskUser);
-        }
-
-        protected virtual void InstallOrders()
-        {
-            //default store
-            var defaultStore = _storeRepository.Table.FirstOrDefault();
-            if (defaultStore == null)
-                throw new Exception("No default store could be loaded");
-
-            //first order
-            var firstCustomer = _customerRepository.Table.First(c => c.Email.Equals("steve_gates@nopCommerce.com"));
-            var firstOrder = new Order
-            {
-                StoreId = defaultStore.Id,
-                OrderGuid = Guid.NewGuid(),
-                Customer = firstCustomer,
-                CustomerLanguageId = _languageRepository.Table.First().Id,
-                CustomerIp = "127.0.0.1",
-                OrderSubtotalInclTax = 1855M,
-                OrderSubtotalExclTax = 1855M,
-                OrderSubTotalDiscountInclTax = decimal.Zero,
-                OrderSubTotalDiscountExclTax = decimal.Zero,
-                OrderShippingInclTax = decimal.Zero,
-                OrderShippingExclTax = decimal.Zero,
-                PaymentMethodAdditionalFeeInclTax = decimal.Zero,
-                PaymentMethodAdditionalFeeExclTax = decimal.Zero,
-                TaxRates = "0:0;",
-                OrderTax = decimal.Zero,
-                OrderTotal = 1855M,
-                RefundedAmount = decimal.Zero,
-                OrderDiscount = decimal.Zero,
-                CheckoutAttributeDescription = string.Empty,
-                CheckoutAttributesXml = string.Empty,
-                CustomerCurrencyCode = "USD",
-                CurrencyRate = 1M,
-                AffiliateId = 0,
-                OrderStatus = OrderStatus.Processing,
-                AllowStoringCreditCardNumber = false,
-                CardType = string.Empty,
-                CardName = string.Empty,
-                CardNumber = string.Empty,
-                MaskedCreditCardNumber = string.Empty,
-                CardCvv2 = string.Empty,
-                CardExpirationMonth = string.Empty,
-                CardExpirationYear = string.Empty,
-                PaymentMethodSystemName = "Payments.CheckMoneyOrder",
-                AuthorizationTransactionId = string.Empty,
-                AuthorizationTransactionCode = string.Empty,
-                AuthorizationTransactionResult = string.Empty,
-                CaptureTransactionId = string.Empty,
-                CaptureTransactionResult = string.Empty,
-                SubscriptionTransactionId = string.Empty,
-                PaymentStatus = PaymentStatus.Paid,
-                PaidDateUtc = DateTime.UtcNow,
-                BillingAddress = (Address)firstCustomer.BillingAddress.Clone(),
-                ShippingAddress = (Address)firstCustomer.ShippingAddress.Clone(),
-                ShippingStatus = ShippingStatus.NotYetShipped,
-                ShippingMethod = "Ground",
-                PickUpInStore = false,
-                ShippingRateComputationMethodSystemName = "Shipping.FixedByWeightByTotal",
-                CustomValuesXml = string.Empty,
-                VatNumber = string.Empty,
-                CreatedOnUtc = DateTime.UtcNow,
-                CustomOrderNumber = string.Empty
-            };
-            _orderRepository.Insert(firstOrder);
-            firstOrder.CustomOrderNumber = firstOrder.Id.ToString();
-            _orderRepository.Update(firstOrder);
-
-            //item Apple iCam
-            var firstOrderItem1 = new OrderItem
-            {
-                OrderItemGuid = Guid.NewGuid(),
-                Order = firstOrder,
-                ProductId = _productRepository.Table.First(p => p.Name.Equals("Apple iCam")).Id,
-                UnitPriceInclTax = 1300M,
-                UnitPriceExclTax = 1300M,
-                PriceInclTax = 1300M,
-                PriceExclTax = 1300M,
-                OriginalProductCost = decimal.Zero,
-                AttributeDescription = string.Empty,
-                AttributesXml = string.Empty,
-                Quantity = 1,
-                DiscountAmountInclTax = decimal.Zero,
-                DiscountAmountExclTax = decimal.Zero,
-                DownloadCount = 0,
-                IsDownloadActivated = false,
-                LicenseDownloadId = 0,
-                ItemWeight = null,
-                RentalStartDateUtc = null,
-                RentalEndDateUtc = null
-            };
-            _orderItemRepository.Insert(firstOrderItem1);
-
-            //item Leica T Mirrorless Digital Camera
-            var fierstOrderItem2 = new OrderItem
-            {
-                OrderItemGuid = Guid.NewGuid(),
-                Order = firstOrder,
-                ProductId = _productRepository.Table.First(p => p.Name.Equals("Leica T Mirrorless Digital Camera")).Id,
-                UnitPriceInclTax = 530M,
-                UnitPriceExclTax = 530M,
-                PriceInclTax = 530M,
-                PriceExclTax = 530M,
-                OriginalProductCost = decimal.Zero,
-                AttributeDescription = string.Empty,
-                AttributesXml = string.Empty,
-                Quantity = 1,
-                DiscountAmountInclTax = decimal.Zero,
-                DiscountAmountExclTax = decimal.Zero,
-                DownloadCount = 0,
-                IsDownloadActivated = false,
-                LicenseDownloadId = 0,
-                ItemWeight = null,
-                RentalStartDateUtc = null,
-                RentalEndDateUtc = null
-            };
-            _orderItemRepository.Insert(fierstOrderItem2);
-
-            //item $25 Virtual Gift Card
-            var firstOrderItem3 = new OrderItem
-            {
-                OrderItemGuid = Guid.NewGuid(),
-                Order = firstOrder,
-                ProductId = _productRepository.Table.First(p => p.Name.Equals("$25 Virtual Gift Card")).Id,
-                UnitPriceInclTax = 25M,
-                UnitPriceExclTax = 25M,
-                PriceInclTax = 25M,
-                PriceExclTax = 25M,
-                OriginalProductCost = decimal.Zero,
-                AttributeDescription = "From: Steve Gates &lt;steve_gates@nopCommerce.com&gt;<br />For: Brenda Lindgren &lt;brenda_lindgren@nopCommerce.com&gt;",
-                AttributesXml = "<Attributes><GiftCardInfo><RecipientName>Brenda Lindgren</RecipientName><RecipientEmail>brenda_lindgren@nopCommerce.com</RecipientEmail><SenderName>Steve Gates</SenderName><SenderEmail>steve_gates@gmail.com</SenderEmail><Message></Message></GiftCardInfo></Attributes>",
-                Quantity = 1,
-                DiscountAmountInclTax = decimal.Zero,
-                DiscountAmountExclTax = decimal.Zero,
-                DownloadCount = 0,
-                IsDownloadActivated = false,
-                LicenseDownloadId = 0,
-                ItemWeight = null,
-                RentalStartDateUtc = null,
-                RentalEndDateUtc = null
-            };
-            _orderItemRepository.Insert(firstOrderItem3);
-
-            var firstOrderGiftcard = new GiftCard
-            {
-                GiftCardType = GiftCardType.Virtual,
-                PurchasedWithOrderItem = firstOrderItem3,
-                Amount = 25M,
-                IsGiftCardActivated = false,
-                GiftCardCouponCode = string.Empty,
-                RecipientName = "Brenda Lindgren",
-                RecipientEmail = "brenda_lindgren@nopCommerce.com",
-                SenderName = "Steve Gates",
-                SenderEmail = "steve_gates@nopCommerce.com",
-                Message = string.Empty,
-                IsRecipientNotified = false,
-                CreatedOnUtc = DateTime.UtcNow
-            };
-            _giftCardRepository.Insert(firstOrderGiftcard);
-
-            //order notes
-            _orderNoteRepository.Insert(new OrderNote
-            {
-                CreatedOnUtc = DateTime.UtcNow,
-                Note = "Order placed",
-                Order = firstOrder
-            });
-            _orderNoteRepository.Insert(new OrderNote
-            {
-                CreatedOnUtc = DateTime.UtcNow,
-                Note = "Order paid",
-                Order = firstOrder
-            });
-            
-            //second order
-            var secondCustomer = _customerRepository.Table.First(c => c.Email.Equals("arthur_holmes@nopCommerce.com"));
-            var secondOrder = new Order
-            {
-                StoreId = defaultStore.Id,
-                OrderGuid = Guid.NewGuid(),
-                Customer = secondCustomer,
-                CustomerLanguageId = _languageRepository.Table.First().Id,
-                CustomerIp = "127.0.0.1",
-                OrderSubtotalInclTax = 2460M,
-                OrderSubtotalExclTax = 2460M,
-                OrderSubTotalDiscountInclTax = decimal.Zero,
-                OrderSubTotalDiscountExclTax = decimal.Zero,
-                OrderShippingInclTax = decimal.Zero,
-                OrderShippingExclTax = decimal.Zero,
-                PaymentMethodAdditionalFeeInclTax = decimal.Zero,
-                PaymentMethodAdditionalFeeExclTax = decimal.Zero,
-                TaxRates = "0:0;",
-                OrderTax = decimal.Zero,
-                OrderTotal = 2460M,
-                RefundedAmount = decimal.Zero,
-                OrderDiscount = decimal.Zero,
-                CheckoutAttributeDescription = string.Empty,
-                CheckoutAttributesXml = string.Empty,
-                CustomerCurrencyCode = "USD",
-                CurrencyRate = 1M,
-                AffiliateId = 0,
-                OrderStatus = OrderStatus.Pending,
-                AllowStoringCreditCardNumber = false,
-                CardType = string.Empty,
-                CardName = string.Empty,
-                CardNumber = string.Empty,
-                MaskedCreditCardNumber = string.Empty,
-                CardCvv2 = string.Empty,
-                CardExpirationMonth = string.Empty,
-                CardExpirationYear = string.Empty,
-                PaymentMethodSystemName = "Payments.CheckMoneyOrder",
-                AuthorizationTransactionId = string.Empty,
-                AuthorizationTransactionCode = string.Empty,
-                AuthorizationTransactionResult = string.Empty,
-                CaptureTransactionId = string.Empty,
-                CaptureTransactionResult = string.Empty,
-                SubscriptionTransactionId = string.Empty,
-                PaymentStatus = PaymentStatus.Pending,
-                PaidDateUtc = null,
-                BillingAddress = (Address)secondCustomer.BillingAddress.Clone(),
-                ShippingAddress = (Address)secondCustomer.ShippingAddress.Clone(),
-                ShippingStatus = ShippingStatus.NotYetShipped,
-                ShippingMethod = "Next Day Air",
-                PickUpInStore = false,
-                ShippingRateComputationMethodSystemName = "Shipping.FixedByWeightByTotal",
-                CustomValuesXml = string.Empty,
-                VatNumber = string.Empty,
-                CreatedOnUtc = DateTime.UtcNow,
-                CustomOrderNumber = string.Empty
-            };
-            _orderRepository.Insert(secondOrder);
-            secondOrder.CustomOrderNumber = secondOrder.Id.ToString();
-            _orderRepository.Update(secondOrder);
-
-            //order notes
-            _orderNoteRepository.Insert(new OrderNote
-            {
-                CreatedOnUtc = DateTime.UtcNow,
-                Note = "Order placed",
-                Order = secondOrder
-            });
-
-            //item Vintage Style Engagement Ring
-            var secondOrderItem1 = new OrderItem
-            {
-                OrderItemGuid = Guid.NewGuid(),
-                Order = secondOrder,
-                ProductId = _productRepository.Table.First(p => p.Name.Equals("Vintage Style Engagement Ring")).Id,
-                UnitPriceInclTax = 2100M,
-                UnitPriceExclTax = 2100M,
-                PriceInclTax = 2100M,
-                PriceExclTax = 2100M,
-                OriginalProductCost = decimal.Zero,
-                AttributeDescription = string.Empty,
-                AttributesXml = string.Empty,
-                Quantity = 1,
-                DiscountAmountInclTax = decimal.Zero,
-                DiscountAmountExclTax = decimal.Zero,
-                DownloadCount = 0,
-                IsDownloadActivated = false,
-                LicenseDownloadId = 0,
-                ItemWeight = null,
-                RentalStartDateUtc = null,
-                RentalEndDateUtc = null
-            };
-            _orderItemRepository.Insert(secondOrderItem1);
-
-            //item Flower Girl Bracelet
-            var secondOrderItem2 = new OrderItem
-            {
-                OrderItemGuid = Guid.NewGuid(),
-                Order = secondOrder,
-                ProductId = _productRepository.Table.First(p => p.Name.Equals("Flower Girl Bracelet")).Id,
-                UnitPriceInclTax = 360M,
-                UnitPriceExclTax = 360M,
-                PriceInclTax = 360M,
-                PriceExclTax = 360M,
-                OriginalProductCost = decimal.Zero,
-                AttributeDescription = string.Empty,
-                AttributesXml = string.Empty,
-                Quantity = 1,
-                DiscountAmountInclTax = decimal.Zero,
-                DiscountAmountExclTax = decimal.Zero,
-                DownloadCount = 0,
-                IsDownloadActivated = false,
-                LicenseDownloadId = 0,
-                ItemWeight = null,
-                RentalStartDateUtc = null,
-                RentalEndDateUtc = null
-            };
-            _orderItemRepository.Insert(secondOrderItem2);
-            
-            //third order
-            var thirdCustomer = _customerRepository.Table.First(c => c.Email.Equals("james_pan@nopCommerce.com"));
-            var thirdOrder = new Order
-            {
-                StoreId = defaultStore.Id,
-                OrderGuid = Guid.NewGuid(),
-                Customer = thirdCustomer,
-                CustomerLanguageId = _languageRepository.Table.First().Id,
-                CustomerIp = "127.0.0.1",
-                OrderSubtotalInclTax = 8.80M,
-                OrderSubtotalExclTax = 8.80M,
-                OrderSubTotalDiscountInclTax = decimal.Zero,
-                OrderSubTotalDiscountExclTax = decimal.Zero,
-                OrderShippingInclTax = decimal.Zero,
-                OrderShippingExclTax = decimal.Zero,
-                PaymentMethodAdditionalFeeInclTax = decimal.Zero,
-                PaymentMethodAdditionalFeeExclTax = decimal.Zero,
-                TaxRates = "0:0;",
-                OrderTax = decimal.Zero,
-                OrderTotal = 8.80M,
-                RefundedAmount = decimal.Zero,
-                OrderDiscount = decimal.Zero,
-                CheckoutAttributeDescription = string.Empty,
-                CheckoutAttributesXml = string.Empty,
-                CustomerCurrencyCode = "USD",
-                CurrencyRate = 1M,
-                AffiliateId = 0,
-                OrderStatus = OrderStatus.Pending,
-                AllowStoringCreditCardNumber = false,
-                CardType = string.Empty,
-                CardName = string.Empty,
-                CardNumber = string.Empty,
-                MaskedCreditCardNumber = string.Empty,
-                CardCvv2 = string.Empty,
-                CardExpirationMonth = string.Empty,
-                CardExpirationYear = string.Empty,
-                PaymentMethodSystemName = "Payments.CheckMoneyOrder",
-                AuthorizationTransactionId = string.Empty,
-                AuthorizationTransactionCode = string.Empty,
-                AuthorizationTransactionResult = string.Empty,
-                CaptureTransactionId = string.Empty,
-                CaptureTransactionResult = string.Empty,
-                SubscriptionTransactionId = string.Empty,
-                PaymentStatus = PaymentStatus.Pending,
-                PaidDateUtc = null,
-                BillingAddress = (Address)thirdCustomer.BillingAddress.Clone(),
-                ShippingAddress = null,
-                ShippingStatus = ShippingStatus.ShippingNotRequired,
-                ShippingMethod = string.Empty,
-                PickUpInStore = false,
-                ShippingRateComputationMethodSystemName = string.Empty,
-                CustomValuesXml = string.Empty,
-                VatNumber = string.Empty,
-                CreatedOnUtc = DateTime.UtcNow,
-                CustomOrderNumber = string.Empty
-            };
-            _orderRepository.Insert(thirdOrder);
-            thirdOrder.CustomOrderNumber = thirdOrder.Id.ToString();
-            _orderRepository.Update(thirdOrder);
-
-            //order notes
-            _orderNoteRepository.Insert(new OrderNote
-            {
-                CreatedOnUtc = DateTime.UtcNow,
-                Note = "Order placed",
-                Order = thirdOrder
-            });
-
-            //item If You Wait
-            var thirdOrderItem1 = new OrderItem
-            {
-                OrderItemGuid = Guid.NewGuid(),
-                Order = thirdOrder,
-                ProductId = _productRepository.Table.First(p => p.Name.Equals("If You Wait (donation)")).Id,
-                UnitPriceInclTax = 3M,
-                UnitPriceExclTax = 3M,
-                PriceInclTax = 3M,
-                PriceExclTax = 3M,
-                OriginalProductCost = decimal.Zero,
-                AttributeDescription = string.Empty,
-                AttributesXml = string.Empty,
-                Quantity = 1,
-                DiscountAmountInclTax = decimal.Zero,
-                DiscountAmountExclTax = decimal.Zero,
-                DownloadCount = 0,
-                IsDownloadActivated = false,
-                LicenseDownloadId = 0,
-                ItemWeight = null,
-                RentalStartDateUtc = null,
-                RentalEndDateUtc = null
-            };
-            _orderItemRepository.Insert(thirdOrderItem1);
-
-            //item Night Visions
-            var thirdOrderItem2 = new OrderItem
-            {
-                OrderItemGuid = Guid.NewGuid(),
-                Order = thirdOrder,
-                ProductId = _productRepository.Table.First(p => p.Name.Equals("Night Visions")).Id,
-                UnitPriceInclTax = 2.8M,
-                UnitPriceExclTax = 2.8M,
-                PriceInclTax = 2.8M,
-                PriceExclTax = 2.8M,
-                OriginalProductCost = decimal.Zero,
-                AttributeDescription = string.Empty,
-                AttributesXml = string.Empty,
-                Quantity = 1,
-                DiscountAmountInclTax = decimal.Zero,
-                DiscountAmountExclTax = decimal.Zero,
-                DownloadCount = 0,
-                IsDownloadActivated = false,
-                LicenseDownloadId = 0,
-                ItemWeight = null,
-                RentalStartDateUtc = null,
-                RentalEndDateUtc = null
-            };
-            _orderItemRepository.Insert(thirdOrderItem2);
-
-            //item Science & Faith
-            var thirdOrderItem3 = new OrderItem
-            {
-                OrderItemGuid = Guid.NewGuid(),
-                Order = thirdOrder,
-                ProductId = _productRepository.Table.First(p => p.Name.Equals("Science & Faith")).Id,
-                UnitPriceInclTax = 3M,
-                UnitPriceExclTax = 3M,
-                PriceInclTax = 3M,
-                PriceExclTax = 3M,
-                OriginalProductCost = decimal.Zero,
-                AttributeDescription = string.Empty,
-                AttributesXml = string.Empty,
-                Quantity = 1,
-                DiscountAmountInclTax = decimal.Zero,
-                DiscountAmountExclTax = decimal.Zero,
-                DownloadCount = 0,
-                IsDownloadActivated = false,
-                LicenseDownloadId = 0,
-                ItemWeight = null,
-                RentalStartDateUtc = null,
-                RentalEndDateUtc = null
-            };
-            _orderItemRepository.Insert(thirdOrderItem3);
-
-            //fourth order
-            var fourthCustomer = _customerRepository.Table.First(c => c.Email.Equals("brenda_lindgren@nopCommerce.com"));
-            var fourthOrder = new Order
-            {
-                StoreId = defaultStore.Id,
-                OrderGuid = Guid.NewGuid(),
-                Customer = fourthCustomer,
-                CustomerLanguageId = _languageRepository.Table.First().Id,
-                CustomerIp = "127.0.0.1",
-                OrderSubtotalInclTax = 102M,
-                OrderSubtotalExclTax = 102M,
-                OrderSubTotalDiscountInclTax = decimal.Zero,
-                OrderSubTotalDiscountExclTax = decimal.Zero,
-                OrderShippingInclTax = decimal.Zero,
-                OrderShippingExclTax = decimal.Zero,
-                PaymentMethodAdditionalFeeInclTax = decimal.Zero,
-                PaymentMethodAdditionalFeeExclTax = decimal.Zero,
-                TaxRates = "0:0;",
-                OrderTax = decimal.Zero,
-                OrderTotal = 102M,
-                RefundedAmount = decimal.Zero,
-                OrderDiscount = decimal.Zero,
-                CheckoutAttributeDescription = string.Empty,
-                CheckoutAttributesXml = string.Empty,
-                CustomerCurrencyCode = "USD",
-                CurrencyRate = 1M,
-                AffiliateId = 0,
-                OrderStatus = OrderStatus.Processing,
-                AllowStoringCreditCardNumber = false,
-                CardType = string.Empty,
-                CardName = string.Empty,
-                CardNumber = string.Empty,
-                MaskedCreditCardNumber = string.Empty,
-                CardCvv2 = string.Empty,
-                CardExpirationMonth = string.Empty,
-                CardExpirationYear = string.Empty,
-                PaymentMethodSystemName = "Payments.CheckMoneyOrder",
-                AuthorizationTransactionId = string.Empty,
-                AuthorizationTransactionCode = string.Empty,
-                AuthorizationTransactionResult = string.Empty,
-                CaptureTransactionId = string.Empty,
-                CaptureTransactionResult = string.Empty,
-                SubscriptionTransactionId = string.Empty,
-                PaymentStatus = PaymentStatus.Paid,
-                PaidDateUtc = DateTime.UtcNow,
-                BillingAddress = (Address)fourthCustomer.BillingAddress.Clone(),
-                ShippingAddress = (Address)fourthCustomer.ShippingAddress.Clone(),
-                ShippingStatus = ShippingStatus.Shipped,
-                ShippingMethod = "Pickup in store",
-                PickUpInStore = true,
-                PickupAddress = (Address)fourthCustomer.ShippingAddress.Clone(),
-                ShippingRateComputationMethodSystemName = "Pickup.PickupInStore",
-                CustomValuesXml = string.Empty,
-                VatNumber = string.Empty,
-                CreatedOnUtc = DateTime.UtcNow,
-                CustomOrderNumber = string.Empty
-            };
-            _orderRepository.Insert(fourthOrder);
-            fourthOrder.CustomOrderNumber = fourthOrder.Id.ToString();
-            _orderRepository.Update(fourthOrder);
-
-            //order notes
-            _orderNoteRepository.Insert(new OrderNote
-            {
-                CreatedOnUtc = DateTime.UtcNow,
-                Note = "Order placed",
-                Order = fourthOrder
-            });
-            _orderNoteRepository.Insert(new OrderNote
-            {
-                CreatedOnUtc = DateTime.UtcNow,
-                Note = "Order paid",
-                Order = fourthOrder
-            });
-            _orderNoteRepository.Insert(new OrderNote
-            {
-                CreatedOnUtc = DateTime.UtcNow,
-                Note = "Order shipped",
-                Order = fourthOrder
-            });
-
-            //item Pride and Prejudice
-            var fourthOrderItem1 = new OrderItem
-            {
-                OrderItemGuid = Guid.NewGuid(),
-                Order = fourthOrder,
-                ProductId = _productRepository.Table.First(p => p.Name.Equals("Pride and Prejudice")).Id,
-                UnitPriceInclTax = 24M,
-                UnitPriceExclTax = 24M,
-                PriceInclTax = 24M,
-                PriceExclTax = 24M,
-                OriginalProductCost = decimal.Zero,
-                AttributeDescription = string.Empty,
-                AttributesXml = string.Empty,
-                Quantity = 1,
-                DiscountAmountInclTax = decimal.Zero,
-                DiscountAmountExclTax = decimal.Zero,
-                DownloadCount = 0,
-                IsDownloadActivated = false,
-                LicenseDownloadId = 0,
-                ItemWeight = null,
-                RentalStartDateUtc = null,
-                RentalEndDateUtc = null
-            };
-            _orderItemRepository.Insert(fourthOrderItem1);
-
-            //item First Prize Pies
-            var fourthOrderItem2 = new OrderItem
-            {
-                OrderItemGuid = Guid.NewGuid(),
-                Order = fourthOrder,
-                ProductId = _productRepository.Table.First(p => p.Name.Equals("First Prize Pies")).Id,
-                UnitPriceInclTax = 51M,
-                UnitPriceExclTax = 51M,
-                PriceInclTax = 51M,
-                PriceExclTax = 51M,
-                OriginalProductCost = decimal.Zero,
-                AttributeDescription = string.Empty,
-                AttributesXml = string.Empty,
-                Quantity = 1,
-                DiscountAmountInclTax = decimal.Zero,
-                DiscountAmountExclTax = decimal.Zero,
-                DownloadCount = 0,
-                IsDownloadActivated = false,
-                LicenseDownloadId = 0,
-                ItemWeight = null,
-                RentalStartDateUtc = null,
-                RentalEndDateUtc = null
-            };
-            _orderItemRepository.Insert(fourthOrderItem2);
-
-            //item Fahrenheit 451 by Ray Bradbury
-            var fourthOrderItem3 = new OrderItem
-            {
-                OrderItemGuid = Guid.NewGuid(),
-                Order = fourthOrder,
-                ProductId = _productRepository.Table.First(p => p.Name.Equals("Fahrenheit 451 by Ray Bradbury")).Id,
-                UnitPriceInclTax = 27M,
-                UnitPriceExclTax = 27M,
-                PriceInclTax = 27M,
-                PriceExclTax = 27M,
-                OriginalProductCost = decimal.Zero,
-                AttributeDescription = string.Empty,
-                AttributesXml = string.Empty,
-                Quantity = 1,
-                DiscountAmountInclTax = decimal.Zero,
-                DiscountAmountExclTax = decimal.Zero,
-                DownloadCount = 0,
-                IsDownloadActivated = false,
-                LicenseDownloadId = 0,
-                ItemWeight = null,
-                RentalStartDateUtc = null,
-                RentalEndDateUtc = null
-            };
-            _orderItemRepository.Insert(fourthOrderItem3);
-
-            //shipments
-            //shipment 1
-            var fourthOrderShipment1 = new Shipment
-            {
-                Order = fourthOrder,
-                TrackingNumber = string.Empty,
-                TotalWeight = 4M,
-                ShippedDateUtc = DateTime.UtcNow,
-                DeliveryDateUtc = DateTime.UtcNow,
-                AdminComment = string.Empty,
-                CreatedOnUtc = DateTime.UtcNow
-            };
-            _shipmentRepository.Insert(fourthOrderShipment1);
-
-            var fourthOrderShipment1Item1 = new ShipmentItem
-            {
-                OrderItemId = fourthOrderItem1.Id,
-                Quantity = 1,
-                WarehouseId = 0,
-                Shipment = fourthOrderShipment1
-            };
-            _shipmentItemRepository.Insert(fourthOrderShipment1Item1);
-
-            var fourthOrderShipment1Item2 = new ShipmentItem
-            {
-                OrderItemId = fourthOrderItem2.Id,
-                Quantity = 1,
-                WarehouseId = 0,
-                Shipment = fourthOrderShipment1
-            };
-            _shipmentItemRepository.Insert(fourthOrderShipment1Item2);
-
-            //shipment 2
-            var fourthOrderShipment2 = new Shipment
-            {
-                Order = fourthOrder,
-                TrackingNumber = string.Empty,
-                TotalWeight = 2M,
-                ShippedDateUtc = DateTime.UtcNow,
-                DeliveryDateUtc = DateTime.UtcNow,
-                AdminComment = string.Empty,
-                CreatedOnUtc = DateTime.UtcNow
-            };
-            _shipmentRepository.Insert(fourthOrderShipment2);
-
-            var fourthOrderShipment2Item1 = new ShipmentItem
-            {
-                OrderItemId = fourthOrderItem3.Id,
-                Quantity = 1,
-                WarehouseId = 0,
-                Shipment = fourthOrderShipment2
-            };
-            _shipmentItemRepository.Insert(fourthOrderShipment2Item1);
-
-            //fifth order
-            var fifthCustomer = _customerRepository.Table.First(c => c.Email.Equals("victoria_victoria@nopCommerce.com"));
-            var fifthOrder = new Order
-            {
-                StoreId = defaultStore.Id,
-                OrderGuid = Guid.NewGuid(),
-                Customer = fifthCustomer,
-                CustomerLanguageId = _languageRepository.Table.First().Id,
-                CustomerIp = "127.0.0.1",
-                OrderSubtotalInclTax = 43.50M,
-                OrderSubtotalExclTax = 43.50M,
-                OrderSubTotalDiscountInclTax = decimal.Zero,
-                OrderSubTotalDiscountExclTax = decimal.Zero,
-                OrderShippingInclTax = decimal.Zero,
-                OrderShippingExclTax = decimal.Zero,
-                PaymentMethodAdditionalFeeInclTax = decimal.Zero,
-                PaymentMethodAdditionalFeeExclTax = decimal.Zero,
-                TaxRates = "0:0;",
-                OrderTax = decimal.Zero,
-                OrderTotal = 43.50M,
-                RefundedAmount = decimal.Zero,
-                OrderDiscount = decimal.Zero,
-                CheckoutAttributeDescription = string.Empty,
-                CheckoutAttributesXml = string.Empty,
-                CustomerCurrencyCode = "USD",
-                CurrencyRate = 1M,
-                AffiliateId = 0,
-                OrderStatus = OrderStatus.Complete,
-                AllowStoringCreditCardNumber = false,
-                CardType = string.Empty,
-                CardName = string.Empty,
-                CardNumber = string.Empty,
-                MaskedCreditCardNumber = string.Empty,
-                CardCvv2 = string.Empty,
-                CardExpirationMonth = string.Empty,
-                CardExpirationYear = string.Empty,
-                PaymentMethodSystemName = "Payments.CheckMoneyOrder",
-                AuthorizationTransactionId = string.Empty,
-                AuthorizationTransactionCode = string.Empty,
-                AuthorizationTransactionResult = string.Empty,
-                CaptureTransactionId = string.Empty,
-                CaptureTransactionResult = string.Empty,
-                SubscriptionTransactionId = string.Empty,
-                PaymentStatus = PaymentStatus.Paid,
-                PaidDateUtc = DateTime.UtcNow,
-                BillingAddress = (Address)fifthCustomer.BillingAddress.Clone(),
-                ShippingAddress = (Address)fifthCustomer.ShippingAddress.Clone(),
-                ShippingStatus = ShippingStatus.Delivered,
-                ShippingMethod = "Ground",
-                PickUpInStore = false,
-                ShippingRateComputationMethodSystemName = "Shipping.FixedByWeightByTotal",
-                CustomValuesXml = string.Empty,
-                VatNumber = string.Empty,
-                CreatedOnUtc = DateTime.UtcNow,
-                CustomOrderNumber = string.Empty
-            };
-            _orderRepository.Insert(fifthOrder);
-            fifthOrder.CustomOrderNumber = fifthOrder.Id.ToString();
-            _orderRepository.Update(fifthOrder);
-
-            //order notes
-            _orderNoteRepository.Insert(new OrderNote
-            {
-                CreatedOnUtc = DateTime.UtcNow,
-                Note = "Order placed",
-                Order = fifthOrder
-            });
-            _orderNoteRepository.Insert(new OrderNote
-            {
-                CreatedOnUtc = DateTime.UtcNow,
-                Note = "Order paid",
-                Order = fifthOrder
-            });
-            _orderNoteRepository.Insert(new OrderNote
-            {
-                CreatedOnUtc = DateTime.UtcNow,
-                Note = "Order shipped",
-                Order = fifthOrder
-            });
-            _orderNoteRepository.Insert(new OrderNote
-            {
-                CreatedOnUtc = DateTime.UtcNow,
-                Note = "Order delivered",
-                Order = fifthOrder
-            });
-
-            //item Levi's 511 Jeans
-            var fifthOrderItem1 = new OrderItem
-            {
-                OrderItemGuid = Guid.NewGuid(),
-                Order = fifthOrder,
-                ProductId = _productRepository.Table.First(p => p.Name.Equals("Levi's 511 Jeans")).Id,
-                UnitPriceInclTax = 43.50M,
-                UnitPriceExclTax = 43.50M,
-                PriceInclTax = 43.50M,
-                PriceExclTax = 43.50M,
-                OriginalProductCost = decimal.Zero,
-                AttributeDescription = string.Empty,
-                AttributesXml = string.Empty,
-                Quantity = 1,
-                DiscountAmountInclTax = decimal.Zero,
-                DiscountAmountExclTax = decimal.Zero,
-                DownloadCount = 0,
-                IsDownloadActivated = false,
-                LicenseDownloadId = 0,
-                ItemWeight = null,
-                RentalStartDateUtc = null,
-                RentalEndDateUtc = null
-            };
-            _orderItemRepository.Insert(fifthOrderItem1);
-
-            //shipment 1
-            var fifthOrderShipment1 = new Shipment
-            {
-                Order = fifthOrder,
-                TrackingNumber = string.Empty,
-                TotalWeight = 2M,
-                ShippedDateUtc = DateTime.UtcNow,
-                DeliveryDateUtc = DateTime.UtcNow,
-                AdminComment = string.Empty,
-                CreatedOnUtc = DateTime.UtcNow
-            };
-            _shipmentRepository.Insert(fifthOrderShipment1);
-
-            var fifthOrderShipment1Item1 = new ShipmentItem
-            {
-                OrderItemId = fifthOrderItem1.Id,
-                Quantity = 1,
-                WarehouseId = 0,
-                Shipment = fifthOrderShipment1
-            };
-            _shipmentItemRepository.Insert(fifthOrderShipment1Item1);
         }
 
         protected virtual void InstallActivityLog(string defaultUserEmail)
@@ -6350,63 +5443,7 @@ namespace Nop.Services.Installation
                 Color3 = "#dde2e6"
             });
 
-            settingService.SaveSetting(new ShoppingCartSettings
-            {
-                DisplayCartAfterAddingProduct = false,
-                DisplayWishlistAfterAddingProduct = false,
-                MaximumShoppingCartItems = 1000,
-                MaximumWishlistItems = 1000,
-                AllowOutOfStockItemsToBeAddedToWishlist = false,
-                MoveItemsFromWishlistToCart = true,
-                CartsSharedBetweenStores = false,
-                ShowProductImagesOnShoppingCart = true,
-                ShowProductImagesOnWishList = true,
-                ShowDiscountBox = true,
-                ShowGiftCardBox = true,
-                CrossSellsNumber = 4,
-                EmailWishlistEnabled = true,
-                AllowAnonymousUsersToEmailWishlist = false,
-                MiniShoppingCartEnabled = true,
-                ShowProductImagesInMiniShoppingCart = true,
-                MiniShoppingCartProductNumber = 5,
-                RoundPricesDuringCalculation = true,
-                GroupTierPricesForDistinctShoppingCartItems = false,
-                AllowCartItemEditing = true,
-                RenderAssociatedAttributeValueQuantity = true
-            });
-
-            settingService.SaveSetting(new OrderSettings
-            {
-                ReturnRequestNumberMask = "{ID}",
-                IsReOrderAllowed = true,
-                MinOrderSubtotalAmount = 0,
-                MinOrderSubtotalAmountIncludingTax = false,
-                MinOrderTotalAmount = 0,
-                AutoUpdateOrderTotalsOnEditingOrder = false,
-                AnonymousCheckoutAllowed = true,
-                TermsOfServiceOnShoppingCartPage = true,
-                TermsOfServiceOnOrderConfirmPage = false,
-                OnePageCheckoutEnabled = true,
-                OnePageCheckoutDisplayOrderTotalsOnPaymentInfoTab = false,
-                DisableBillingAddressCheckoutStep = false,
-                DisableOrderCompletedPage = false,
-                AttachPdfInvoiceToOrderPlacedEmail = false,
-                AttachPdfInvoiceToOrderCompletedEmail = false,
-                GeneratePdfInvoiceInCustomerLanguage = true,
-                AttachPdfInvoiceToOrderPaidEmail = false,
-                ReturnRequestsEnabled = true,
-                ReturnRequestsAllowFiles = false,
-                ReturnRequestsFileMaximumSize = 2048,
-                NumberOfDaysReturnRequestAvailable = 365,
-                MinimumOrderPlacementInterval = 30,
-                ActivateGiftCardsAfterCompletingOrder = false,
-                DeactivateGiftCardsAfterCancellingOrder = false,
-                DeactivateGiftCardsAfterDeletingOrder = false,
-                CompleteOrderWhenDelivered = true,
-                CustomOrderNumberMask = "{ID}",
-                ExportWithProducts = true,
-                AllowAdminsToBuyCallForPriceProducts = true
-            });
+            
 
             settingService.SaveSetting(new SecuritySettings
             {
@@ -6420,43 +5457,6 @@ namespace Nop.Services.Installation
                 AllowNonAsciiCharactersInHeaders = true
             });
 
-            settingService.SaveSetting(new ShippingSettings
-            {
-                ActiveShippingRateComputationMethodSystemNames = new List<string> { "Shipping.FixedByWeightByTotal" },
-                ActivePickupPointProviderSystemNames = new List<string> { "Pickup.PickupInStore" },
-                ShipToSameAddress = true,
-                AllowPickUpInStore = true,
-                DisplayPickupPointsOnMap = false,
-                IgnoreAdditionalShippingChargeForPickUpInStore = true,
-                UseWarehouseLocation = false,
-                NotifyCustomerAboutShippingFromMultipleLocations = false,
-                FreeShippingOverXEnabled = false,
-                FreeShippingOverXValue = decimal.Zero,
-                FreeShippingOverXIncludingTax = false,
-                EstimateShippingEnabled = true,
-                DisplayShipmentEventsToCustomers = false,
-                DisplayShipmentEventsToStoreOwner = false,
-                HideShippingTotal = false,
-                ReturnValidOptionsIfThereAreAny = true,
-                BypassShippingMethodSelectionIfOnlyOne = false,
-                UseCubeRootMethod = true,
-                ConsiderAssociatedProductsDimensions = true,
-                ShipSeparatelyOneItemEach = true
-            });
-
-            settingService.SaveSetting(new PaymentSettings
-            {
-                ActivePaymentMethodSystemNames = new List<string>
-                    {
-                        "Payments.CheckMoneyOrder",
-                        "Payments.Manual"
-                    },
-                AllowRePostingPayments = true,
-                BypassPaymentMethodSelectionIfOnlyOne = true,
-                ShowPaymentMethodDescriptions = true,
-                SkipPaymentInfoStepForRedirectionPaymentMethods = false,
-                CancelRecurringPaymentsAfterFailedPayment = false
-            });
 
             settingService.SaveSetting(new TaxSettings
             {
@@ -6622,36 +5622,6 @@ namespace Nop.Services.Installation
             {
                 UsePopupNotifications = false
             });
-        }
-
-        protected virtual void InstallCheckoutAttributes()
-        {
-            var ca1 = new CheckoutAttribute
-            {
-                Name = "Gift wrapping",
-                IsRequired = true,
-                ShippableProductRequired = true,
-                AttributeControlType = AttributeControlType.DropdownList,
-                DisplayOrder = 1
-            };
-            ca1.CheckoutAttributeValues.Add(new CheckoutAttributeValue
-            {
-                Name = "No",
-                PriceAdjustment = 0,
-                DisplayOrder = 1,
-                IsPreSelected = true
-            });
-            ca1.CheckoutAttributeValues.Add(new CheckoutAttributeValue
-            {
-                Name = "Yes",
-                PriceAdjustment = 10,
-                DisplayOrder = 2
-            });
-            var checkoutAttributes = new List<CheckoutAttribute>
-            {
-                ca1
-            };
-            _checkoutAttributeRepository.Insert(checkoutAttributes);
         }
 
         protected virtual void InstallSpecificationAttributes()
@@ -7139,79 +6109,6 @@ namespace Nop.Services.Installation
             }
         }
 
-        protected virtual void InstallManufacturers()
-        {
-            var pictureService = EngineContext.Current.Resolve<IPictureService>();
-            var sampleImagesPath = GetSamplesPath();
-
-            var manufacturerTemplateInGridAndLines =
-                _manufacturerTemplateRepository.Table.FirstOrDefault(pt => pt.Name == "Products in Grid or Lines");
-            if (manufacturerTemplateInGridAndLines == null)
-                throw new Exception("Manufacturer template cannot be loaded");
-
-            var allManufacturers = new List<Manufacturer>();
-            var manufacturerAsus = new Manufacturer
-            {
-                Name = "Apple",
-                ManufacturerTemplateId = manufacturerTemplateInGridAndLines.Id,
-                PageSize = 6,
-                AllowCustomersToSelectPageSize = true,
-                PageSizeOptions = "6, 3, 9",
-                Published = true,
-                PictureId = pictureService.InsertPicture(_fileProvider.ReadAllBytes(sampleImagesPath + "manufacturer_apple.jpg"), MimeTypes.ImagePJpeg, pictureService.GetPictureSeName("Apple")).Id,
-                DisplayOrder = 1,
-                CreatedOnUtc = DateTime.UtcNow,
-                UpdatedOnUtc = DateTime.UtcNow
-            };
-            _manufacturerRepository.Insert(manufacturerAsus);
-            allManufacturers.Add(manufacturerAsus);
-
-            var manufacturerHp = new Manufacturer
-            {
-                Name = "HP",
-                ManufacturerTemplateId = manufacturerTemplateInGridAndLines.Id,
-                PageSize = 6,
-                AllowCustomersToSelectPageSize = true,
-                PageSizeOptions = "6, 3, 9",
-                Published = true,
-                PictureId = pictureService.InsertPicture(_fileProvider.ReadAllBytes(sampleImagesPath + "manufacturer_hp.jpg"), MimeTypes.ImagePJpeg, pictureService.GetPictureSeName("Hp")).Id,
-                DisplayOrder = 5,
-                CreatedOnUtc = DateTime.UtcNow,
-                UpdatedOnUtc = DateTime.UtcNow
-            };
-            _manufacturerRepository.Insert(manufacturerHp);
-            allManufacturers.Add(manufacturerHp);
-
-            var manufacturerNike = new Manufacturer
-            {
-                Name = "Nike",
-                ManufacturerTemplateId = manufacturerTemplateInGridAndLines.Id,
-                PageSize = 6,
-                AllowCustomersToSelectPageSize = true,
-                PageSizeOptions = "6, 3, 9",
-                Published = true,
-                PictureId = pictureService.InsertPicture(_fileProvider.ReadAllBytes(sampleImagesPath + "manufacturer_nike.jpg"), MimeTypes.ImagePJpeg, pictureService.GetPictureSeName("Nike")).Id,
-                DisplayOrder = 5,
-                CreatedOnUtc = DateTime.UtcNow,
-                UpdatedOnUtc = DateTime.UtcNow
-            };
-            _manufacturerRepository.Insert(manufacturerNike);
-            allManufacturers.Add(manufacturerNike);
-
-            //search engine names
-            foreach (var manufacturer in allManufacturers)
-            {
-                _urlRecordRepository.Insert(new UrlRecord
-                {
-                    EntityId = manufacturer.Id,
-                    EntityName = typeof(Manufacturer).Name,
-                    LanguageId = 0,
-                    IsActive = true,
-                    Slug = ValidateSeName(manufacturer, manufacturer.Name)
-                });
-            }
-        }
-
         protected virtual void InstallComputers(ProductTemplate productTemplateSimple, List<Product> allProducts, string sampleImagesPath, IPictureService pictureService, List<RelatedProduct> relatedProducts)
         {
             var productBuildComputer = new Product
@@ -7543,14 +6440,6 @@ namespace Nop.Services.Installation
                         DisplayOrder = 1
                     }
                 },
-                ProductManufacturers =
-                {
-                    new ProductManufacturer
-                    {
-                        Manufacturer = _manufacturerRepository.Table.Single(c => c.Name == "Apple"),
-                        DisplayOrder = 2
-                    }
-                },
                 ProductSpecificationAttributes =
                 {
                     new ProductSpecificationAttribute
@@ -7795,15 +6684,7 @@ namespace Nop.Services.Installation
                         Category = _categoryRepository.Table.Single(c => c.Name == "Notebooks"),
                         DisplayOrder = 1
                     }
-                },
-                ProductManufacturers =
-                {
-                    new ProductManufacturer
-                    {
-                        Manufacturer = _manufacturerRepository.Table.Single(c => c.Name == "HP"),
-                        DisplayOrder = 3
-                    }
-                },
+                },              
                 ProductSpecificationAttributes =
                 {
                     new ProductSpecificationAttribute
@@ -7889,15 +6770,7 @@ namespace Nop.Services.Installation
                         Category = _categoryRepository.Table.Single(c => c.Name == "Notebooks"),
                         DisplayOrder = 1
                     }
-                },
-                ProductManufacturers =
-                {
-                    new ProductManufacturer
-                    {
-                        Manufacturer = _manufacturerRepository.Table.Single(c => c.Name == "HP"),
-                        DisplayOrder = 4
-                    }
-                },
+                },             
                 ProductSpecificationAttributes =
                 {
                     new ProductSpecificationAttribute
@@ -8550,15 +7423,7 @@ namespace Nop.Services.Installation
                         Category = _categoryRepository.Table.Single(c => c.Name == "Camera & photo"),
                         DisplayOrder = 2
                     }
-                },
-                ProductManufacturers =
-                {
-                    new ProductManufacturer
-                    {
-                        Manufacturer = _manufacturerRepository.Table.Single(c => c.Name == "Apple"),
-                        DisplayOrder = 1
-                    }
-                }
+                }               
             };
             allProducts.Add(productAppleICam);
             productAppleICam.ProductPictures.Add(new ProductPicture
@@ -8985,970 +7850,6 @@ namespace Nop.Services.Installation
                 {
                      ProductId1 = productNokiaLumia.Id,
                      ProductId2 = productPortableSoundSpeakers.Id
-                }
-            });
-        }
-
-        protected virtual void InstallApparel(ProductTemplate productTemplateSimple, List<Product> allProducts, string sampleImagesPath, IPictureService pictureService, List<RelatedProduct> relatedProducts, ProductAvailabilityRange productAvailabilityRange)
-        {
-            var productNikeFloral = new Product
-            {
-                ProductType = ProductType.SimpleProduct,
-                VisibleIndividually = true,
-                Name = "Nike Floral Roshe Customized Running Shoes",
-                Sku = "NK_FRC_RS",
-                ShortDescription = "When you ran across these shoes, you will immediately fell in love and needed a pair of these customized beauties.",
-                FullDescription = "<p>Each Rosh Run is personalized and exclusive, handmade in our workshop Custom. Run Your Rosh creations born from the hand of an artist specialized in sneakers, more than 10 years of experience.</p>",
-                ProductTemplateId = productTemplateSimple.Id,
-                //SeName = "adidas-womens-supernova-csh-7-running-shoe",
-                AllowCustomerReviews = true,
-                Price = 40M,
-                IsShipEnabled = true,
-                Weight = 2,
-                Length = 2,
-                Width = 2,
-                Height = 2,
-                TaxCategoryId = _taxCategoryRepository.Table.Single(tc => tc.Name == "Apparel").Id,
-                ManageInventoryMethod = ManageInventoryMethod.ManageStock,
-                StockQuantity = 10000,
-                NotifyAdminForQuantityBelow = 1,
-                AllowBackInStockSubscriptions = false,
-                DisplayStockAvailability = true,
-                LowStockActivity = LowStockActivity.DisableBuyButton,
-                BackorderMode = BackorderMode.NoBackorders,
-                OrderMinimumQuantity = 1,
-                OrderMaximumQuantity = 10000,
-                Published = true,
-                CreatedOnUtc = DateTime.UtcNow,
-                UpdatedOnUtc = DateTime.UtcNow,
-                ProductAttributeMappings =
-                {
-                    new ProductAttributeMapping
-                    {
-                        ProductAttribute = _productAttributeRepository.Table.Single(x => x.Name == "Size"),
-                        AttributeControlType = AttributeControlType.DropdownList,
-                        IsRequired = true,
-                        ProductAttributeValues =
-                        {
-                            new ProductAttributeValue
-                            {
-                                AttributeValueType = AttributeValueType.Simple,
-                                Name = "8",
-                                DisplayOrder = 1
-                            },
-                            new ProductAttributeValue
-                            {
-                                AttributeValueType = AttributeValueType.Simple,
-                                Name = "9",
-                                DisplayOrder = 2
-                            },
-                            new ProductAttributeValue
-                            {
-                                AttributeValueType = AttributeValueType.Simple,
-                                Name = "10",
-                                DisplayOrder = 3
-                            },
-                            new ProductAttributeValue
-                            {
-                                AttributeValueType = AttributeValueType.Simple,
-                                Name = "11",
-                                DisplayOrder = 4
-                            }
-                        }
-                    },
-                    new ProductAttributeMapping
-                    {
-                        ProductAttribute = _productAttributeRepository.Table.Single(x => x.Name == "Color"),
-                        AttributeControlType = AttributeControlType.DropdownList,
-                        IsRequired = true,
-                        ProductAttributeValues =
-                        {
-                            new ProductAttributeValue
-                            {
-                                AttributeValueType = AttributeValueType.Simple,
-                                Name = "White/Blue",
-                                DisplayOrder = 1
-                            },
-                            new ProductAttributeValue
-                            {
-                                AttributeValueType = AttributeValueType.Simple,
-                                Name = "White/Black",
-                                DisplayOrder = 2
-                            }
-                        }
-                    },
-                    new ProductAttributeMapping
-                    {
-                        ProductAttribute = _productAttributeRepository.Table.Single(x => x.Name == "Print"),
-                        AttributeControlType = AttributeControlType.ImageSquares,
-                        IsRequired = true,
-                        ProductAttributeValues =
-                        {
-                            new ProductAttributeValue
-                            {
-                                AttributeValueType = AttributeValueType.Simple,
-                                Name = "Natural",
-                                DisplayOrder = 1,
-                                ImageSquaresPictureId = pictureService.InsertPicture(_fileProvider.ReadAllBytes(sampleImagesPath + "p_attribute_print_2.jpg"), MimeTypes.ImagePJpeg, pictureService.GetPictureSeName("Natural Print")).Id
-                            },
-                            new ProductAttributeValue
-                            {
-                                AttributeValueType = AttributeValueType.Simple,
-                                Name = "Fresh",
-                                DisplayOrder = 2,
-                                ImageSquaresPictureId = pictureService.InsertPicture(_fileProvider.ReadAllBytes(sampleImagesPath + "p_attribute_print_1.jpg"), MimeTypes.ImagePJpeg, pictureService.GetPictureSeName("Fresh Print")).Id
-                            }
-                        }
-                    }
-                },
-                ProductCategories =
-                {
-                    new ProductCategory
-                    {
-                        Category = _categoryRepository.Table.Single(c => c.Name == "Shoes"),
-                        DisplayOrder = 1
-                    }
-                },
-                ProductManufacturers =
-                {
-                    new ProductManufacturer
-                    {
-                        Manufacturer = _manufacturerRepository.Table.Single(c => c.Name == "Nike"),
-                        DisplayOrder = 2
-                    }
-                },
-                ProductSpecificationAttributes =
-                {
-                    new ProductSpecificationAttribute
-                    {
-                        AllowFiltering = true,
-                        ShowOnProductPage = false,
-                        DisplayOrder = 1,
-                        SpecificationAttributeOption =
-                            _specificationAttributeRepository.Table.Single(sa => sa.Name == "Color")
-                                .SpecificationAttributeOptions.Single(sao => sao.Name == "Grey")
-                    }
-                }
-            };
-            allProducts.Add(productNikeFloral);
-            productNikeFloral.ProductPictures.Add(new ProductPicture
-            {
-                Picture = pictureService.InsertPicture(_fileProvider.ReadAllBytes(sampleImagesPath + "product_NikeFloralShoe_1.jpg"), MimeTypes.ImagePJpeg, pictureService.GetPictureSeName(productNikeFloral.Name)),
-                DisplayOrder = 1
-            });
-            productNikeFloral.ProductPictures.Add(new ProductPicture
-            {
-                Picture = pictureService.InsertPicture(_fileProvider.ReadAllBytes(sampleImagesPath + "product_NikeFloralShoe_2.jpg"), MimeTypes.ImagePJpeg, pictureService.GetPictureSeName(productNikeFloral.Name)),
-                DisplayOrder = 2
-            });
-            _productRepository.Insert(productNikeFloral);
-
-            AddProductTag(productNikeFloral, "cool");
-            AddProductTag(productNikeFloral, "shoes");
-            AddProductTag(productNikeFloral, "apparel");
-
-            productNikeFloral.ProductAttributeMappings.First(x => x.ProductAttribute.Name == "Print").ProductAttributeValues.First(x => x.Name == "Natural").PictureId = productNikeFloral.ProductPictures.ElementAt(0).PictureId;
-            productNikeFloral.ProductAttributeMappings.First(x => x.ProductAttribute.Name == "Print").ProductAttributeValues.First(x => x.Name == "Fresh").PictureId = productNikeFloral.ProductPictures.ElementAt(1).PictureId;
-            _productRepository.Update(productNikeFloral);
-
-            var productAdidas = new Product
-            {
-                ProductType = ProductType.SimpleProduct,
-                VisibleIndividually = true,
-                Name = "adidas Consortium Campus 80s Running Shoes",
-                Sku = "AD_C80_RS",
-                ShortDescription = "adidas Consortium Campus 80s Primeknit Light Maroon/Running Shoes",
-                FullDescription = "<p>One of three colorways of the adidas Consortium Campus 80s Primeknit set to drop alongside each other. This pair comes in light maroon and running white. Featuring a maroon-based primeknit upper with white accents. A limited release, look out for these at select adidas Consortium accounts worldwide.</p>",
-                ProductTemplateId = productTemplateSimple.Id,
-                //SeName = "etnies-mens-digit-sneaker",
-                AllowCustomerReviews = true,
-                Price = 27.56M,
-                IsShipEnabled = true,
-                Weight = 2,
-                Length = 2,
-                Width = 2,
-                Height = 2,
-                TaxCategoryId = _taxCategoryRepository.Table.Single(tc => tc.Name == "Apparel").Id,
-                ManageInventoryMethod = ManageInventoryMethod.ManageStock,
-                StockQuantity = 10000,
-                NotifyAdminForQuantityBelow = 1,
-                AllowBackInStockSubscriptions = false,
-                DisplayStockAvailability = true,
-                LowStockActivity = LowStockActivity.DisableBuyButton,
-                BackorderMode = BackorderMode.NoBackorders,
-                OrderMinimumQuantity = 1,
-                OrderMaximumQuantity = 10000,
-                Published = true,
-                //ShowOnHomePage = true,
-                CreatedOnUtc = DateTime.UtcNow,
-                UpdatedOnUtc = DateTime.UtcNow,
-                ProductAttributeMappings =
-                {
-                    new ProductAttributeMapping
-                    {
-                        ProductAttribute = _productAttributeRepository.Table.Single(x => x.Name == "Size"),
-                        AttributeControlType = AttributeControlType.DropdownList,
-                        IsRequired = true,
-                        ProductAttributeValues =
-                        {
-                            new ProductAttributeValue
-                            {
-                                AttributeValueType = AttributeValueType.Simple,
-                                Name = "8",
-                                DisplayOrder = 1
-                            },
-                            new ProductAttributeValue
-                            {
-                                AttributeValueType = AttributeValueType.Simple,
-                                Name = "9",
-                                DisplayOrder = 2
-                            },
-                            new ProductAttributeValue
-                            {
-                                AttributeValueType = AttributeValueType.Simple,
-                                Name = "10",
-                                DisplayOrder = 3
-                            },
-                            new ProductAttributeValue
-                            {
-                                AttributeValueType = AttributeValueType.Simple,
-                                Name = "11",
-                                DisplayOrder = 4
-                            }
-                        }
-                    },
-                    new ProductAttributeMapping
-                    {
-                        ProductAttribute = _productAttributeRepository.Table.Single(x => x.Name == "Color"),
-                        AttributeControlType = AttributeControlType.ColorSquares,
-                        IsRequired = true,
-                        ProductAttributeValues =
-                        {
-                            new ProductAttributeValue
-                            {
-                                AttributeValueType = AttributeValueType.Simple,
-                                Name = "Red",
-                                IsPreSelected = true,
-                                ColorSquaresRgb = "#663030",
-                                DisplayOrder = 1
-                            },
-                            new ProductAttributeValue
-                            {
-                                AttributeValueType = AttributeValueType.Simple,
-                                Name = "Blue",
-                                ColorSquaresRgb = "#363656",
-                                DisplayOrder = 2
-                            },
-                            new ProductAttributeValue
-                            {
-                                AttributeValueType = AttributeValueType.Simple,
-                                Name = "Silver",
-                                ColorSquaresRgb = "#c5c5d5",
-                                DisplayOrder = 3
-                            }
-                        }
-                    }
-                },
-                ProductCategories =
-                {
-                    new ProductCategory
-                    {
-                        Category = _categoryRepository.Table.Single(c => c.Name == "Shoes"),
-                        DisplayOrder = 1
-                    }
-                },
-                ProductSpecificationAttributes =
-                {
-                    new ProductSpecificationAttribute
-                    {
-                        AllowFiltering = true,
-                        ShowOnProductPage = false,
-                        DisplayOrder = 1,
-                        SpecificationAttributeOption =
-                            _specificationAttributeRepository.Table.Single(sa => sa.Name == "Color")
-                                .SpecificationAttributeOptions.Single(sao => sao.Name == "Grey")
-                    },
-                    new ProductSpecificationAttribute
-                    {
-                        AllowFiltering = true,
-                        ShowOnProductPage = false,
-                        DisplayOrder = 2,
-                        SpecificationAttributeOption =
-                            _specificationAttributeRepository.Table.Single(sa => sa.Name == "Color")
-                                .SpecificationAttributeOptions.Single(sao => sao.Name == "Red")
-                    },
-                    new ProductSpecificationAttribute
-                    {
-                        AllowFiltering = true,
-                        ShowOnProductPage = false,
-                        DisplayOrder = 3,
-                        SpecificationAttributeOption =
-                            _specificationAttributeRepository.Table.Single(sa => sa.Name == "Color")
-                                .SpecificationAttributeOptions.Single(sao => sao.Name == "Blue")
-                    }
-                }
-            };
-            allProducts.Add(productAdidas);
-            productAdidas.ProductPictures.Add(new ProductPicture
-            {
-                Picture = pictureService.InsertPicture(_fileProvider.ReadAllBytes(sampleImagesPath + "product_adidas.jpg"), MimeTypes.ImagePJpeg, pictureService.GetPictureSeName(productAdidas.Name)),
-                DisplayOrder = 1
-            });
-            productAdidas.ProductPictures.Add(new ProductPicture
-            {
-                Picture = pictureService.InsertPicture(_fileProvider.ReadAllBytes(sampleImagesPath + "product_adidas_2.jpg"), MimeTypes.ImagePJpeg, pictureService.GetPictureSeName(productAdidas.Name)),
-                DisplayOrder = 2
-            });
-            productAdidas.ProductPictures.Add(new ProductPicture
-            {
-                Picture = pictureService.InsertPicture(_fileProvider.ReadAllBytes(sampleImagesPath + "product_adidas_3.jpg"), MimeTypes.ImagePJpeg, pictureService.GetPictureSeName(productAdidas.Name)),
-                DisplayOrder = 3
-            });
-
-            _productRepository.Insert(productAdidas);
-
-            AddProductTag(productAdidas, "cool");
-            AddProductTag(productAdidas, "shoes");
-            AddProductTag(productAdidas, "apparel");
-
-            productAdidas.ProductAttributeMappings.First(x => x.ProductAttribute.Name == "Color").ProductAttributeValues.First(x => x.Name == "Red").PictureId = productAdidas.ProductPictures.ElementAt(0).PictureId;
-            productAdidas.ProductAttributeMappings.First(x => x.ProductAttribute.Name == "Color").ProductAttributeValues.First(x => x.Name == "Blue").PictureId = productAdidas.ProductPictures.ElementAt(1).PictureId;
-            productAdidas.ProductAttributeMappings.First(x => x.ProductAttribute.Name == "Color").ProductAttributeValues.First(x => x.Name == "Silver").PictureId = productAdidas.ProductPictures.ElementAt(2).PictureId;
-            _productRepository.Update(productAdidas);
-
-            var productNikeZoom = new Product
-            {
-                ProductType = ProductType.SimpleProduct,
-                VisibleIndividually = true,
-                Name = "Nike SB Zoom Stefan Janoski \"Medium Mint\"",
-                Sku = "NK_ZSJ_MM",
-                ShortDescription = "Nike SB Zoom Stefan Janoski Dark Grey Medium Mint Teal ...",
-                FullDescription = "The newly Nike SB Zoom Stefan Janoski gets hit with a \"Medium Mint\" accents that sits atop a Dark Grey suede. Expected to drop in October.",
-                ProductTemplateId = productTemplateSimple.Id,
-                //SeName = "v-blue-juniors-cuffed-denim-short-with-rhinestones",
-                AllowCustomerReviews = true,
-                Price = 30M,
-                IsShipEnabled = true,
-                Weight = 2,
-                Length = 2,
-                Width = 2,
-                Height = 2,
-                TaxCategoryId = _taxCategoryRepository.Table.Single(tc => tc.Name == "Apparel").Id,
-                ManageInventoryMethod = ManageInventoryMethod.ManageStock,
-                StockQuantity = 10000,
-                NotifyAdminForQuantityBelow = 1,
-                AllowBackInStockSubscriptions = false,
-                DisplayStockAvailability = true,
-                LowStockActivity = LowStockActivity.DisableBuyButton,
-                BackorderMode = BackorderMode.NoBackorders,
-                OrderMinimumQuantity = 1,
-                OrderMaximumQuantity = 10000,
-                Published = true,
-                CreatedOnUtc = DateTime.UtcNow,
-                UpdatedOnUtc = DateTime.UtcNow,
-                ProductCategories =
-                {
-                    new ProductCategory
-                    {
-                        Category = _categoryRepository.Table.Single(c => c.Name == "Shoes"),
-                        DisplayOrder = 1
-                    }
-                },
-                ProductManufacturers =
-                {
-                    new ProductManufacturer
-                    {
-                        Manufacturer = _manufacturerRepository.Table.Single(c => c.Name == "Nike"),
-                        DisplayOrder = 2
-                    }
-                },
-                ProductSpecificationAttributes =
-                {
-                    new ProductSpecificationAttribute
-                    {
-                        AllowFiltering = true,
-                        ShowOnProductPage = false,
-                        DisplayOrder = 1,
-                        SpecificationAttributeOption =
-                            _specificationAttributeRepository.Table.Single(sa => sa.Name == "Color")
-                                .SpecificationAttributeOptions.Single(sao => sao.Name == "Grey")
-                    }
-                }
-            };
-
-            allProducts.Add(productNikeZoom);
-            productNikeZoom.ProductPictures.Add(new ProductPicture
-            {
-                Picture = pictureService.InsertPicture(_fileProvider.ReadAllBytes(sampleImagesPath + "product_NikeZoom.jpg"), MimeTypes.ImagePJpeg, pictureService.GetPictureSeName(productNikeZoom.Name)),
-                DisplayOrder = 1
-            });
-            _productRepository.Insert(productNikeZoom);
-
-            AddProductTag(productNikeZoom, "jeans");
-            AddProductTag(productNikeZoom, "cool");
-            AddProductTag(productNikeZoom, "apparel");
-
-            var productNikeTailwind = new Product
-            {
-                ProductType = ProductType.SimpleProduct,
-                VisibleIndividually = true,
-                Name = "Nike Tailwind Loose Short-Sleeve Running Shirt",
-                Sku = "NK_TLS_RS",
-                ShortDescription = string.Empty,
-                FullDescription = "<p>Boost your adrenaline with the Nike® Women's Tailwind Running Shirt. The lightweight, slouchy fit is great for layering, and moisture-wicking fabrics keep you feeling at your best. This tee has a notched hem for an enhanced range of motion, while flat seams with reinforcement tape lessen discomfort and irritation over longer distances. Put your keys and card in the side zip pocket and take off in your Nike® running t-shirt.</p>",
-                ProductTemplateId = productTemplateSimple.Id,
-                //SeName = "50s-rockabilly-polka-dot-top-jr-plus-size",
-                AllowCustomerReviews = true,
-                Published = true,
-                Price = 15M,
-                IsShipEnabled = true,
-                Weight = 1,
-                Length = 2,
-                Width = 3,
-                Height = 3,
-                TaxCategoryId = _taxCategoryRepository.Table.Single(tc => tc.Name == "Apparel").Id,
-                ManageInventoryMethod = ManageInventoryMethod.ManageStock,
-                StockQuantity = 10000,
-                NotifyAdminForQuantityBelow = 1,
-                AllowBackInStockSubscriptions = false,
-                DisplayStockAvailability = true,
-                LowStockActivity = LowStockActivity.DisableBuyButton,
-                BackorderMode = BackorderMode.NoBackorders,
-                OrderMinimumQuantity = 1,
-                OrderMaximumQuantity = 10000,
-                CreatedOnUtc = DateTime.UtcNow,
-                UpdatedOnUtc = DateTime.UtcNow,
-                ProductAttributeMappings =
-                {
-                    new ProductAttributeMapping
-                    {
-                        ProductAttribute = _productAttributeRepository.Table.Single(x => x.Name == "Size"),
-                        AttributeControlType = AttributeControlType.DropdownList,
-                        IsRequired = true,
-                        ProductAttributeValues =
-                        {
-                            new ProductAttributeValue
-                            {
-                                AttributeValueType = AttributeValueType.Simple,
-                                Name = "Small",
-                                DisplayOrder = 1
-                            },
-                            new ProductAttributeValue
-                            {
-                                AttributeValueType = AttributeValueType.Simple,
-                                Name = "1X",
-                                DisplayOrder = 2
-                            },
-                            new ProductAttributeValue
-                            {
-                                AttributeValueType = AttributeValueType.Simple,
-                                Name = "2X",
-                                DisplayOrder = 3
-                            },
-                            new ProductAttributeValue
-                            {
-                                AttributeValueType = AttributeValueType.Simple,
-                                Name = "3X",
-                                DisplayOrder = 4
-                            },
-                            new ProductAttributeValue
-                            {
-                                AttributeValueType = AttributeValueType.Simple,
-                                Name = "4X",
-                                DisplayOrder = 5
-                            },
-                            new ProductAttributeValue
-                            {
-                                AttributeValueType = AttributeValueType.Simple,
-                                Name = "5X",
-                                DisplayOrder = 6
-                            }
-                        }
-                    }
-                },
-                ProductCategories =
-                {
-                    new ProductCategory
-                    {
-                        Category = _categoryRepository.Table.Single(c => c.Name == "Clothing"),
-                        DisplayOrder = 1
-                    }
-                },
-                ProductManufacturers =
-                {
-                    new ProductManufacturer
-                    {
-                        Manufacturer = _manufacturerRepository.Table.Single(c => c.Name == "Nike"),
-                        DisplayOrder = 2
-                    }
-                }
-            };
-            allProducts.Add(productNikeTailwind);
-            productNikeTailwind.ProductPictures.Add(new ProductPicture
-            {
-                Picture = pictureService.InsertPicture(_fileProvider.ReadAllBytes(sampleImagesPath + "product_NikeShirt.jpg"), MimeTypes.ImagePJpeg, pictureService.GetPictureSeName(productNikeTailwind.Name)),
-                DisplayOrder = 1
-            });
-            _productRepository.Insert(productNikeTailwind);
-
-            AddProductTag(productNikeTailwind, "cool");
-            AddProductTag(productNikeTailwind, "apparel");
-            AddProductTag(productNikeTailwind, "shirt");
-
-            var productOversizedWomenTShirt = new Product
-            {
-                ProductType = ProductType.SimpleProduct,
-                VisibleIndividually = true,
-                Name = "Oversized Women T-Shirt",
-                Sku = "WM_OVR_TS",
-                ShortDescription = string.Empty,
-                FullDescription = "<p>This oversized women t-Shirt needs minimum ironing. It is a great product at a great value!</p>",
-                ProductTemplateId = productTemplateSimple.Id,
-                //SeName = "arrow-mens-wrinkle-free-pinpoint-solid-long-sleeve",
-                AllowCustomerReviews = true,
-                Price = 24M,
-                IsShipEnabled = true,
-                Weight = 4,
-                Length = 3,
-                Width = 3,
-                Height = 3,
-                TaxCategoryId = _taxCategoryRepository.Table.Single(tc => tc.Name == "Apparel").Id,
-                ManageInventoryMethod = ManageInventoryMethod.ManageStock,
-                StockQuantity = 10000,
-                NotifyAdminForQuantityBelow = 1,
-                AllowBackInStockSubscriptions = false,
-                DisplayStockAvailability = true,
-                LowStockActivity = LowStockActivity.DisableBuyButton,
-                BackorderMode = BackorderMode.NoBackorders,
-                OrderMinimumQuantity = 1,
-                OrderMaximumQuantity = 10000,
-                Published = true,
-                CreatedOnUtc = DateTime.UtcNow,
-                UpdatedOnUtc = DateTime.UtcNow,
-                TierPrices =
-                {
-                    new TierPrice
-                    {
-                        Quantity = 3,
-                        Price = 21
-                    },
-                    new TierPrice
-                    {
-                        Quantity = 7,
-                        Price = 19
-                    },
-                    new TierPrice
-                    {
-                        Quantity = 10,
-                        Price = 16
-                    }
-                },
-                HasTierPrices = true,
-                ProductCategories =
-                {
-                    new ProductCategory
-                    {
-                        Category = _categoryRepository.Table.Single(c => c.Name == "Clothing"),
-                        DisplayOrder = 1
-                    }
-                }
-            };
-            allProducts.Add(productOversizedWomenTShirt);
-            productOversizedWomenTShirt.ProductPictures.Add(new ProductPicture
-            {
-                Picture = pictureService.InsertPicture(_fileProvider.ReadAllBytes(sampleImagesPath + "product_WomenTShirt.jpg"), MimeTypes.ImagePJpeg, pictureService.GetPictureSeName(productOversizedWomenTShirt.Name)),
-                DisplayOrder = 1
-            });
-            _productRepository.Insert(productOversizedWomenTShirt);
-
-            AddProductTag(productOversizedWomenTShirt, "cool");
-            AddProductTag(productOversizedWomenTShirt, "apparel");
-            AddProductTag(productOversizedWomenTShirt, "shirt");
-
-            var productCustomTShirt = new Product
-            {
-                ProductType = ProductType.SimpleProduct,
-                VisibleIndividually = true,
-                Name = "Custom T-Shirt",
-                Sku = "CS_TSHIRT",
-                ShortDescription = "T-Shirt - Add Your Content",
-                FullDescription = "<p>Comfort comes in all shapes and forms, yet this tee out does it all. Rising above the rest, our classic cotton crew provides the simple practicality you need to make it through the day. Tag-free, relaxed fit wears well under dress shirts or stands alone in laid-back style. Reinforced collar and lightweight feel give way to long-lasting shape and breathability. One less thing to worry about, rely on this tee to provide comfort and ease with every wear.</p>",
-                ProductTemplateId = productTemplateSimple.Id,
-                //SeName = "custom-t-shirt",
-                AllowCustomerReviews = true,
-                Price = 15M,
-                IsShipEnabled = true,
-                Weight = 4,
-                Length = 3,
-                Width = 3,
-                Height = 3,
-                TaxCategoryId = _taxCategoryRepository.Table.Single(tc => tc.Name == "Apparel").Id,
-                ManageInventoryMethod = ManageInventoryMethod.ManageStock,
-                StockQuantity = 10000,
-                NotifyAdminForQuantityBelow = 1,
-                AllowBackInStockSubscriptions = false,
-                DisplayStockAvailability = true,
-                LowStockActivity = LowStockActivity.DisableBuyButton,
-                BackorderMode = BackorderMode.NoBackorders,
-                OrderMinimumQuantity = 1,
-                OrderMaximumQuantity = 10000,
-                Published = true,
-                CreatedOnUtc = DateTime.UtcNow,
-                UpdatedOnUtc = DateTime.UtcNow,
-                ProductAttributeMappings =
-                {
-                    new ProductAttributeMapping
-                    {
-                        ProductAttribute = _productAttributeRepository.Table.Single(x => x.Name == "Custom Text"),
-                        TextPrompt = "Enter your text:",
-                        AttributeControlType = AttributeControlType.TextBox,
-                        IsRequired = true
-                    }
-                },
-                ProductCategories =
-                {
-                    new ProductCategory
-                    {
-                        Category = _categoryRepository.Table.Single(c => c.Name == "Clothing"),
-                        DisplayOrder = 1
-                    }
-                }
-            };
-            allProducts.Add(productCustomTShirt);
-            productCustomTShirt.ProductPictures.Add(new ProductPicture
-            {
-                Picture = pictureService.InsertPicture(_fileProvider.ReadAllBytes(sampleImagesPath + "product_CustomTShirt.jpeg"), MimeTypes.ImageJpeg, pictureService.GetPictureSeName(productCustomTShirt.Name)),
-                DisplayOrder = 1
-            });
-            _productRepository.Insert(productCustomTShirt);
-
-            AddProductTag(productCustomTShirt, "cool");
-            AddProductTag(productCustomTShirt, "shirt");
-            AddProductTag(productCustomTShirt, "apparel");
-
-            var productLeviJeans = new Product
-            {
-                ProductType = ProductType.SimpleProduct,
-                VisibleIndividually = true,
-                Name = "Levi's 511 Jeans",
-                Sku = "LV_511_JN",
-                ShortDescription = "Levi's Faded Black 511 Jeans ",
-                FullDescription = "<p>Between a skinny and straight fit, our 511&trade; slim fit jeans are cut close without being too restricting. Slim throughout the thigh and leg opening for a long and lean look.</p><ul><li>Slouch1y at top; sits below the waist</li><li>Slim through the leg, close at the thigh and straight to the ankle</li><li>Stretch for added comfort</li><li>Classic five-pocket styling</li><li>99% Cotton, 1% Spandex, 11.2 oz. - Imported</li></ul>",
-                ProductTemplateId = productTemplateSimple.Id,
-                //SeName = "levis-skinny-511-jeans",
-                AllowCustomerReviews = true,
-                Price = 43.5M,
-                OldPrice = 55M,
-                IsShipEnabled = true,
-                Weight = 2,
-                Length = 2,
-                Width = 2,
-                Height = 2,
-                TaxCategoryId = _taxCategoryRepository.Table.Single(tc => tc.Name == "Apparel").Id,
-                ManageInventoryMethod = ManageInventoryMethod.ManageStock,
-                StockQuantity = 10000,
-                NotifyAdminForQuantityBelow = 1,
-                AllowBackInStockSubscriptions = false,
-                DisplayStockAvailability = true,
-                LowStockActivity = LowStockActivity.DisableBuyButton,
-                BackorderMode = BackorderMode.NoBackorders,
-                OrderMinimumQuantity = 1,
-                OrderMaximumQuantity = 10000,
-                Published = true,
-                CreatedOnUtc = DateTime.UtcNow,
-                UpdatedOnUtc = DateTime.UtcNow,
-                TierPrices =
-                {
-                    new TierPrice
-                    {
-                        Quantity = 3,
-                        Price = 40
-                    },
-                    new TierPrice
-                    {
-                        Quantity = 6,
-                        Price = 38
-                    },
-                    new TierPrice
-                    {
-                        Quantity = 10,
-                        Price = 35
-                    }
-                },
-                HasTierPrices = true,
-                ProductCategories =
-                {
-                    new ProductCategory
-                    {
-                        Category = _categoryRepository.Table.Single(c => c.Name == "Clothing"),
-                        DisplayOrder = 1
-                    }
-                }
-            };
-            allProducts.Add(productLeviJeans);
-
-            productLeviJeans.ProductPictures.Add(new ProductPicture
-            {
-                Picture = pictureService.InsertPicture(_fileProvider.ReadAllBytes(sampleImagesPath + "product_LeviJeans_1.jpg"), MimeTypes.ImagePJpeg, pictureService.GetPictureSeName(productLeviJeans.Name)),
-                DisplayOrder = 1
-            });
-            productLeviJeans.ProductPictures.Add(new ProductPicture
-            {
-                Picture = pictureService.InsertPicture(_fileProvider.ReadAllBytes(sampleImagesPath + "product_LeviJeans_2.jpg"), MimeTypes.ImagePJpeg, pictureService.GetPictureSeName(productLeviJeans.Name)),
-                DisplayOrder = 2
-            });
-            _productRepository.Insert(productLeviJeans);
-
-            AddProductTag(productLeviJeans, "cool");
-            AddProductTag(productLeviJeans, "jeans");
-            AddProductTag(productLeviJeans, "apparel");
-
-             var productObeyHat = new Product
-            {
-                ProductType = ProductType.SimpleProduct,
-                VisibleIndividually = true,
-                Name = "Obey Propaganda Hat",
-                Sku = "OB_HAT_PR",
-                ShortDescription = string.Empty,
-                FullDescription = "<p>Printed poplin 5 panel camp hat with debossed leather patch and web closure</p>",
-                ProductTemplateId = productTemplateSimple.Id,
-                //SeName = "indiana-jones-shapeable-wool-hat",
-                AllowCustomerReviews = true,
-                Price = 30M,
-                IsShipEnabled = true,
-                Weight = 2,
-                Length = 2,
-                Width = 2,
-                Height = 2,
-                TaxCategoryId = _taxCategoryRepository.Table.Single(tc => tc.Name == "Apparel").Id,
-                ManageInventoryMethod = ManageInventoryMethod.ManageStock,
-                StockQuantity = 10000,
-                NotifyAdminForQuantityBelow = 1,
-                AllowBackInStockSubscriptions = false,
-                DisplayStockAvailability = true,
-                LowStockActivity = LowStockActivity.DisableBuyButton,
-                BackorderMode = BackorderMode.NoBackorders,
-                OrderMinimumQuantity = 1,
-                OrderMaximumQuantity = 10000,
-                Published = true,
-                CreatedOnUtc = DateTime.UtcNow,
-                UpdatedOnUtc = DateTime.UtcNow,
-                ProductAttributeMappings =
-                {
-                    new ProductAttributeMapping
-                    {
-                        ProductAttribute = _productAttributeRepository.Table.Single(x => x.Name == "Size"),
-                        AttributeControlType = AttributeControlType.DropdownList,
-                        IsRequired = true,
-                        ProductAttributeValues =
-                        {
-                            new ProductAttributeValue
-                            {
-                                AttributeValueType = AttributeValueType.Simple,
-                                Name = "Small",
-                                DisplayOrder = 1
-                            },
-                            new ProductAttributeValue
-                            {
-                                AttributeValueType = AttributeValueType.Simple,
-                                Name = "Medium",
-                                DisplayOrder = 2
-                            },
-                            new ProductAttributeValue
-                            {
-                                AttributeValueType = AttributeValueType.Simple,
-                                Name = "Large",
-                                DisplayOrder = 3
-                            },
-                            new ProductAttributeValue
-                            {
-                                AttributeValueType = AttributeValueType.Simple,
-                                Name = "X-Large",
-                                DisplayOrder = 4
-                            }
-                        }
-                    }
-                },
-                ProductCategories =
-                {
-                    new ProductCategory
-                    {
-                        Category = _categoryRepository.Table.Single(c => c.Name == "Accessories"),
-                        DisplayOrder = 1
-                    }
-                }
-            };
-            allProducts.Add(productObeyHat);
-            productObeyHat.ProductPictures.Add(new ProductPicture
-            {
-                Picture = pictureService.InsertPicture(_fileProvider.ReadAllBytes(sampleImagesPath + "product_hat.jpg"), MimeTypes.ImagePJpeg, pictureService.GetPictureSeName(productObeyHat.Name)),
-                DisplayOrder = 1
-            });
-            _productRepository.Insert(productObeyHat);
-
-            AddProductTag(productObeyHat, "apparel");
-            AddProductTag(productObeyHat, "cool");
-
-            var productBelt = new Product
-            {
-                ProductType = ProductType.SimpleProduct,
-                VisibleIndividually = true,
-                Name = "Reversible Horseferry Check Belt",
-                Sku = "RH_CHK_BL",
-                ShortDescription = "Reversible belt in Horseferry check with smooth leather trim",
-                FullDescription = "<p>Reversible belt in Horseferry check with smooth leather trim</p><p>Leather lining, polished metal buckle</p>",
-                ProductTemplateId = productTemplateSimple.Id,
-                //SeName = "nike-golf-casual-belt",
-                AllowCustomerReviews = true,
-                Price = 45M,
-                IsShipEnabled = true,
-                Weight = 7,
-                Length = 7,
-                Width = 7,
-                Height = 7,
-                TaxCategoryId = _taxCategoryRepository.Table.Single(tc => tc.Name == "Apparel").Id,
-                ManageInventoryMethod = ManageInventoryMethod.ManageStock,
-                ProductAvailabilityRangeId = productAvailabilityRange.Id,
-                StockQuantity = 0,
-                NotifyAdminForQuantityBelow = 1,
-                AllowBackInStockSubscriptions = false,
-                DisplayStockAvailability = true,
-                LowStockActivity = LowStockActivity.DisableBuyButton,
-                BackorderMode = BackorderMode.NoBackorders,
-                OrderMinimumQuantity = 1,
-                OrderMaximumQuantity = 10000,
-                Published = true,
-                CreatedOnUtc = DateTime.UtcNow,
-                UpdatedOnUtc = DateTime.UtcNow,
-                ProductCategories =
-                {
-                    new ProductCategory
-                    {
-                        Category = _categoryRepository.Table.Single(c => c.Name == "Accessories"),
-                        DisplayOrder = 1
-                    }
-                }
-            };
-            allProducts.Add(productBelt);
-            productBelt.ProductPictures.Add(new ProductPicture
-            {
-                Picture = pictureService.InsertPicture(_fileProvider.ReadAllBytes(sampleImagesPath + "product_Belt.jpeg"), MimeTypes.ImageJpeg, pictureService.GetPictureSeName(productBelt.Name)),
-                DisplayOrder = 1
-            });
-            _productRepository.Insert(productBelt);
-
-            var productSunglasses = new Product
-            {
-                ProductType = ProductType.SimpleProduct,
-                VisibleIndividually = true,
-                Name = "Ray Ban Aviator Sunglasses",
-                Sku = "RB_AVR_SG",
-                ShortDescription = "Aviator sunglasses are one of the first widely popularized styles of modern day sunwear.",
-                FullDescription = "<p>Since 1937, Ray-Ban can genuinely claim the title as the world's leading sunglasses and optical eyewear brand. Combining the best of fashion and sports performance, the Ray-Ban line of Sunglasses delivers a truly classic style that will have you looking great today and for years to come.</p>",
-                ProductTemplateId = productTemplateSimple.Id,
-                //SeName = "ray-ban-aviator-sunglasses-rb-3025",
-                AllowCustomerReviews = true,
-                Price = 25M,
-                IsShipEnabled = true,
-                Weight = 7,
-                Length = 7,
-                Width = 7,
-                Height = 7,
-                TaxCategoryId = _taxCategoryRepository.Table.Single(tc => tc.Name == "Apparel").Id,
-                ManageInventoryMethod = ManageInventoryMethod.ManageStock,
-                StockQuantity = 10000,
-                NotifyAdminForQuantityBelow = 1,
-                AllowBackInStockSubscriptions = false,
-                DisplayStockAvailability = true,
-                LowStockActivity = LowStockActivity.DisableBuyButton,
-                BackorderMode = BackorderMode.NoBackorders,
-                OrderMinimumQuantity = 1,
-                OrderMaximumQuantity = 10000,
-                Published = true,
-                CreatedOnUtc = DateTime.UtcNow,
-                UpdatedOnUtc = DateTime.UtcNow,
-                ProductCategories =
-                {
-                    new ProductCategory
-                    {
-                        Category = _categoryRepository.Table.Single(c => c.Name == "Accessories"),
-                        DisplayOrder = 1
-                    }
-                }
-            };
-            allProducts.Add(productSunglasses);
-            productSunglasses.ProductPictures.Add(new ProductPicture
-            {
-                Picture = pictureService.InsertPicture(_fileProvider.ReadAllBytes(sampleImagesPath + "product_Sunglasses.jpg"), MimeTypes.ImagePJpeg, pictureService.GetPictureSeName(productSunglasses.Name)),
-                DisplayOrder = 1
-            });
-            _productRepository.Insert(productSunglasses);
-
-            AddProductTag(productSunglasses, "apparel");
-            AddProductTag(productSunglasses, "cool");
-
-            relatedProducts.AddRange(new[]
-            {
-                 new RelatedProduct
-                {
-                     ProductId1 = productAdidas.Id,
-                     ProductId2 = productLeviJeans.Id
-                },
-                new RelatedProduct
-                {
-                     ProductId1 = productAdidas.Id,
-                     ProductId2 = productNikeFloral.Id
-                },
-                new RelatedProduct
-                {
-                     ProductId1 = productAdidas.Id,
-                     ProductId2 = productNikeZoom.Id
-                },
-                new RelatedProduct
-                {
-                     ProductId1 = productAdidas.Id,
-                     ProductId2 = productNikeTailwind.Id
-                },
-                new RelatedProduct
-                {
-                     ProductId1 = productLeviJeans.Id,
-                     ProductId2 = productAdidas.Id
-                },
-                new RelatedProduct
-                {
-                     ProductId1 = productLeviJeans.Id,
-                     ProductId2 = productNikeFloral.Id
-                },
-                new RelatedProduct
-                {
-                     ProductId1 = productLeviJeans.Id,
-                     ProductId2 = productNikeZoom.Id
-                },
-                new RelatedProduct
-                {
-                     ProductId1 = productLeviJeans.Id,
-                     ProductId2 = productNikeTailwind.Id
-                },
-
-                new RelatedProduct
-                {
-                     ProductId1 = productCustomTShirt.Id,
-                     ProductId2 = productLeviJeans.Id
-                },
-                new RelatedProduct
-                {
-                     ProductId1 = productCustomTShirt.Id,
-                     ProductId2 = productNikeTailwind.Id
-                },
-                new RelatedProduct
-                {
-                     ProductId1 = productCustomTShirt.Id,
-                     ProductId2 = productOversizedWomenTShirt.Id
-                },
-                new RelatedProduct
-                {
-                     ProductId1 = productCustomTShirt.Id,
-                     ProductId2 = productObeyHat.Id
                 }
             });
         }
@@ -10571,148 +8472,6 @@ namespace Nop.Services.Installation
                 }
             });
         }
-
-        protected virtual void InstallGiftCards(ProductTemplate productTemplateSimple, List<Product> allProducts, string sampleImagesPath, IPictureService pictureService, List<RelatedProduct> relatedProducts, DeliveryDate deliveryDate)
-        {
-            var product25GiftCard = new Product
-            {
-                ProductType = ProductType.SimpleProduct,
-                VisibleIndividually = true,
-                Name = "$25 Virtual Gift Card",
-                Sku = "VG_CR_025",
-                ShortDescription = "$25 Gift Card. Gift Cards must be redeemed through our site Web site toward the purchase of eligible products.",
-                FullDescription = "<p>Gift Cards must be redeemed through our site Web site toward the purchase of eligible products. Purchases are deducted from the GiftCard balance. Any unused balance will be placed in the recipient's GiftCard account when redeemed. If an order exceeds the amount of the GiftCard, the balance must be paid with a credit card or other available payment method.</p>",
-                ProductTemplateId = productTemplateSimple.Id,
-                //SeName = "25-virtual-gift-card",
-                AllowCustomerReviews = true,
-                Price = 25M,
-                IsGiftCard = true,
-                GiftCardType = GiftCardType.Virtual,
-                ManageInventoryMethod = ManageInventoryMethod.DontManageStock,
-                OrderMinimumQuantity = 1,
-                OrderMaximumQuantity = 10000,
-                StockQuantity = 10000,
-                NotifyAdminForQuantityBelow = 1,
-                AllowBackInStockSubscriptions = false,
-                Published = true,
-                ShowOnHomePage = true,
-                CreatedOnUtc = DateTime.UtcNow,
-                UpdatedOnUtc = DateTime.UtcNow,
-                ProductCategories =
-                {
-                    new ProductCategory
-                    {
-                        Category = _categoryRepository.Table.Single(c => c.Name == "Gift Cards"),
-                        DisplayOrder = 2
-                    }
-                }
-            };
-            allProducts.Add(product25GiftCard);
-            product25GiftCard.ProductPictures.Add(new ProductPicture
-            {
-                Picture = pictureService.InsertPicture(_fileProvider.ReadAllBytes(sampleImagesPath + "product_25giftcart.jpeg"), MimeTypes.ImageJpeg, pictureService.GetPictureSeName(product25GiftCard.Name)),
-                DisplayOrder = 1
-            });
-            _productRepository.Insert(product25GiftCard);
-
-            AddProductTag(product25GiftCard, "nice");
-            AddProductTag(product25GiftCard, "gift");
-
-            var product50GiftCard = new Product
-            {
-                ProductType = ProductType.SimpleProduct,
-                VisibleIndividually = true,
-                Name = "$50 Physical Gift Card",
-                Sku = "PG_CR_050",
-                ShortDescription = "$50 Gift Card. Gift Cards must be redeemed through our site Web site toward the purchase of eligible products.",
-                FullDescription = "<p>Gift Cards must be redeemed through our site Web site toward the purchase of eligible products. Purchases are deducted from the GiftCard balance. Any unused balance will be placed in the recipient's GiftCard account when redeemed. If an order exceeds the amount of the GiftCard, the balance must be paid with a credit card or other available payment method.</p>",
-                ProductTemplateId = productTemplateSimple.Id,
-                //SeName = "50-physical-gift-card",
-                AllowCustomerReviews = true,
-                Price = 50M,
-                IsGiftCard = true,
-                GiftCardType = GiftCardType.Physical,
-                IsShipEnabled = true,
-                IsFreeShipping = true,
-                DeliveryDateId = deliveryDate.Id,
-                Weight = 1,
-                Length = 1,
-                Width = 1,
-                Height = 1,
-                ManageInventoryMethod = ManageInventoryMethod.DontManageStock,
-                OrderMinimumQuantity = 1,
-                OrderMaximumQuantity = 10000,
-                StockQuantity = 10000,
-                NotifyAdminForQuantityBelow = 1,
-                AllowBackInStockSubscriptions = false,
-                Published = true,
-                MarkAsNew = true,
-                CreatedOnUtc = DateTime.UtcNow,
-                UpdatedOnUtc = DateTime.UtcNow,
-                ProductCategories =
-                {
-                    new ProductCategory
-                    {
-                        Category = _categoryRepository.Table.Single(c => c.Name == "Gift Cards"),
-                        DisplayOrder = 3
-                    }
-                }
-            };
-            allProducts.Add(product50GiftCard);
-            product50GiftCard.ProductPictures.Add(new ProductPicture
-            {
-                Picture = pictureService.InsertPicture(_fileProvider.ReadAllBytes(sampleImagesPath + "product_50giftcart.jpeg"), MimeTypes.ImageJpeg, pictureService.GetPictureSeName(product50GiftCard.Name)),
-                DisplayOrder = 1
-            });
-            _productRepository.Insert(product50GiftCard);
-
-            var product100GiftCard = new Product
-            {
-                ProductType = ProductType.SimpleProduct,
-                VisibleIndividually = true,
-                Name = "$100 Physical Gift Card",
-                Sku = "PG_CR_100",
-                ShortDescription = "$100 Gift Card. Gift Cards must be redeemed through our site Web site toward the purchase of eligible products.",
-                FullDescription = "<p>Gift Cards must be redeemed through our site Web site toward the purchase of eligible products. Purchases are deducted from the GiftCard balance. Any unused balance will be placed in the recipient's GiftCard account when redeemed. If an order exceeds the amount of the GiftCard, the balance must be paid with a credit card or other available payment method.</p>",
-                ProductTemplateId = productTemplateSimple.Id,
-                //SeName = "100-physical-gift-card",
-                AllowCustomerReviews = true,
-                Price = 100M,
-                IsGiftCard = true,
-                GiftCardType = GiftCardType.Physical,
-                IsShipEnabled = true,
-                DeliveryDateId = deliveryDate.Id,
-                Weight = 1,
-                Length = 1,
-                Width = 1,
-                Height = 1,
-                ManageInventoryMethod = ManageInventoryMethod.DontManageStock,
-                OrderMinimumQuantity = 1,
-                OrderMaximumQuantity = 10000,
-                StockQuantity = 10000,
-                NotifyAdminForQuantityBelow = 1,
-                AllowBackInStockSubscriptions = false,
-                Published = true,
-                CreatedOnUtc = DateTime.UtcNow,
-                UpdatedOnUtc = DateTime.UtcNow,
-                ProductCategories =
-                {
-                    new ProductCategory
-                    {
-                        Category = _categoryRepository.Table.Single(c => c.Name == "Gift Cards"),
-                        DisplayOrder = 4
-                    }
-                }
-            };
-            allProducts.Add(product100GiftCard);
-            product100GiftCard.ProductPictures.Add(new ProductPicture
-            {
-                Picture = pictureService.InsertPicture(_fileProvider.ReadAllBytes(sampleImagesPath + "product_100giftcart.jpeg"), MimeTypes.ImageJpeg, pictureService.GetPictureSeName(product100GiftCard.Name)),
-                DisplayOrder = 1
-            });
-            _productRepository.Insert(product100GiftCard);
-        }
-
         protected virtual void InstallProducts(string defaultUserEmail)
         {
             var productTemplateSimple = _productTemplateRepository.Table.FirstOrDefault(pt => pt.Name == "Simple product");
@@ -10721,17 +8480,7 @@ namespace Nop.Services.Installation
             var productTemplateGrouped = _productTemplateRepository.Table.FirstOrDefault(pt => pt.Name == "Grouped product (with variants)");
             if (productTemplateGrouped == null)
                 throw new Exception("Grouped product template could not be loaded");
-
-            //delivery date
-            var deliveryDate = _deliveryDateRepository.Table.FirstOrDefault();
-            if (deliveryDate == null)
-                throw new Exception("No default deliveryDate could be loaded");
-
-            //product availability range
-            var productAvailabilityRange = _productAvailabilityRangeRepository.Table.FirstOrDefault();
-            if (productAvailabilityRange == null)
-                throw new Exception("No default product availability range could be loaded");
-
+            
             //default customer/user
             var defaultCustomer = _customerRepository.Table.FirstOrDefault(x => x.Email == defaultUserEmail);
             if (defaultCustomer == null)
@@ -10760,16 +8509,12 @@ namespace Nop.Services.Installation
             InstallComputers(productTemplateSimple, allProducts, sampleImagesPath, pictureService, relatedProducts);
             //camera & photo, cell phones, others
             InstallElectronics(productTemplateSimple, productTemplateGrouped, allProducts, sampleImagesPath, pictureService, relatedProducts);
-            //shoes, clothing, accessories
-            InstallApparel(productTemplateSimple, allProducts, sampleImagesPath, pictureService, relatedProducts, productAvailabilityRange);
             //digital downloads
             InstallDigitalDownloads(productTemplateSimple, allProducts, sampleImagesPath, pictureService, relatedProducts, sampleDownloadsPath, downloadService);
             //books
             InstallBooks(productTemplateSimple, allProducts, sampleImagesPath, pictureService, relatedProducts);
             //jewelry
             InstallJewelry(productTemplateSimple, allProducts, sampleImagesPath, pictureService, relatedProducts);
-            //gift cards
-            InstallGiftCards(productTemplateSimple, allProducts, sampleImagesPath, pictureService, relatedProducts, deliveryDate);
             
             //search engine names
             foreach (var product in allProducts)
@@ -10891,36 +8636,6 @@ namespace Nop.Services.Installation
                 UpdatedOnUtc = DateTime.UtcNow
             };
             _forumRepository.Insert(packagingShippingForum);
-        }
-
-        protected virtual void InstallDiscounts()
-        {
-            var discounts = new List<Discount>
-            {
-                new Discount
-                {
-                    Name = "Sample discount with coupon code",
-                    DiscountType = DiscountType.AssignedToSkus,
-                    DiscountLimitation = DiscountLimitationType.Unlimited,
-                    UsePercentage = false,
-                    DiscountAmount = 10,
-                    RequiresCouponCode = true,
-                    CouponCode = "123"
-                },
-                new Discount
-                {
-                    Name = "'20% order total' discount",
-                    DiscountType = DiscountType.AssignedToOrderTotal,
-                    DiscountLimitation = DiscountLimitationType.Unlimited,
-                    UsePercentage = true,
-                    DiscountPercentage = 20,
-                    StartDateUtc = new DateTime(2010, 1, 1),
-                    EndDateUtc = new DateTime(2020, 1, 1),
-                    RequiresCouponCode = true,
-                    CouponCode = "456"
-                }
-            };
-            _discountRepository.Insert(discounts);
         }
 
         protected virtual void InstallBlogPosts(string defaultUserEmail)
@@ -12045,20 +9760,6 @@ namespace Nop.Services.Installation
             _categoryTemplateRepository.Insert(categoryTemplates);
         }
 
-        protected virtual void InstallManufacturerTemplates()
-        {
-            var manufacturerTemplates = new List<ManufacturerTemplate>
-            {
-                new ManufacturerTemplate
-                {
-                    Name = "Products in Grid or Lines",
-                    ViewPath = "ManufacturerTemplate.ProductsInGridOrLines",
-                    DisplayOrder = 1
-                }
-            };
-            _manufacturerTemplateRepository.Insert(manufacturerTemplates);
-        }
-
         protected virtual void InstallTopicTemplates()
         {
             var topicTemplates = new List<TopicTemplate>
@@ -12131,91 +9832,7 @@ namespace Nop.Services.Installation
 
             _scheduleTaskRepository.Insert(tasks);
         }
-
-        protected virtual void InstallReturnRequestReasons()
-        {
-            var returnRequestReasons = new List<ReturnRequestReason>
-            {
-                new ReturnRequestReason
-                {
-                    Name = "Received Wrong Product",
-                    DisplayOrder = 1
-                },
-                new ReturnRequestReason
-                {
-                    Name = "Wrong Product Ordered",
-                    DisplayOrder = 2
-                },
-                new ReturnRequestReason
-                {
-                    Name = "There Was A Problem With The Product",
-                    DisplayOrder = 3
-                }
-            };
-            _returnRequestReasonRepository.Insert(returnRequestReasons);
-        }
-
-        protected virtual void InstallReturnRequestActions()
-        {
-            var returnRequestActions = new List<ReturnRequestAction>
-            {
-                new ReturnRequestAction
-                {
-                    Name = "Repair",
-                    DisplayOrder = 1
-                },
-                new ReturnRequestAction
-                {
-                    Name = "Replacement",
-                    DisplayOrder = 2
-                },
-                new ReturnRequestAction
-                {
-                    Name = "Store Credit",
-                    DisplayOrder = 3
-                }
-            };
-            _returnRequestActionRepository.Insert(returnRequestActions);
-        }
-
-        protected virtual void InstallWarehouses()
-        {
-            var warehouse1address = new Address
-            {
-                Address1 = "21 West 52nd Street",
-                City = "New York",
-                StateProvince = _stateProvinceRepository.Table.FirstOrDefault(sp => sp.Name == "New York"),
-                Country = _countryRepository.Table.FirstOrDefault(c => c.ThreeLetterIsoCode == "USA"),
-                ZipPostalCode = "10021",
-                CreatedOnUtc = DateTime.UtcNow
-            };
-            _addressRepository.Insert(warehouse1address);
-            var warehouse2address = new Address
-            {
-                Address1 = "300 South Spring Stree",
-                City = "Los Angeles",
-                StateProvince = _stateProvinceRepository.Table.FirstOrDefault(sp => sp.Name == "California"),
-                Country = _countryRepository.Table.FirstOrDefault(c => c.ThreeLetterIsoCode == "USA"),
-                ZipPostalCode = "90013",
-                CreatedOnUtc = DateTime.UtcNow
-            };
-            _addressRepository.Insert(warehouse2address);
-            var warehouses = new List<Warehouse>
-            {
-                new Warehouse
-                {
-                    Name = "Warehouse 1 (New York)",
-                    AddressId = warehouse1address.Id
-                },
-                new Warehouse
-                {
-                    Name = "Warehouse 2 (Los Angeles)",
-                    AddressId = warehouse2address.Id
-                }
-            };
-
-            _warehouseRepository.Insert(warehouses);
-        }
+        
 
         protected virtual void InstallVendors()
         {
@@ -12265,31 +9882,6 @@ namespace Nop.Services.Installation
             }
         }
 
-        protected virtual void InstallAffiliates()
-        {
-            var affiliateAddress = new Address
-            {
-                FirstName = "John",
-                LastName = "Smith",
-                Email = "affiliate_email@gmail.com",
-                Company = "Company name here...",
-                City = "New York",
-                Address1 = "21 West 52nd Street",
-                ZipPostalCode = "10021",
-                PhoneNumber = "123456789",
-                StateProvince = _stateProvinceRepository.Table.FirstOrDefault(sp => sp.Name == "New York"),
-                Country = _countryRepository.Table.FirstOrDefault(c => c.ThreeLetterIsoCode == "USA"),
-                CreatedOnUtc = DateTime.UtcNow
-            };
-            _addressRepository.Insert(affiliateAddress);
-            var affilate = new Affiliate
-            {
-                Active = true,
-                Address = affiliateAddress
-            };
-            _affiliateRepository.Insert(affilate);
-        }
-
         private void AddProductTag(Product product, string tag)
         {
             var productTag = _productTagRepository.Table.FirstOrDefault(pt => pt.Name == tag);
@@ -12332,13 +9924,9 @@ namespace Nop.Services.Installation
         {
             InstallStores();
             InstallMeasures();
-            InstallTaxCategories();
             InstallLanguages();
             InstallCurrencies();
             InstallCountriesAndStates();
-            InstallShippingMethods();
-            InstallDeliveryDates();
-            InstallProductAvailabilityRanges();
             InstallEmailAccounts();
             InstallMessageTemplates();
             InstallTopicTemplates();
@@ -12349,29 +9937,20 @@ namespace Nop.Services.Installation
             InstallActivityLogTypes();
             InstallProductTemplates();
             InstallCategoryTemplates();
-            InstallManufacturerTemplates();
             InstallScheduleTasks();
-            InstallReturnRequestReasons();
-            InstallReturnRequestActions();
 
             if (!installSampleData) 
                 return;
-
-            InstallCheckoutAttributes();
+            
             InstallSpecificationAttributes();
             InstallProductAttributes();
             InstallCategories();
-            InstallManufacturers();
             InstallProducts(defaultUserEmail);
             InstallForums();
-            InstallDiscounts();
             InstallBlogPosts(defaultUserEmail);
             InstallNews(defaultUserEmail);
             InstallPolls();
-            InstallWarehouses();
             InstallVendors();
-            InstallAffiliates();
-            InstallOrders();
             InstallActivityLog(defaultUserEmail);
             InstallSearchTerms();
         }

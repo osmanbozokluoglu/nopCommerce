@@ -9,25 +9,19 @@ using Nop.Core;
 using Nop.Core.Caching;
 using Nop.Core.Domain.Catalog;
 using Nop.Core.Domain.Directory;
-using Nop.Core.Domain.Discounts;
-using Nop.Core.Domain.Orders;
 using Nop.Core.Domain.Tax;
 using Nop.Core.Domain.Vendors;
 using Nop.Services.Catalog;
 using Nop.Services.Customers;
 using Nop.Services.Directory;
-using Nop.Services.Discounts;
 using Nop.Services.Helpers;
 using Nop.Services.Localization;
 using Nop.Services.Media;
-using Nop.Services.Orders;
 using Nop.Services.Seo;
-using Nop.Services.Shipping;
 using Nop.Services.Stores;
 using Nop.Web.Areas.Admin.Infrastructure.Cache;
 using Nop.Web.Areas.Admin.Infrastructure.Mapper.Extensions;
 using Nop.Web.Areas.Admin.Models.Catalog;
-using Nop.Web.Areas.Admin.Models.Orders;
 using Nop.Web.Framework.Extensions;
 using Nop.Web.Framework.Factories;
 
@@ -48,13 +42,9 @@ namespace Nop.Web.Areas.Admin.Factories
         private readonly ICurrencyService _currencyService;
         private readonly ICustomerService _customerService;
         private readonly IDateTimeHelper _dateTimeHelper;
-        private readonly IDiscountService _discountService;
-        private readonly IDiscountSupportedModelFactory _discountSupportedModelFactory;
         private readonly ILocalizationService _localizationService;
         private readonly ILocalizedModelFactory _localizedModelFactory;
-        private readonly IManufacturerService _manufacturerService;
         private readonly IMeasureService _measureService;
-        private readonly IOrderService _orderService;
         private readonly IPictureService _pictureService;
         private readonly IProductAttributeFormatter _productAttributeFormatter;
         private readonly IProductAttributeParser _productAttributeParser;
@@ -63,9 +53,6 @@ namespace Nop.Web.Areas.Admin.Factories
         private readonly IProductTagService _productTagService;
         private readonly IProductTemplateService _productTemplateService;
         private readonly ISettingModelFactory _settingModelFactory;
-        private readonly IShipmentService _shipmentService;
-        private readonly IShippingService _shippingService;
-        private readonly IShoppingCartService _shoppingCartService;
         private readonly ISpecificationAttributeService _specificationAttributeService;
         private readonly IStaticCacheManager _cacheManager;
         private readonly IStoreMappingSupportedModelFactory _storeMappingSupportedModelFactory;
@@ -88,13 +75,9 @@ namespace Nop.Web.Areas.Admin.Factories
             ICurrencyService currencyService,
             ICustomerService customerService,
             IDateTimeHelper dateTimeHelper,
-            IDiscountService discountService,
-            IDiscountSupportedModelFactory discountSupportedModelFactory,
             ILocalizationService localizationService,
             ILocalizedModelFactory localizedModelFactory,
-            IManufacturerService manufacturerService,
             IMeasureService measureService,
-            IOrderService orderService,
             IPictureService pictureService,
             IProductAttributeFormatter productAttributeFormatter,
             IProductAttributeParser productAttributeParser,
@@ -103,9 +86,6 @@ namespace Nop.Web.Areas.Admin.Factories
             IProductTagService productTagService,
             IProductTemplateService productTemplateService,
             ISettingModelFactory settingModelFactory,
-            IShipmentService shipmentService,
-            IShippingService shippingService,
-            IShoppingCartService shoppingCartService,
             ISpecificationAttributeService specificationAttributeService,
             IStaticCacheManager cacheManager,
             IStoreMappingSupportedModelFactory storeMappingSupportedModelFactory,
@@ -125,14 +105,10 @@ namespace Nop.Web.Areas.Admin.Factories
             this._currencyService = currencyService;
             this._customerService = customerService;
             this._dateTimeHelper = dateTimeHelper;
-            this._discountService = discountService;
-            this._discountSupportedModelFactory = discountSupportedModelFactory;
             this._localizationService = localizationService;
             this._localizedModelFactory = localizedModelFactory;
-            this._manufacturerService = manufacturerService;
             this._measureService = measureService;
             this._measureSettings = measureSettings;
-            this._orderService = orderService;
             this._pictureService = pictureService;
             this._productAttributeFormatter = productAttributeFormatter;
             this._productAttributeParser = productAttributeParser;
@@ -141,9 +117,6 @@ namespace Nop.Web.Areas.Admin.Factories
             this._productTagService = productTagService;
             this._productTemplateService = productTemplateService;
             this._settingModelFactory = settingModelFactory;
-            this._shipmentService = shipmentService;
-            this._shippingService = shippingService;
-            this._shoppingCartService = shoppingCartService;
             this._specificationAttributeService = specificationAttributeService;
             this._storeMappingSupportedModelFactory = storeMappingSupportedModelFactory;
             this._storeService = storeService;
@@ -174,38 +147,6 @@ namespace Nop.Web.Areas.Admin.Factories
             model.CopyImages = true;
 
             return model;
-        }
-
-        /// <summary>
-        /// Prepare product warehouse inventory models
-        /// </summary>
-        /// <param name="models">List of product warehouse inventory models</param>
-        /// <param name="product">Product</param>
-        protected virtual void PrepareProductWarehouseInventoryModels(IList<ProductWarehouseInventoryModel> models, Product product)
-        {
-            if (models == null)
-                throw new ArgumentNullException(nameof(models));
-
-            foreach (var warehouse in _shippingService.GetAllWarehouses())
-            {
-                var model = new ProductWarehouseInventoryModel
-                {
-                    WarehouseId = warehouse.Id,
-                    WarehouseName = warehouse.Name
-                };
-
-                var productWarehouseInventory = product?.ProductWarehouseInventory
-                    .FirstOrDefault(inventory => inventory.WarehouseId == warehouse.Id);
-                if (productWarehouseInventory != null)
-                {
-                    model.WarehouseUsed = true;
-                    model.StockQuantity = productWarehouseInventory.StockQuantity;
-                    model.ReservedQuantity = productWarehouseInventory.ReservedQuantity;
-                    model.PlannedQuantity = _shipmentService.GetQuantityInShipments(product, productWarehouseInventory.WarehouseId, true, true);
-                }
-
-                models.Add(model);
-            }
         }
 
         /// <summary>
@@ -491,31 +432,6 @@ namespace Nop.Web.Areas.Admin.Factories
         }
 
         /// <summary>
-        /// Prepare stock quantity history search model
-        /// </summary>
-        /// <param name="searchModel">Stock quantity history search model</param>
-        /// <param name="product">Product</param>
-        /// <returns>Stock quantity history search model</returns>
-        protected virtual StockQuantityHistorySearchModel PrepareStockQuantityHistorySearchModel(StockQuantityHistorySearchModel searchModel, Product product)
-        {
-            if (searchModel == null)
-                throw new ArgumentNullException(nameof(searchModel));
-
-            if (product == null)
-                throw new ArgumentNullException(nameof(product));
-
-            searchModel.ProductId = product.Id;
-
-            //prepare available warehouses
-            _baseAdminModelFactory.PrepareWarehouses(searchModel.AvailableWarehouses);
-
-            //prepare page parameters
-            searchModel.SetGridPageSize();
-
-            return searchModel;
-        }
-
-        /// <summary>
         /// Prepare product attribute mapping search model
         /// </summary>
         /// <param name="searchModel">Product attribute mapping search model</param>
@@ -628,9 +544,6 @@ namespace Nop.Web.Areas.Admin.Factories
             //prepare available categories
             _baseAdminModelFactory.PrepareCategories(searchModel.AvailableCategories);
 
-            //prepare available manufacturers
-            _baseAdminModelFactory.PrepareManufacturers(searchModel.AvailableManufacturers);
-
             //prepare available stores
             _baseAdminModelFactory.PrepareStores(searchModel.AvailableStores);
 
@@ -639,9 +552,6 @@ namespace Nop.Web.Areas.Admin.Factories
 
             //prepare available product types
             _baseAdminModelFactory.PrepareProductTypes(searchModel.AvailableProductTypes);
-
-            //prepare available warehouses
-            _baseAdminModelFactory.PrepareWarehouses(searchModel.AvailableWarehouses);
 
             searchModel.HideStoresList = _catalogSettings.IgnoreStoreLimitations || searchModel.AvailableStores.SelectionIsNotPossible();
 
@@ -765,8 +675,6 @@ namespace Nop.Web.Areas.Admin.Factories
                 {
                     model.SelectedCategoryIds = _categoryService.GetProductCategoriesByProductId(product.Id, true)
                         .Select(productCategory => productCategory.CategoryId).ToList();
-                    model.SelectedManufacturerIds = _manufacturerService.GetProductManufacturersByProductId(product.Id, true)
-                        .Select(productManufacturer => productManufacturer.ManufacturerId).ToList();
                 }
 
                 //prepare copy product model
@@ -780,7 +688,6 @@ namespace Nop.Web.Areas.Admin.Factories
                 PrepareProductSpecificationAttributeSearchModel(model.ProductSpecificationAttributeSearchModel, product);
                 PrepareProductOrderSearchModel(model.ProductOrderSearchModel, product);
                 PrepareTierPriceSearchModel(model.TierPriceSearchModel, product);
-                PrepareStockQuantityHistorySearchModel(model.StockQuantityHistorySearchModel, product);
                 PrepareProductAttributeMappingSearchModel(model.ProductAttributeMappingSearchModel, product);
                 PrepareProductAttributeCombinationSearchModel(model.ProductAttributeCombinationSearchModel, product);
 
@@ -853,25 +760,9 @@ namespace Nop.Web.Areas.Admin.Factories
                 }
             }
 
-            //prepare available delivery dates
-            _baseAdminModelFactory.PrepareDeliveryDates(model.AvailableDeliveryDates,
-                defaultItemText: _localizationService.GetResource("Admin.Catalog.Products.Fields.DeliveryDate.None"));
-
-            //prepare available product availability ranges
-            _baseAdminModelFactory.PrepareProductAvailabilityRanges(model.AvailableProductAvailabilityRanges,
-                defaultItemText: _localizationService.GetResource("Admin.Catalog.Products.Fields.ProductAvailabilityRange.None"));
-
             //prepare available vendors
             _baseAdminModelFactory.PrepareVendors(model.AvailableVendors,
                 defaultItemText: _localizationService.GetResource("Admin.Catalog.Products.Fields.Vendor.None"));
-
-            //prepare available tax categories
-            _baseAdminModelFactory.PrepareTaxCategories(model.AvailableTaxCategories);
-
-            //prepare available warehouses
-            _baseAdminModelFactory.PrepareWarehouses(model.AvailableWarehouses,
-                defaultItemText: _localizationService.GetResource("Admin.Catalog.Products.Fields.Warehouse.None"));
-            PrepareProductWarehouseInventoryModels(model.ProductWarehouseInventoryModels, product);
 
             //prepare available base price units
             var availableMeasureWeights = _measureService.GetAllMeasureWeights()
@@ -886,18 +777,6 @@ namespace Nop.Web.Areas.Admin.Factories
                 categoryItem.Selected = int.TryParse(categoryItem.Value, out var categoryId)
                     && model.SelectedCategoryIds.Contains(categoryId);
             }
-
-            //prepare model manufacturers
-            _baseAdminModelFactory.PrepareManufacturers(model.AvailableManufacturers, false);
-            foreach (var manufacturerItem in model.AvailableManufacturers)
-            {
-                manufacturerItem.Selected = int.TryParse(manufacturerItem.Value, out var manufacturerId)
-                    && model.SelectedManufacturerIds.Contains(manufacturerId);
-            }
-
-            //prepare model discounts
-            var availableDiscounts = _discountService.GetAllDiscounts(DiscountType.AssignedToSkus, showHidden: true);
-            _discountSupportedModelFactory.PrepareModelDiscounts(model, product, availableDiscounts, excludeProperties);
 
             //prepare model customer roles
             _aclSupportedModelFactory.PrepareModelCustomerRoles(model, product, excludeProperties);
@@ -922,9 +801,6 @@ namespace Nop.Web.Areas.Admin.Factories
 
             //prepare available categories
             _baseAdminModelFactory.PrepareCategories(searchModel.AvailableCategories);
-
-            //prepare available manufacturers
-            _baseAdminModelFactory.PrepareManufacturers(searchModel.AvailableManufacturers);
 
             //prepare available stores
             _baseAdminModelFactory.PrepareStores(searchModel.AvailableStores);
@@ -1032,9 +908,6 @@ namespace Nop.Web.Areas.Admin.Factories
 
             //prepare available categories
             _baseAdminModelFactory.PrepareCategories(searchModel.AvailableCategories);
-
-            //prepare available manufacturers
-            _baseAdminModelFactory.PrepareManufacturers(searchModel.AvailableManufacturers);
 
             //prepare available stores
             _baseAdminModelFactory.PrepareStores(searchModel.AvailableStores);
@@ -1147,9 +1020,6 @@ namespace Nop.Web.Areas.Admin.Factories
             //prepare available categories
             _baseAdminModelFactory.PrepareCategories(searchModel.AvailableCategories);
 
-            //prepare available manufacturers
-            _baseAdminModelFactory.PrepareManufacturers(searchModel.AvailableManufacturers);
-
             //prepare available stores
             _baseAdminModelFactory.PrepareStores(searchModel.AvailableStores);
 
@@ -1256,9 +1126,6 @@ namespace Nop.Web.Areas.Admin.Factories
 
             //prepare available categories
             _baseAdminModelFactory.PrepareCategories(searchModel.AvailableCategories);
-
-            //prepare available manufacturers
-            _baseAdminModelFactory.PrepareManufacturers(searchModel.AvailableManufacturers);
 
             //prepare available stores
             _baseAdminModelFactory.PrepareStores(searchModel.AvailableStores);
@@ -1576,54 +1443,6 @@ namespace Nop.Web.Areas.Admin.Factories
         }
 
         /// <summary>
-        /// Prepare paged product order list model
-        /// </summary>
-        /// <param name="searchModel">Product order search model</param>
-        /// <param name="product">Product</param>
-        /// <returns>Product order list model</returns>
-        public virtual ProductOrderListModel PrepareProductOrderListModel(ProductOrderSearchModel searchModel, Product product)
-        {
-            if (searchModel == null)
-                throw new ArgumentNullException(nameof(searchModel));
-
-            if (product == null)
-                throw new ArgumentNullException(nameof(product));
-
-            //get orders
-            var orders = _orderService.SearchOrders(productId: searchModel.ProductId,
-                pageIndex: searchModel.Page - 1, pageSize: searchModel.PageSize);
-
-            //prepare grid model
-            var model = new ProductOrderListModel
-            {
-                Data = orders.Select(order =>
-                {
-                    //fill in model values from the entity
-                    var orderModel = new OrderModel
-                    {
-                        Id = order.Id,
-                        CustomerEmail = order.BillingAddress.Email,
-                        CustomOrderNumber = order.CustomOrderNumber
-                    };
-
-                    //convert dates to the user time
-                    orderModel.CreatedOn = _dateTimeHelper.ConvertToUserTime(order.CreatedOnUtc, DateTimeKind.Utc);
-
-                    //fill in additional values (not existing in the entity)
-                    orderModel.StoreName = _storeService.GetStoreById(order.StoreId)?.Name ?? "Deleted";
-                    orderModel.OrderStatus = _localizationService.GetLocalizedEnum(order.OrderStatus);
-                    orderModel.PaymentStatus = _localizationService.GetLocalizedEnum(order.PaymentStatus);
-                    orderModel.ShippingStatus = _localizationService.GetLocalizedEnum(order.ShippingStatus);
-
-                    return orderModel;
-                }),
-                Total = orders.TotalCount
-            };
-
-            return model;
-        }
-
-        /// <summary>
         /// Prepare bulk edit product search model
         /// </summary>
         /// <param name="searchModel">Bulk edit product search model</param>
@@ -1635,9 +1454,6 @@ namespace Nop.Web.Areas.Admin.Factories
 
             //prepare available categories
             _baseAdminModelFactory.PrepareCategories(searchModel.AvailableCategories);
-
-            //prepare available manufacturers
-            _baseAdminModelFactory.PrepareManufacturers(searchModel.AvailableManufacturers);
 
             //prepare available product types
             _baseAdminModelFactory.PrepareProductTypes(searchModel.AvailableProductTypes);
@@ -1761,56 +1577,6 @@ namespace Nop.Web.Areas.Admin.Factories
 
             //prepare available customer roles
             _baseAdminModelFactory.PrepareCustomerRoles(model.AvailableCustomerRoles);
-
-            return model;
-        }
-
-        /// <summary>
-        /// Prepare paged stock quantity history list model
-        /// </summary>
-        /// <param name="searchModel">Stock quantity history search model</param>
-        /// <param name="product">Product</param>
-        /// <returns>Stock quantity history list model</returns>
-        public virtual StockQuantityHistoryListModel PrepareStockQuantityHistoryListModel(StockQuantityHistorySearchModel searchModel, Product product)
-        {
-            if (searchModel == null)
-                throw new ArgumentNullException(nameof(searchModel));
-
-            if (product == null)
-                throw new ArgumentNullException(nameof(product));
-
-            //get stock quantity history
-            var stockQuantityHistory = _productService.GetStockQuantityHistory(product: product,
-                warehouseId: searchModel.WarehouseId,
-                pageIndex: searchModel.Page - 1, pageSize: searchModel.PageSize);
-
-            //prepare grid model
-            var model = new StockQuantityHistoryListModel
-            {
-                Data = stockQuantityHistory.Select(historyEntry =>
-                {
-                    //fill in model values from the entity
-                    var stockQuantityHistoryModel = historyEntry.ToModel<StockQuantityHistoryModel>();
-
-                    //convert dates to the user time
-                    stockQuantityHistoryModel.CreatedOn = _dateTimeHelper.ConvertToUserTime(historyEntry.CreatedOnUtc, DateTimeKind.Utc);
-
-                    //fill in additional values (not existing in the entity)
-                    var combination = _productAttributeService.GetProductAttributeCombinationById(historyEntry.CombinationId ?? 0);
-                    if (combination != null)
-                    {
-                        stockQuantityHistoryModel.AttributeCombination = _productAttributeFormatter.FormatAttributes(historyEntry.Product,
-                            combination.AttributesXml, _workContext.CurrentCustomer, renderGiftCardAttributes: false);
-                    }
-
-                    stockQuantityHistoryModel.WarehouseName = historyEntry.WarehouseId.HasValue
-                        ? _shippingService.GetWarehouseById(historyEntry.WarehouseId.Value)?.Name ?? "Deleted"
-                        : _localizationService.GetResource("Admin.Catalog.Products.Fields.Warehouse.None");
-
-                    return stockQuantityHistoryModel;
-                }),
-                Total = stockQuantityHistory.TotalCount
-            };
 
             return model;
         }
@@ -2091,9 +1857,6 @@ namespace Nop.Web.Areas.Admin.Factories
             //prepare available categories
             _baseAdminModelFactory.PrepareCategories(searchModel.AvailableCategories);
 
-            //prepare available manufacturers
-            _baseAdminModelFactory.PrepareManufacturers(searchModel.AvailableManufacturers);
-
             //prepare available stores
             _baseAdminModelFactory.PrepareStores(searchModel.AvailableStores);
 
@@ -2185,11 +1948,6 @@ namespace Nop.Web.Areas.Admin.Factories
                     if (string.IsNullOrEmpty(pictureThumbnailUrl))
                         pictureThumbnailUrl = _pictureService.GetPictureUrl(null, 1);
                     productAttributeCombinationModel.PictureThumbnailUrl = pictureThumbnailUrl;
-                    var warnings = _shoppingCartService.GetShoppingCartItemAttributeWarnings(_workContext.CurrentCustomer,
-                        ShoppingCartType.ShoppingCart, combination.Product,
-                        attributesXml: combination.AttributesXml,
-                        ignoreNonCombinableAttributes: true).Aggregate(string.Empty, (message, warning) => $"{message}{warning}<br />");
-                    productAttributeCombinationModel.Warnings = new List<string> { warnings };
 
                     return productAttributeCombinationModel;
                 }),

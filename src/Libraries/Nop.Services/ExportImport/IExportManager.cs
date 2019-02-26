@@ -3,7 +3,6 @@ using Nop.Core.Domain.Catalog;
 using Nop.Core.Domain.Customers;
 using Nop.Core.Domain.Directory;
 using Nop.Core.Domain.Messages;
-using Nop.Core.Domain.Orders;
 
 namespace Nop.Services.ExportImport
 {
@@ -12,19 +11,6 @@ namespace Nop.Services.ExportImport
     /// </summary>
     public partial interface IExportManager
     {
-        /// <summary>
-        /// Export manufacturer list to XML
-        /// </summary>
-        /// <param name="manufacturers">Manufacturers</param>
-        /// <returns>Result in XML format</returns>
-        string ExportManufacturersToXml(IList<Manufacturer> manufacturers);
-
-        /// <summary>
-        /// Export manufacturers to XLSX
-        /// </summary>
-        /// <param name="manufacturers">Manufactures</param>
-        byte[] ExportManufacturersToXlsx(IEnumerable<Manufacturer> manufacturers);
-
         /// <summary>
         /// Export category list to XML
         /// </summary>
@@ -48,20 +34,7 @@ namespace Nop.Services.ExportImport
         /// Export products to XLSX
         /// </summary>
         /// <param name="products">Products</param>
-        byte[] ExportProductsToXlsx(IEnumerable<Product> products);
-
-        /// <summary>
-        /// Export order list to XML
-        /// </summary>
-        /// <param name="orders">Orders</param>
-        /// <returns>Result in XML format</returns>
-        string ExportOrdersToXml(IList<Order> orders);
-
-        /// <summary>
-        /// Export orders to XLSX
-        /// </summary>
-        /// <param name="orders">Orders</param>
-        byte[] ExportOrdersToXlsx(IList<Order> orders);
+        byte[] ExportProductsToXlsx(IEnumerable<Product> products);        
 
         /// <summary>
         /// Export customer list to XLSX
@@ -89,13 +62,5 @@ namespace Nop.Services.ExportImport
         /// <param name="states">States</param>
         /// <returns>Result in TXT (string) format</returns>
         string ExportStatesToTxt(IList<StateProvince> states);
-
-        /// <summary>
-        /// Export customer info (GDPR request) to XLSX 
-        /// </summary>
-        /// <param name="customer">Customer</param>
-        /// <param name="storeId">Store identifier</param>
-        /// <returns>Customer GDPR info</returns>
-        byte[] ExportCustomerGdprInfoToXlsx(Customer customer, int storeId);
     }
 }

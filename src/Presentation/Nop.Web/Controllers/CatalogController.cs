@@ -31,7 +31,6 @@ namespace Nop.Web.Controllers
         private readonly ICustomerActivityService _customerActivityService;
         private readonly IGenericAttributeService _genericAttributeService;
         private readonly ILocalizationService _localizationService;
-        private readonly IManufacturerService _manufacturerService;
         private readonly IPermissionService _permissionService;
         private readonly IProductModelFactory _productModelFactory;
         private readonly IProductService _productService;
@@ -55,7 +54,6 @@ namespace Nop.Web.Controllers
             ICustomerActivityService customerActivityService,
             IGenericAttributeService genericAttributeService,
             ILocalizationService localizationService,
-            IManufacturerService manufacturerService,
             IPermissionService permissionService, 
             IProductModelFactory productModelFactory,
             IProductService productService, 
@@ -75,7 +73,6 @@ namespace Nop.Web.Controllers
             this._customerActivityService = customerActivityService;
             this._genericAttributeService = genericAttributeService;
             this._localizationService = localizationService;
-            this._manufacturerService = manufacturerService;
             this._permissionService = permissionService;
             this._productModelFactory = productModelFactory;
             this._productService = productService;
@@ -134,58 +131,6 @@ namespace Nop.Web.Controllers
             return View(templateViewPath, model);
         }
 
-        #endregion
-
-        #region Manufacturers
-
-        [HttpsRequirement(SslRequirement.No)]
-        public virtual IActionResult Manufacturer(int manufacturerId, CatalogPagingFilteringModel command)
-        {
-            var manufacturer = _manufacturerService.GetManufacturerById(manufacturerId);
-            if (manufacturer == null || manufacturer.Deleted)
-                return InvokeHttp404();
-
-            var notAvailable =
-                //published?
-                !manufacturer.Published ||
-                //ACL (access control list) 
-                !_aclService.Authorize(manufacturer) ||
-                //Store mapping
-                !_storeMappingService.Authorize(manufacturer);
-            //Check whether the current user has a "Manage categories" permission (usually a store owner)
-            //We should allows him (her) to use "Preview" functionality
-            if (notAvailable && !_permissionService.Authorize(StandardPermissionProvider.ManageManufacturers))
-                return InvokeHttp404();
-
-            //'Continue shopping' URL
-            _genericAttributeService.SaveAttribute(_workContext.CurrentCustomer, 
-                NopCustomerDefaults.LastContinueShoppingPageAttribute, 
-                _webHelper.GetThisPageUrl(false),
-                _storeContext.CurrentStore.Id);
-            
-            //display "edit" (manage) link
-            if (_permissionService.Authorize(StandardPermissionProvider.AccessAdminPanel) && _permissionService.Authorize(StandardPermissionProvider.ManageManufacturers))
-                DisplayEditLink(Url.Action("Edit", "Manufacturer", new { id = manufacturer.Id, area = AreaNames.Admin }));
-
-            //activity log
-            _customerActivityService.InsertActivity("PublicStore.ViewManufacturer",
-                string.Format(_localizationService.GetResource("ActivityLog.PublicStore.ViewManufacturer"), manufacturer.Name), manufacturer);
-
-            //model
-            var model = _catalogModelFactory.PrepareManufacturerModel(manufacturer, command);
-            
-            //template
-            var templateViewPath = _catalogModelFactory.PrepareManufacturerTemplateViewPath(manufacturer.ManufacturerTemplateId);
-            return View(templateViewPath, model);
-        }
-
-        [HttpsRequirement(SslRequirement.No)]
-        public virtual IActionResult ManufacturerAll()
-        {
-            var model = _catalogModelFactory.PrepareManufacturerAllModels();
-            return View(model);
-        }
-        
         #endregion
 
         #region Vendors

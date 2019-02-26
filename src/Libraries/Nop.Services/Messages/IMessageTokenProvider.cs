@@ -5,8 +5,6 @@ using Nop.Core.Domain.Customers;
 using Nop.Core.Domain.Forums;
 using Nop.Core.Domain.Messages;
 using Nop.Core.Domain.News;
-using Nop.Core.Domain.Orders;
-using Nop.Core.Domain.Shipping;
 using Nop.Core.Domain.Stores;
 using Nop.Core.Domain.Vendors;
 
@@ -25,59 +23,8 @@ namespace Nop.Services.Messages
         /// <param name="emailAccount">Email account</param>
         void AddStoreTokens(IList<Token> tokens, Store store, EmailAccount emailAccount);
 
-        /// <summary>
-        /// Add order tokens
-        /// </summary>
-        /// <param name="tokens">List of already added tokens</param>
-        /// <param name="order"></param>
-        /// <param name="languageId">Language identifier</param>
-        /// <param name="vendorId">Vendor identifier</param>
-        void AddOrderTokens(IList<Token> tokens, Order order, int languageId, int vendorId = 0);
 
-        /// <summary>
-        /// Add refunded order tokens
-        /// </summary>
-        /// <param name="tokens">List of already added tokens</param>
-        /// <param name="order">Order</param>
-        /// <param name="refundedAmount">Refunded amount of order</param>
-        void AddOrderRefundedTokens(IList<Token> tokens, Order order, decimal refundedAmount);
-
-        /// <summary>
-        /// Add shipment tokens
-        /// </summary>
-        /// <param name="tokens">List of already added tokens</param>
-        /// <param name="shipment">Shipment item</param>
-        /// <param name="languageId">Language identifier</param>
-        void AddShipmentTokens(IList<Token> tokens, Shipment shipment, int languageId);
-
-        /// <summary>
-        /// Add order note tokens
-        /// </summary>
-        /// <param name="tokens">List of already added tokens</param>
-        /// <param name="orderNote">Order note</param>
-        void AddOrderNoteTokens(IList<Token> tokens, OrderNote orderNote);
-
-        /// <summary>
-        /// Add recurring payment tokens
-        /// </summary>
-        /// <param name="tokens">List of already added tokens</param>
-        /// <param name="recurringPayment">Recurring payment</param>
-        void AddRecurringPaymentTokens(IList<Token> tokens, RecurringPayment recurringPayment);
-
-        /// <summary>
-        /// Add return request tokens
-        /// </summary>
-        /// <param name="tokens">List of already added tokens</param>
-        /// <param name="returnRequest">Return request</param>
-        /// <param name="orderItem">Order item</param>
-        void AddReturnRequestTokens(IList<Token> tokens, ReturnRequest returnRequest, OrderItem orderItem);
-
-        /// <summary>
-        /// Add gift card tokens
-        /// </summary>
-        /// <param name="tokens">List of already added tokens</param>
-        /// <param name="giftCard">Gift card</param>
-        void AddGiftCardTokens(IList<Token> tokens, GiftCard giftCard);
+      
 
         /// <summary>
         /// Add customer tokens

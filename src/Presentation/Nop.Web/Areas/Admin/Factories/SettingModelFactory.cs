@@ -14,10 +14,10 @@ using Nop.Core.Domain.Gdpr;
 using Nop.Core.Domain.Localization;
 using Nop.Core.Domain.Media;
 using Nop.Core.Domain.News;
-using Nop.Core.Domain.Orders;
+
 using Nop.Core.Domain.Security;
 using Nop.Core.Domain.Seo;
-using Nop.Core.Domain.Shipping;
+
 using Nop.Core.Domain.Tax;
 using Nop.Core.Domain.Vendors;
 using Nop.Services;
@@ -60,7 +60,6 @@ namespace Nop.Web.Areas.Admin.Factories
         private readonly ILocalizationService _localizationService;
         private readonly IMaintenanceService _maintenanceService;
         private readonly IPictureService _pictureService;
-        private readonly IReturnRequestModelFactory _returnRequestModelFactory;
         private readonly IReviewTypeModelFactory _reviewTypeModelFactory;
         private readonly ISettingService _settingService;
         private readonly IStoreContext _storeContext;
@@ -87,7 +86,6 @@ namespace Nop.Web.Areas.Admin.Factories
             ILocalizationService localizationService,
             IMaintenanceService maintenanceService,
             IPictureService pictureService,
-            IReturnRequestModelFactory returnRequestModelFactory,
             ISettingService settingService,
             IStoreContext storeContext,
             IStoreService storeService,
@@ -110,7 +108,6 @@ namespace Nop.Web.Areas.Admin.Factories
             this._localizationService = localizationService;
             this._maintenanceService = maintenanceService;
             this._pictureService = pictureService;
-            this._returnRequestModelFactory = returnRequestModelFactory;
             this._settingService = settingService;
             this._storeContext = storeContext;
             this._storeService = storeService;
@@ -798,54 +795,6 @@ namespace Nop.Web.Areas.Admin.Factories
         }
 
         /// <summary>
-        /// Prepare shipping settings model
-        /// </summary>
-        /// <returns>Shipping settings model</returns>
-        public virtual ShippingSettingsModel PrepareShippingSettingsModel()
-        {
-            //load settings for a chosen store scope
-            var storeId = _storeContext.ActiveStoreScopeConfiguration;
-            var shippingSettings = _settingService.LoadSetting<ShippingSettings>(storeId);
-
-            //fill in model values from the entity
-            var model = shippingSettings.ToSettingsModel<ShippingSettingsModel>();
-
-            //fill in additional values (not existing in the entity)
-            model.ActiveStoreScopeConfiguration = storeId;
-            model.PrimaryStoreCurrencyCode = _currencyService.GetCurrencyById(_currencySettings.PrimaryStoreCurrencyId)?.CurrencyCode;
-
-            //fill in overridden values
-            if (storeId > 0)
-            {
-                model.ShipToSameAddress_OverrideForStore = _settingService.SettingExists(shippingSettings, x => x.ShipToSameAddress, storeId);
-                model.AllowPickUpInStore_OverrideForStore = _settingService.SettingExists(shippingSettings, x => x.AllowPickUpInStore, storeId);
-                model.DisplayPickupPointsOnMap_OverrideForStore = _settingService.SettingExists(shippingSettings, x => x.DisplayPickupPointsOnMap, storeId);
-                model.IgnoreAdditionalShippingChargeForPickUpInStore_OverrideForStore = _settingService.SettingExists(shippingSettings, x => x.IgnoreAdditionalShippingChargeForPickUpInStore, storeId);
-                model.GoogleMapsApiKey_OverrideForStore = _settingService.SettingExists(shippingSettings, x => x.GoogleMapsApiKey, storeId);
-                model.UseWarehouseLocation_OverrideForStore = _settingService.SettingExists(shippingSettings, x => x.UseWarehouseLocation, storeId);
-                model.NotifyCustomerAboutShippingFromMultipleLocations_OverrideForStore = _settingService.SettingExists(shippingSettings, x => x.NotifyCustomerAboutShippingFromMultipleLocations, storeId);
-                model.FreeShippingOverXEnabled_OverrideForStore = _settingService.SettingExists(shippingSettings, x => x.FreeShippingOverXEnabled, storeId);
-                model.FreeShippingOverXValue_OverrideForStore = _settingService.SettingExists(shippingSettings, x => x.FreeShippingOverXValue, storeId);
-                model.FreeShippingOverXIncludingTax_OverrideForStore = _settingService.SettingExists(shippingSettings, x => x.FreeShippingOverXIncludingTax, storeId);
-                model.EstimateShippingEnabled_OverrideForStore = _settingService.SettingExists(shippingSettings, x => x.EstimateShippingEnabled, storeId);
-                model.DisplayShipmentEventsToCustomers_OverrideForStore = _settingService.SettingExists(shippingSettings, x => x.DisplayShipmentEventsToCustomers, storeId);
-                model.DisplayShipmentEventsToStoreOwner_OverrideForStore = _settingService.SettingExists(shippingSettings, x => x.DisplayShipmentEventsToStoreOwner, storeId);
-                model.HideShippingTotal_OverrideForStore = _settingService.SettingExists(shippingSettings, x => x.HideShippingTotal, storeId);
-                model.BypassShippingMethodSelectionIfOnlyOne_OverrideForStore = _settingService.SettingExists(shippingSettings, x => x.BypassShippingMethodSelectionIfOnlyOne, storeId);
-                model.ConsiderAssociatedProductsDimensions_OverrideForStore = _settingService.SettingExists(shippingSettings, x => x.ConsiderAssociatedProductsDimensions, storeId);
-                model.ShippingOriginAddress_OverrideForStore = _settingService.SettingExists(shippingSettings, x => x.ShippingOriginAddressId, storeId);
-            }
-
-            //prepare shipping origin address
-            var originAddress = _addressService.GetAddressById(shippingSettings.ShippingOriginAddressId);
-            if (originAddress != null)
-                model.ShippingOriginAddress = originAddress.ToModel(model.ShippingOriginAddress);
-            PrepareAddressModel(model.ShippingOriginAddress, originAddress);
-
-            return model;
-        }
-
-        /// <summary>
         /// Prepare tax settings model
         /// </summary>
         /// <returns>Tax settings model</returns>
@@ -891,9 +840,6 @@ namespace Nop.Web.Areas.Admin.Factories
                 model.EuVatAssumeValid_OverrideForStore = _settingService.SettingExists(taxSettings, x => x.EuVatAssumeValid, storeId);
                 model.EuVatEmailAdminWhenNewVatSubmitted_OverrideForStore = _settingService.SettingExists(taxSettings, x => x.EuVatEmailAdminWhenNewVatSubmitted, storeId);
             }
-
-            //prepare available tax categories
-            _baseAdminModelFactory.PrepareTaxCategories(model.TaxCategories);
 
             //prepare available EU VAT countries
             _baseAdminModelFactory.PrepareCountries(model.EuVatShopCountries);
@@ -1088,103 +1034,6 @@ namespace Nop.Web.Areas.Admin.Factories
             model.DisplayHowMuchWillBeEarned_OverrideForStore = _settingService.SettingExists(rewardPointsSettings, x => x.DisplayHowMuchWillBeEarned, storeId);
             model.PointsForRegistration_OverrideForStore = _settingService.SettingExists(rewardPointsSettings, x => x.PointsForRegistration, storeId);
             model.PageSize_OverrideForStore = _settingService.SettingExists(rewardPointsSettings, x => x.PageSize, storeId);
-
-            return model;
-        }
-
-        /// <summary>
-        /// Prepare order settings model
-        /// </summary>
-        /// <returns>Order settings model</returns>
-        public virtual OrderSettingsModel PrepareOrderSettingsModel()
-        {
-            //load settings for a chosen store scope
-            var storeId = _storeContext.ActiveStoreScopeConfiguration;
-            var orderSettings = _settingService.LoadSetting<OrderSettings>(storeId);
-
-            //fill in model values from the entity
-            var model = orderSettings.ToSettingsModel<OrderSettingsModel>();
-
-            //fill in additional values (not existing in the entity)
-            model.ActiveStoreScopeConfiguration = storeId;
-            model.PrimaryStoreCurrencyCode = _currencyService.GetCurrencyById(_currencySettings.PrimaryStoreCurrencyId)?.CurrencyCode;
-            model.OrderIdent = _maintenanceService.GetTableIdent<Order>();
-
-            //fill in overridden values
-            if (storeId > 0)
-            {
-                model.IsReOrderAllowed_OverrideForStore = _settingService.SettingExists(orderSettings, x => x.IsReOrderAllowed, storeId);
-                model.MinOrderSubtotalAmount_OverrideForStore = _settingService.SettingExists(orderSettings, x => x.MinOrderSubtotalAmount, storeId);
-                model.MinOrderSubtotalAmountIncludingTax_OverrideForStore = _settingService.SettingExists(orderSettings, x => x.MinOrderSubtotalAmountIncludingTax, storeId);
-                model.MinOrderTotalAmount_OverrideForStore = _settingService.SettingExists(orderSettings, x => x.MinOrderTotalAmount, storeId);
-                model.AutoUpdateOrderTotalsOnEditingOrder_OverrideForStore = _settingService.SettingExists(orderSettings, x => x.AutoUpdateOrderTotalsOnEditingOrder, storeId);
-                model.AnonymousCheckoutAllowed_OverrideForStore = _settingService.SettingExists(orderSettings, x => x.AnonymousCheckoutAllowed, storeId);
-                model.CheckoutDisabled_OverrideForStore = _settingService.SettingExists(orderSettings, x => x.CheckoutDisabled, storeId);
-                model.TermsOfServiceOnShoppingCartPage_OverrideForStore = _settingService.SettingExists(orderSettings, x => x.TermsOfServiceOnShoppingCartPage, storeId);
-                model.TermsOfServiceOnOrderConfirmPage_OverrideForStore = _settingService.SettingExists(orderSettings, x => x.TermsOfServiceOnOrderConfirmPage, storeId);
-                model.OnePageCheckoutEnabled_OverrideForStore = _settingService.SettingExists(orderSettings, x => x.OnePageCheckoutEnabled, storeId);
-                model.OnePageCheckoutDisplayOrderTotalsOnPaymentInfoTab_OverrideForStore = _settingService.SettingExists(orderSettings, x => x.OnePageCheckoutDisplayOrderTotalsOnPaymentInfoTab, storeId);
-                model.DisableBillingAddressCheckoutStep_OverrideForStore = _settingService.SettingExists(orderSettings, x => x.DisableBillingAddressCheckoutStep, storeId);
-                model.DisableOrderCompletedPage_OverrideForStore = _settingService.SettingExists(orderSettings, x => x.DisableOrderCompletedPage, storeId);
-                model.AttachPdfInvoiceToOrderPlacedEmail_OverrideForStore = _settingService.SettingExists(orderSettings, x => x.AttachPdfInvoiceToOrderPlacedEmail, storeId);
-                model.AttachPdfInvoiceToOrderPaidEmail_OverrideForStore = _settingService.SettingExists(orderSettings, x => x.AttachPdfInvoiceToOrderPaidEmail, storeId);
-                model.AttachPdfInvoiceToOrderCompletedEmail_OverrideForStore = _settingService.SettingExists(orderSettings, x => x.AttachPdfInvoiceToOrderCompletedEmail, storeId);
-                model.ReturnRequestsEnabled_OverrideForStore = _settingService.SettingExists(orderSettings, x => x.ReturnRequestsEnabled, storeId);
-                model.ReturnRequestsAllowFiles_OverrideForStore = _settingService.SettingExists(orderSettings, x => x.ReturnRequestsAllowFiles, storeId);
-                model.ReturnRequestNumberMask_OverrideForStore = _settingService.SettingExists(orderSettings, x => x.ReturnRequestNumberMask, storeId);
-                model.NumberOfDaysReturnRequestAvailable_OverrideForStore = _settingService.SettingExists(orderSettings, x => x.NumberOfDaysReturnRequestAvailable, storeId);
-                model.CustomOrderNumberMask_OverrideForStore = _settingService.SettingExists(orderSettings, x => x.CustomOrderNumberMask, storeId);
-                model.ExportWithProducts_OverrideForStore = _settingService.SettingExists(orderSettings, x => x.ExportWithProducts, storeId);
-                model.AllowAdminsToBuyCallForPriceProducts_OverrideForStore = _settingService.SettingExists(orderSettings, x => x.AllowAdminsToBuyCallForPriceProducts, storeId);
-                model.DeleteGiftCardUsageHistory_OverrideForStore = _settingService.SettingExists(orderSettings, x => x.DeleteGiftCardUsageHistory, storeId);
-            }
-
-            //prepare nested search models
-            _returnRequestModelFactory.PrepareReturnRequestReasonSearchModel(model.ReturnRequestReasonSearchModel);
-            _returnRequestModelFactory.PrepareReturnRequestActionSearchModel(model.ReturnRequestActionSearchModel);
-
-            return model;
-        }
-
-        /// <summary>
-        /// Prepare shopping cart settings model
-        /// </summary>
-        /// <returns>Shopping cart settings model</returns>
-        public virtual ShoppingCartSettingsModel PrepareShoppingCartSettingsModel()
-        {
-            //load settings for a chosen store scope
-            var storeId = _storeContext.ActiveStoreScopeConfiguration;
-            var shoppingCartSettings = _settingService.LoadSetting<ShoppingCartSettings>(storeId);
-
-            //fill in model values from the entity
-            var model = shoppingCartSettings.ToSettingsModel<ShoppingCartSettingsModel>();
-
-            //fill in additional values (not existing in the entity)
-            model.ActiveStoreScopeConfiguration = storeId;
-
-            if (storeId <= 0)
-                return model;
-
-            //fill in overridden values
-            model.DisplayCartAfterAddingProduct_OverrideForStore = _settingService.SettingExists(shoppingCartSettings, x => x.DisplayCartAfterAddingProduct, storeId);
-            model.DisplayWishlistAfterAddingProduct_OverrideForStore = _settingService.SettingExists(shoppingCartSettings, x => x.DisplayWishlistAfterAddingProduct, storeId);
-            model.MaximumShoppingCartItems_OverrideForStore = _settingService.SettingExists(shoppingCartSettings, x => x.MaximumShoppingCartItems, storeId);
-            model.MaximumWishlistItems_OverrideForStore = _settingService.SettingExists(shoppingCartSettings, x => x.MaximumWishlistItems, storeId);
-            model.AllowOutOfStockItemsToBeAddedToWishlist_OverrideForStore = _settingService.SettingExists(shoppingCartSettings, x => x.AllowOutOfStockItemsToBeAddedToWishlist, storeId);
-            model.MoveItemsFromWishlistToCart_OverrideForStore = _settingService.SettingExists(shoppingCartSettings, x => x.MoveItemsFromWishlistToCart, storeId);
-            model.CartsSharedBetweenStores_OverrideForStore = _settingService.SettingExists(shoppingCartSettings, x => x.CartsSharedBetweenStores, storeId);
-            model.ShowProductImagesOnShoppingCart_OverrideForStore = _settingService.SettingExists(shoppingCartSettings, x => x.ShowProductImagesOnShoppingCart, storeId);
-            model.ShowProductImagesOnWishList_OverrideForStore = _settingService.SettingExists(shoppingCartSettings, x => x.ShowProductImagesOnWishList, storeId);
-            model.ShowDiscountBox_OverrideForStore = _settingService.SettingExists(shoppingCartSettings, x => x.ShowDiscountBox, storeId);
-            model.ShowGiftCardBox_OverrideForStore = _settingService.SettingExists(shoppingCartSettings, x => x.ShowGiftCardBox, storeId);
-            model.CrossSellsNumber_OverrideForStore = _settingService.SettingExists(shoppingCartSettings, x => x.CrossSellsNumber, storeId);
-            model.EmailWishlistEnabled_OverrideForStore = _settingService.SettingExists(shoppingCartSettings, x => x.EmailWishlistEnabled, storeId);
-            model.AllowAnonymousUsersToEmailWishlist_OverrideForStore = _settingService.SettingExists(shoppingCartSettings, x => x.AllowAnonymousUsersToEmailWishlist, storeId);
-            model.MiniShoppingCartEnabled_OverrideForStore = _settingService.SettingExists(shoppingCartSettings, x => x.MiniShoppingCartEnabled, storeId);
-            model.ShowProductImagesInMiniShoppingCart_OverrideForStore = _settingService.SettingExists(shoppingCartSettings, x => x.ShowProductImagesInMiniShoppingCart, storeId);
-            model.MiniShoppingCartProductNumber_OverrideForStore = _settingService.SettingExists(shoppingCartSettings, x => x.MiniShoppingCartProductNumber, storeId);
-            model.AllowCartItemEditing_OverrideForStore = _settingService.SettingExists(shoppingCartSettings, x => x.AllowCartItemEditing, storeId);
-            model.GroupTierPricesForDistinctShoppingCartItems_OverrideForStore = _settingService.SettingExists(shoppingCartSettings, x => x.GroupTierPricesForDistinctShoppingCartItems, storeId);
 
             return model;
         }

@@ -2,9 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Nop.Core.Domain.Catalog;
-using Nop.Core.Domain.Discounts;
 using Nop.Services.Catalog;
-using Nop.Services.Discounts;
 using Nop.Services.Localization;
 using Nop.Services.Seo;
 using Nop.Web.Areas.Admin.Infrastructure.Mapper.Extensions;
@@ -25,8 +23,6 @@ namespace Nop.Web.Areas.Admin.Factories
         private readonly IAclSupportedModelFactory _aclSupportedModelFactory;
         private readonly IBaseAdminModelFactory _baseAdminModelFactory;
         private readonly ICategoryService _categoryService;
-        private readonly IDiscountService _discountService;
-        private readonly IDiscountSupportedModelFactory _discountSupportedModelFactory;
         private readonly ILocalizationService _localizationService;
         private readonly ILocalizedModelFactory _localizedModelFactory;
         private readonly IProductService _productService;
@@ -41,8 +37,6 @@ namespace Nop.Web.Areas.Admin.Factories
             IAclSupportedModelFactory aclSupportedModelFactory,
             IBaseAdminModelFactory baseAdminModelFactory,
             ICategoryService categoryService,
-            IDiscountService discountService,
-            IDiscountSupportedModelFactory discountSupportedModelFactory,
             ILocalizationService localizationService,
             ILocalizedModelFactory localizedModelFactory,
             IProductService productService,
@@ -53,8 +47,6 @@ namespace Nop.Web.Areas.Admin.Factories
             this._aclSupportedModelFactory = aclSupportedModelFactory;
             this._baseAdminModelFactory = baseAdminModelFactory;
             this._categoryService = categoryService;
-            this._discountService = discountService;
-            this._discountSupportedModelFactory = discountSupportedModelFactory;
             this._localizationService = localizationService;
             this._localizedModelFactory = localizedModelFactory;
             this._productService = productService;
@@ -204,11 +196,7 @@ namespace Nop.Web.Areas.Admin.Factories
             //prepare available parent categories
             _baseAdminModelFactory.PrepareCategories(model.AvailableCategories,
                 defaultItemText: _localizationService.GetResource("Admin.Catalog.Categories.Fields.Parent.None"));
-
-            //prepare model discounts
-            var availableDiscounts = _discountService.GetAllDiscounts(DiscountType.AssignedToCategories, showHidden: true);
-            _discountSupportedModelFactory.PrepareModelDiscounts(model, category, availableDiscounts, excludeProperties);
-
+            
             //prepare model customer roles
             _aclSupportedModelFactory.PrepareModelCustomerRoles(model, category, excludeProperties);
 
@@ -268,9 +256,6 @@ namespace Nop.Web.Areas.Admin.Factories
 
             //prepare available categories
             _baseAdminModelFactory.PrepareCategories(searchModel.AvailableCategories);
-
-            //prepare available manufacturers
-            _baseAdminModelFactory.PrepareManufacturers(searchModel.AvailableManufacturers);
 
             //prepare available stores
             _baseAdminModelFactory.PrepareStores(searchModel.AvailableStores);

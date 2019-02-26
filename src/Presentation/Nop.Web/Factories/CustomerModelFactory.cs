@@ -9,7 +9,6 @@ using Nop.Core.Domain.Customers;
 using Nop.Core.Domain.Forums;
 using Nop.Core.Domain.Gdpr;
 using Nop.Core.Domain.Media;
-using Nop.Core.Domain.Orders;
 using Nop.Core.Domain.Security;
 using Nop.Core.Domain.Tax;
 using Nop.Core.Domain.Vendors;
@@ -22,7 +21,6 @@ using Nop.Services.Helpers;
 using Nop.Services.Localization;
 using Nop.Services.Media;
 using Nop.Services.Messages;
-using Nop.Services.Orders;
 using Nop.Services.Seo;
 using Nop.Services.Stores;
 using Nop.Web.Models.Common;
@@ -57,16 +55,13 @@ namespace Nop.Web.Factories
         private readonly IGenericAttributeService _genericAttributeService;
         private readonly ILocalizationService _localizationService;
         private readonly INewsLetterSubscriptionService _newsLetterSubscriptionService;
-        private readonly IOrderService _orderService;
         private readonly IPictureService _pictureService;
-        private readonly IReturnRequestService _returnRequestService;
         private readonly IStateProvinceService _stateProvinceService;
         private readonly IStoreContext _storeContext;
         private readonly IStoreMappingService _storeMappingService;
         private readonly IUrlRecordService _urlRecordService;
         private readonly IWorkContext _workContext;
         private readonly MediaSettings _mediaSettings;
-        private readonly OrderSettings _orderSettings;
         private readonly RewardPointsSettings _rewardPointsSettings;
         private readonly SecuritySettings _securitySettings;
         private readonly TaxSettings _taxSettings;
@@ -96,16 +91,13 @@ namespace Nop.Web.Factories
             IGenericAttributeService genericAttributeService,
             ILocalizationService localizationService,
             INewsLetterSubscriptionService newsLetterSubscriptionService,
-            IOrderService orderService,
             IPictureService pictureService,
-            IReturnRequestService returnRequestService,
             IStateProvinceService stateProvinceService,
             IStoreContext storeContext,
             IStoreMappingService storeMappingService,
             IUrlRecordService urlRecordService,
             IWorkContext workContext,
             MediaSettings mediaSettings,
-            OrderSettings orderSettings,
             RewardPointsSettings rewardPointsSettings,
             SecuritySettings securitySettings,
             TaxSettings taxSettings,
@@ -131,16 +123,13 @@ namespace Nop.Web.Factories
             this._genericAttributeService = genericAttributeService;
             this._localizationService = localizationService;
             this._newsLetterSubscriptionService = newsLetterSubscriptionService;
-            this._orderService = orderService;
             this._pictureService = pictureService;
-            this._returnRequestService = returnRequestService;
             this._stateProvinceService = stateProvinceService;
             this._storeContext = storeContext;
             this._storeMappingService = storeMappingService;
             this._urlRecordService = urlRecordService;
             this._workContext = workContext;
             this._mediaSettings = mediaSettings;
-            this._orderSettings = orderSettings;
             this._rewardPointsSettings = rewardPointsSettings;
             this._securitySettings = securitySettings;
             this._taxSettings = taxSettings;
@@ -660,18 +649,6 @@ namespace Nop.Web.Factories
                 ItemClass = "customer-orders"
             });
 
-            if (_orderSettings.ReturnRequestsEnabled &&
-                _returnRequestService.SearchReturnRequests(_storeContext.CurrentStore.Id,
-                    _workContext.CurrentCustomer.Id, pageIndex: 0, pageSize: 1).Any())
-            {
-                model.CustomerNavigationItems.Add(new CustomerNavigationItemModel
-                {
-                    RouteName = "CustomerReturnRequests",
-                    Title = _localizationService.GetResource("Account.CustomerReturnRequests"),
-                    Tab = CustomerNavigationEnum.ReturnRequests,
-                    ItemClass = "return-requests"
-                });
-            }
 
             if (!_customerSettings.HideDownloadableProductsTab)
             {
@@ -808,62 +785,6 @@ namespace Nop.Web.Factories
         }
 
         /// <summary>
-        /// Prepare the customer downloadable products model
-        /// </summary>
-        /// <returns>Customer downloadable products model</returns>
-        public virtual CustomerDownloadableProductsModel PrepareCustomerDownloadableProductsModel()
-        {
-            var model = new CustomerDownloadableProductsModel();
-            var items = _orderService.GetDownloadableOrderItems(_workContext.CurrentCustomer.Id);
-            foreach (var item in items)
-            {
-                var itemModel = new CustomerDownloadableProductsModel.DownloadableProductsModel
-                {
-                    OrderItemGuid = item.OrderItemGuid,
-                    OrderId = item.OrderId,
-                    CustomOrderNumber = item.Order.CustomOrderNumber,
-                    CreatedOn = _dateTimeHelper.ConvertToUserTime(item.Order.CreatedOnUtc, DateTimeKind.Utc),
-                    ProductName = _localizationService.GetLocalized(item.Product, x => x.Name),
-                    ProductSeName = _urlRecordService.GetSeName(item.Product),
-                    ProductAttributes = item.AttributeDescription,
-                    ProductId = item.ProductId
-                };
-                model.Items.Add(itemModel);
-
-                if (_downloadService.IsDownloadAllowed(item))
-                    itemModel.DownloadId = item.Product.DownloadId;
-
-                if (_downloadService.IsLicenseDownloadAllowed(item))
-                    itemModel.LicenseId = item.LicenseDownloadId.HasValue ? item.LicenseDownloadId.Value : 0;
-            }
-
-            return model;
-        }
-
-        /// <summary>
-        /// Prepare the user agreement model
-        /// </summary>
-        /// <param name="orderItem">Order item</param>
-        /// <param name="product">Product</param>
-        /// <returns>User agreement model</returns>
-        public virtual UserAgreementModel PrepareUserAgreementModel(OrderItem orderItem, Product product)
-        {
-            if (orderItem == null)
-                throw new ArgumentNullException(nameof(orderItem));
-
-            if (product == null)
-                throw new ArgumentNullException(nameof(product));
-
-            var model = new UserAgreementModel
-            {
-                UserAgreementText = product.UserAgreementText,
-                OrderItemGuid = orderItem.OrderItemGuid
-            };
-
-            return model;
-        }
-
-        /// <summary>
         /// Prepare the change password model
         /// </summary>
         /// <returns>Change password model</returns>
@@ -900,16 +821,7 @@ namespace Nop.Web.Factories
             var model = new GdprToolsModel();
             return model;
         }
-
-        /// <summary>
-        /// Prepare the check gift card balance madel
-        /// </summary>
-        /// <returns>Check gift card balance madel</returns>
-        public virtual CheckGiftCardBalanceModel PrepareCheckGiftCardBalanceModel()
-        {
-            var model = new CheckGiftCardBalanceModel();
-            return model;
-        }
+        
 
         #endregion
     }

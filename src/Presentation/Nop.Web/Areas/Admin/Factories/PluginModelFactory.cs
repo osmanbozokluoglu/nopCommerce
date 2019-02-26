@@ -9,11 +9,7 @@ using Nop.Services.Authentication.External;
 using Nop.Services.Cms;
 using Nop.Services.Localization;
 using Nop.Services.Logging;
-using Nop.Services.Payments;
 using Nop.Services.Plugins;
-using Nop.Services.Shipping;
-using Nop.Services.Shipping.Pickup;
-using Nop.Services.Tax;
 using Nop.Web.Areas.Admin.Infrastructure.Mapper.Extensions;
 using Nop.Web.Areas.Admin.Models.Plugins;
 using Nop.Web.Framework.Extensions;
@@ -34,9 +30,7 @@ namespace Nop.Web.Areas.Admin.Factories
         private readonly ILocalizationService _localizationService;
         private readonly ILocalizedModelFactory _localizedModelFactory;
         private readonly IOfficialFeedManager _officialFeedManager;
-        private readonly IPaymentService _paymentService;
         private readonly IPluginService _pluginService;
-        private readonly IShippingService _shippingService;
         private readonly IStoreMappingSupportedModelFactory _storeMappingSupportedModelFactory;
         private readonly IWidgetService _widgetService;
         private readonly TaxSettings _taxSettings;
@@ -52,9 +46,7 @@ namespace Nop.Web.Areas.Admin.Factories
             ILocalizationService localizationService,
             ILocalizedModelFactory localizedModelFactory,
             IOfficialFeedManager officialFeedManager,
-            IPaymentService paymentService,
             IPluginService pluginService,
-            IShippingService shippingService,
             IStoreMappingSupportedModelFactory storeMappingSupportedModelFactory,
             IWidgetService widgetService,
             TaxSettings taxSettings,
@@ -66,9 +58,7 @@ namespace Nop.Web.Areas.Admin.Factories
             this._localizationService = localizationService;
             this._localizedModelFactory = localizedModelFactory;
             this._officialFeedManager = officialFeedManager;
-            this._paymentService = paymentService;
             this._pluginService = pluginService;
-            this._shippingService = shippingService;
             this._storeMappingSupportedModelFactory = storeMappingSupportedModelFactory;
             this._widgetService = widgetService;
             this._taxSettings = taxSettings;
@@ -99,23 +89,6 @@ namespace Nop.Web.Areas.Admin.Factories
             model.CanChangeEnabled = true;
             switch (plugin)
             {
-                case IPaymentMethod paymentMethod:
-                    model.IsEnabled = _paymentService.IsPaymentMethodActive(paymentMethod);
-                    break;
-
-                case IShippingRateComputationMethod shippingRateComputationMethod:
-                    model.IsEnabled = _shippingService.IsShippingRateComputationMethodActive(shippingRateComputationMethod);
-                    break;
-
-                case IPickupPointProvider pickupPointProvider:
-                    model.IsEnabled = _shippingService.IsPickupPointProviderActive(pickupPointProvider);
-                    break;
-
-                case ITaxProvider _:
-                    model.IsEnabled = plugin.PluginDescriptor.SystemName
-                        .Equals(_taxSettings.ActiveTaxProviderSystemName, StringComparison.InvariantCultureIgnoreCase);
-                    break;
-
                 case IExternalAuthenticationMethod externalAuthenticationMethod:
                     model.IsEnabled = _externalAuthenticationService.IsExternalAuthenticationMethodActive(externalAuthenticationMethod);
                     break;

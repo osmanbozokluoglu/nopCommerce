@@ -6,7 +6,6 @@ using Nop.Services.Common;
 using Nop.Services.Events;
 using Nop.Services.Localization;
 using Nop.Services.Messages;
-using Nop.Services.Orders;
 using Nop.Services.Security;
 using Nop.Services.Stores;
 
@@ -26,7 +25,6 @@ namespace Nop.Services.Customers
         private readonly IGenericAttributeService _genericAttributeService;
         private readonly ILocalizationService _localizationService;
         private readonly INewsLetterSubscriptionService _newsLetterSubscriptionService;
-        private readonly IRewardPointService _rewardPointService;
         private readonly IStoreService _storeService;
         private readonly IWorkContext _workContext;
         private readonly IWorkflowMessageService _workflowMessageService;
@@ -43,7 +41,6 @@ namespace Nop.Services.Customers
             IGenericAttributeService genericAttributeService,
             ILocalizationService localizationService,
             INewsLetterSubscriptionService newsLetterSubscriptionService,
-            IRewardPointService rewardPointService,
             IStoreService storeService,
             IWorkContext workContext,
             IWorkflowMessageService workflowMessageService,
@@ -56,7 +53,6 @@ namespace Nop.Services.Customers
             this._genericAttributeService = genericAttributeService;
             this._localizationService = localizationService;
             this._newsLetterSubscriptionService = newsLetterSubscriptionService;
-            this._rewardPointService = rewardPointService;
             this._storeService = storeService;
             this._workContext = workContext;
             this._workflowMessageService = workflowMessageService;
@@ -266,16 +262,7 @@ namespace Nop.Services.Customers
                 //request.Customer.CustomerRoles.Remove(guestRole);
                 request.Customer.RemoveCustomerRoleMapping(
                     request.Customer.CustomerCustomerRoleMappings.FirstOrDefault(mapping => mapping.CustomerRoleId == guestRole.Id));
-            }
-
-            //add reward points for customer registration (if enabled)
-            if (_rewardPointsSettings.Enabled && _rewardPointsSettings.PointsForRegistration > 0)
-            {
-                var endDate = _rewardPointsSettings.RegistrationPointsValidity > 0
-                    ? (DateTime?)DateTime.UtcNow.AddDays(_rewardPointsSettings.RegistrationPointsValidity.Value) : null;
-                _rewardPointService.AddRewardPointsHistoryEntry(request.Customer, _rewardPointsSettings.PointsForRegistration,
-                    request.StoreId, _localizationService.GetResource("RewardPoints.Message.EarnedForRegistration"), endDate: endDate);
-            }
+            }            
 
             _customerService.UpdateCustomer(request.Customer);
 

@@ -35,12 +35,8 @@ namespace Nop.Web.Areas.Admin.Models.Customers
             this.AvailableNewsletterSubscriptionStores = new List<SelectListItem>();
             this.SelectedNewsletterSubscriptionStoreIds = new List<int>();
             this.AddRewardPoints = new AddRewardPointsToCustomerModel();
-            this.CustomerRewardPointsSearchModel = new CustomerRewardPointsSearchModel();
             this.CustomerAddressSearchModel = new CustomerAddressSearchModel();
-            this.CustomerOrderSearchModel = new CustomerOrderSearchModel();
-            this.CustomerShoppingCartSearchModel = new CustomerShoppingCartSearchModel();
             this.CustomerActivityLogSearchModel = new CustomerActivityLogSearchModel();
-            this.CustomerBackInStockSubscriptionSearchModel = new CustomerBackInStockSubscriptionSearchModel();
         }
 
         #endregion
@@ -214,8 +210,6 @@ namespace Nop.Web.Areas.Admin.Models.Customers
 
         public AddRewardPointsToCustomerModel AddRewardPoints { get; set; }
 
-        public CustomerRewardPointsSearchModel CustomerRewardPointsSearchModel { get; set; }
-
         //send email model
         public SendEmailModel SendEmail { get; set; }
 
@@ -238,13 +232,7 @@ namespace Nop.Web.Areas.Admin.Models.Customers
 
         public CustomerAddressSearchModel CustomerAddressSearchModel { get; set; }
 
-        public CustomerOrderSearchModel CustomerOrderSearchModel { get; set; }
-
-        public CustomerShoppingCartSearchModel CustomerShoppingCartSearchModel { get; set; }
-
         public CustomerActivityLogSearchModel CustomerActivityLogSearchModel { get; set; }
-
-        public CustomerBackInStockSubscriptionSearchModel CustomerBackInStockSubscriptionSearchModel { get; set; }
 
         #endregion
 

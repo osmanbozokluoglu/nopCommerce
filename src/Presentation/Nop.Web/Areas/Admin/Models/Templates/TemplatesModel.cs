@@ -12,7 +12,6 @@ namespace Nop.Web.Areas.Admin.Models.Templates
         public TemplatesModel()
         {
             TemplatesCategory = new CategoryTemplateSearchModel();
-            TemplatesManufacturer = new ManufacturerTemplateSearchModel();
             TemplatesProduct = new ProductTemplateSearchModel();
             TemplatesTopic = new TopicTemplateSearchModel();
         }
@@ -22,8 +21,6 @@ namespace Nop.Web.Areas.Admin.Models.Templates
         #region Properties
 
         public CategoryTemplateSearchModel TemplatesCategory { get; set; }
-
-        public ManufacturerTemplateSearchModel TemplatesManufacturer { get; set; }
 
         public ProductTemplateSearchModel TemplatesProduct { get; set; }
 

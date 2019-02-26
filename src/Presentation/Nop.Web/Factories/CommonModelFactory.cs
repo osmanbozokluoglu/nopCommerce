@@ -16,7 +16,6 @@ using Nop.Core.Domain.Customers;
 using Nop.Core.Domain.Forums;
 using Nop.Core.Domain.Localization;
 using Nop.Core.Domain.News;
-using Nop.Core.Domain.Orders;
 using Nop.Core.Domain.Security;
 using Nop.Core.Domain.Vendors;
 using Nop.Core.Infrastructure;
@@ -27,7 +26,6 @@ using Nop.Services.Directory;
 using Nop.Services.Forums;
 using Nop.Services.Localization;
 using Nop.Services.Media;
-using Nop.Services.Orders;
 using Nop.Services.Security;
 using Nop.Services.Seo;
 using Nop.Services.Themes;
@@ -61,7 +59,6 @@ namespace Nop.Web.Factories
         private readonly IGenericAttributeService _genericAttributeService;
         private readonly ILanguageService _languageService;
         private readonly ILocalizationService _localizationService;
-        private readonly IManufacturerService _manufacturerService;
         private readonly INopFileProvider _fileProvider;
         private readonly IPageHeadBuilder _pageHeadBuilder;
         private readonly IPermissionService _permissionService;
@@ -69,7 +66,6 @@ namespace Nop.Web.Factories
         private readonly IProductService _productService;
         private readonly IProductTagService _productTagService;
         private readonly ISitemapGenerator _sitemapGenerator;
-        private readonly IShoppingCartService _shoppingCartService;
         private readonly IStaticCacheManager _cacheManager;
         private readonly IStoreContext _storeContext;
         private readonly IThemeContext _themeContext;
@@ -103,7 +99,6 @@ namespace Nop.Web.Factories
             IGenericAttributeService genericAttributeService,
             ILanguageService languageService,
             ILocalizationService localizationService,
-            IManufacturerService manufacturerService,
             INopFileProvider fileProvider,
             IPageHeadBuilder pageHeadBuilder,
             IPermissionService permissionService,
@@ -111,7 +106,6 @@ namespace Nop.Web.Factories
             IProductService productService,
             IProductTagService productTagService,
             ISitemapGenerator sitemapGenerator,
-            IShoppingCartService shoppingCartService,
             IStaticCacheManager cacheManager,
             IStoreContext storeContext,
             IThemeContext themeContext,
@@ -141,7 +135,6 @@ namespace Nop.Web.Factories
             this._genericAttributeService = genericAttributeService;
             this._languageService = languageService;
             this._localizationService = localizationService;
-            this._manufacturerService = manufacturerService;
             this._fileProvider = fileProvider;
             this._pageHeadBuilder = pageHeadBuilder;
             this._permissionService = permissionService;
@@ -149,7 +142,6 @@ namespace Nop.Web.Factories
             this._productService = productService;
             this._productTagService = productTagService;
             this._sitemapGenerator = sitemapGenerator;
-            this._shoppingCartService = shoppingCartService;
             this._cacheManager = cacheManager;
             this._storeContext = storeContext;
             this._themeContext = themeContext;
@@ -297,20 +289,6 @@ namespace Nop.Web.Factories
         }
 
         /// <summary>
-        /// Prepare the tax type selector model
-        /// </summary>
-        /// <returns>Tax type selector model</returns>
-        public virtual TaxTypeSelectorModel PrepareTaxTypeSelectorModel()
-        {
-            var model = new TaxTypeSelectorModel
-            {
-                CurrentTaxType = _workContext.TaxDisplayType
-            };
-
-            return model;
-        }
-
-        /// <summary>
         /// Prepare the header links model
         /// </summary>
         /// <returns>Header links model</returns>
@@ -344,15 +322,6 @@ namespace Nop.Web.Factories
                 UnreadPrivateMessages = unreadMessage,
                 AlertMessage = alertMessage,
             };
-            //performance optimization (use "HasShoppingCartItems" property)
-            if (customer.HasShoppingCartItems)
-            {
-                model.ShoppingCartItems = _shoppingCartService.GetShoppingCart(customer, ShoppingCartType.ShoppingCart, _storeContext.CurrentStore.Id)
-                    .Sum(item => item.Quantity);
-
-                model.WishlistItems = _shoppingCartService.GetShoppingCart(customer, ShoppingCartType.Wishlist, _storeContext.CurrentStore.Id)
-                    .Sum(item => item.Quantity);
-            }
 
             return model;
         }
@@ -617,19 +586,6 @@ namespace Nop.Web.Factories
                         GroupTitle = categoriesGroupTitle,
                         Name = _localizationService.GetLocalized(category, x => x.Name),
                         Url = urlHelper.RouteUrl("Category", new { SeName = _urlRecordService.GetSeName(category) })
-                    }));
-                }
-
-                //manufacturers
-                if (_commonSettings.SitemapIncludeManufacturers)
-                {
-                    var manufacturersGroupTitle = _localizationService.GetResource("Sitemap.Manufacturers");
-                    var manufacturers = _manufacturerService.GetAllManufacturers(storeId: _storeContext.CurrentStore.Id);
-                    model.Items.AddRange(manufacturers.Select(manufacturer => new SitemapModel.SitemapItemModel
-                    {
-                        GroupTitle = manufacturersGroupTitle,
-                        Name = _localizationService.GetLocalized(manufacturer, x => x.Name),
-                        Url = urlHelper.RouteUrl("Manufacturer", new { SeName = _urlRecordService.GetSeName(manufacturer) })
                     }));
                 }
 

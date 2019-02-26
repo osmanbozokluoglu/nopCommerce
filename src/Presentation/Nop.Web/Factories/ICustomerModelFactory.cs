@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using Nop.Core.Domain.Catalog;
 using Nop.Core.Domain.Customers;
-using Nop.Core.Domain.Orders;
+
 using Nop.Web.Models.Customer;
 
 namespace Nop.Web.Factories
@@ -27,7 +27,7 @@ namespace Nop.Web.Factories
         /// <param name="excludeProperties">Whether to exclude populating of model properties from the entity</param>
         /// <param name="overrideCustomCustomerAttributesXml">Overridden customer attributes in XML format; pass null to use CustomCustomerAttributes of customer</param>
         /// <returns>Customer info model</returns>
-        CustomerInfoModel PrepareCustomerInfoModel(CustomerInfoModel model, Customer customer, 
+        CustomerInfoModel PrepareCustomerInfoModel(CustomerInfoModel model, Customer customer,
             bool excludeProperties, string overrideCustomCustomerAttributesXml = "");
 
         /// <summary>
@@ -38,7 +38,7 @@ namespace Nop.Web.Factories
         /// <param name="overrideCustomCustomerAttributesXml">Overridden customer attributes in XML format; pass null to use CustomCustomerAttributes of customer</param>
         /// <param name="setDefaultValues">Whether to populate model properties by default values</param>
         /// <returns>Customer register model</returns>
-        RegisterModel PrepareRegisterModel(RegisterModel model, bool excludeProperties, 
+        RegisterModel PrepareRegisterModel(RegisterModel model, bool excludeProperties,
             string overrideCustomCustomerAttributesXml = "", bool setDefaultValues = false);
 
         /// <summary>
@@ -81,20 +81,6 @@ namespace Nop.Web.Factories
         CustomerAddressListModel PrepareCustomerAddressListModel();
 
         /// <summary>
-        /// Prepare the customer downloadable products model
-        /// </summary>
-        /// <returns>Customer downloadable products model</returns>
-        CustomerDownloadableProductsModel PrepareCustomerDownloadableProductsModel();
-
-        /// <summary>
-        /// Prepare the user agreement model
-        /// </summary>
-        /// <param name="orderItem">Order item</param>
-        /// <param name="product">Product</param>
-        /// <returns>User agreement model</returns>
-        UserAgreementModel PrepareUserAgreementModel(OrderItem orderItem, Product product);
-
-        /// <summary>
         /// Prepare the change password model
         /// </summary>
         /// <returns>Change password model</returns>
@@ -113,10 +99,5 @@ namespace Nop.Web.Factories
         /// <returns>GDPR tools model</returns>
         GdprToolsModel PrepareGdprToolsModel();
 
-        /// <summary>
-        /// Prepare the check gift card balance model
-        /// </summary>
-        /// <returns>check gift card balance model</returns>
-        CheckGiftCardBalanceModel PrepareCheckGiftCardBalanceModel();
     }
 }

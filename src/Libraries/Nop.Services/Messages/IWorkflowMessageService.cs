@@ -5,8 +5,6 @@ using Nop.Core.Domain.Customers;
 using Nop.Core.Domain.Forums;
 using Nop.Core.Domain.Messages;
 using Nop.Core.Domain.News;
-using Nop.Core.Domain.Orders;
-using Nop.Core.Domain.Shipping;
 using Nop.Core.Domain.Vendors;
 
 namespace Nop.Services.Messages
@@ -60,166 +58,7 @@ namespace Nop.Services.Messages
 
         #endregion
 
-        #region Order workflow
-
-        /// <summary>
-        /// Sends an order placed notification to a vendor
-        /// </summary>
-        /// <param name="order">Order instance</param>
-        /// <param name="vendor">Vendor instance</param>
-        /// <param name="languageId">Message language identifier</param>
-        /// <returns>Queued email identifier</returns>
-        IList<int> SendOrderPlacedVendorNotification(Order order, Vendor vendor, int languageId);
-
-        /// <summary>
-        /// Sends an order placed notification to a store owner
-        /// </summary>
-        /// <param name="order">Order instance</param>
-        /// <param name="languageId">Message language identifier</param>
-        /// <returns>Queued email identifier</returns>
-        IList<int> SendOrderPlacedStoreOwnerNotification(Order order, int languageId);
-
-        /// <summary>
-        /// Sends an order placed notification to an affiliate
-        /// </summary>
-        /// <param name="order">Order instance</param>
-        /// <param name="languageId">Message language identifier</param>
-        /// <returns>Queued email identifier</returns>
-        IList<int> SendOrderPlacedAffiliateNotification(Order order, int languageId);
-
-        /// <summary>
-        /// Sends an order paid notification to a store owner
-        /// </summary>
-        /// <param name="order">Order instance</param>
-        /// <param name="languageId">Message language identifier</param>
-        /// <returns>Queued email identifier</returns>
-        IList<int> SendOrderPaidStoreOwnerNotification(Order order, int languageId);
-
-        /// <summary>
-        /// Sends an order paid notification to a customer
-        /// </summary>
-        /// <param name="order">Order instance</param>
-        /// <param name="languageId">Message language identifier</param>
-        /// <param name="attachmentFilePath">Attachment file path</param>
-        /// <param name="attachmentFileName">Attachment file name. If specified, then this file name will be sent to a recipient. Otherwise, "AttachmentFilePath" name will be used.</param>
-        /// <returns>Queued email identifier</returns>
-        IList<int> SendOrderPaidCustomerNotification(Order order, int languageId, 
-            string attachmentFilePath = null, string attachmentFileName = null);
-
-        /// <summary>
-        /// Sends an order paid notification to a vendor
-        /// </summary>
-        /// <param name="order">Order instance</param>
-        /// <param name="vendor">Vendor instance</param>
-        /// <param name="languageId">Message language identifier</param>
-        /// <returns>Queued email identifier</returns>
-        IList<int> SendOrderPaidVendorNotification(Order order, Vendor vendor, int languageId);
-
-        /// <summary>
-        /// Sends an order paid notification to an affiliate
-        /// </summary>
-        /// <param name="order">Order instance</param>
-        /// <param name="languageId">Message language identifier</param>
-        /// <returns>Queued email identifier</returns>
-        IList<int> SendOrderPaidAffiliateNotification(Order order, int languageId);
-
-        /// <summary>
-        /// Sends an order placed notification to a customer
-        /// </summary>
-        /// <param name="order">Order instance</param>
-        /// <param name="languageId">Message language identifier</param>
-        /// <param name="attachmentFilePath">Attachment file path</param>
-        /// <param name="attachmentFileName">Attachment file name. If specified, then this file name will be sent to a recipient. Otherwise, "AttachmentFilePath" name will be used.</param>
-        /// <returns>Queued email identifier</returns>
-        IList<int> SendOrderPlacedCustomerNotification(Order order, int languageId, 
-            string attachmentFilePath = null, string attachmentFileName = null);
-
-        /// <summary>
-        /// Sends a shipment sent notification to a customer
-        /// </summary>
-        /// <param name="shipment">Shipment</param>
-        /// <param name="languageId">Message language identifier</param>
-        /// <returns>Queued email identifier</returns>
-        IList<int> SendShipmentSentCustomerNotification(Shipment shipment, int languageId);
-
-        /// <summary>
-        /// Sends a shipment delivered notification to a customer
-        /// </summary>
-        /// <param name="shipment">Shipment</param>
-        /// <param name="languageId">Message language identifier</param>
-        /// <returns>Queued email identifier</returns>
-        IList<int> SendShipmentDeliveredCustomerNotification(Shipment shipment, int languageId);
-
-        /// <summary>
-        /// Sends an order completed notification to a customer
-        /// </summary>
-        /// <param name="order">Order instance</param>
-        /// <param name="languageId">Message language identifier</param>
-        /// <param name="attachmentFilePath">Attachment file path</param>
-        /// <param name="attachmentFileName">Attachment file name. If specified, then this file name will be sent to a recipient. Otherwise, "AttachmentFilePath" name will be used.</param>
-        /// <returns>Queued email identifier</returns>
-        IList<int> SendOrderCompletedCustomerNotification(Order order, int languageId, 
-            string attachmentFilePath = null, string attachmentFileName = null);
-
-        /// <summary>
-        /// Sends an order cancelled notification to a customer
-        /// </summary>
-        /// <param name="order">Order instance</param>
-        /// <param name="languageId">Message language identifier</param>
-        /// <returns>Queued email identifier</returns>
-        IList<int> SendOrderCancelledCustomerNotification(Order order, int languageId);
-
-        /// <summary>
-        /// Sends an order refunded notification to a store owner
-        /// </summary>
-        /// <param name="order">Order instance</param>
-        /// <param name="refundedAmount">Amount refunded</param>
-        /// <param name="languageId">Message language identifier</param>
-        /// <returns>Queued email identifier</returns>
-        IList<int> SendOrderRefundedStoreOwnerNotification(Order order, decimal refundedAmount, int languageId);
-
-        /// <summary>
-        /// Sends an order refunded notification to a customer
-        /// </summary>
-        /// <param name="order">Order instance</param>
-        /// <param name="refundedAmount">Amount refunded</param>
-        /// <param name="languageId">Message language identifier</param>
-        /// <returns>Queued email identifier</returns>
-        IList<int> SendOrderRefundedCustomerNotification(Order order, decimal refundedAmount, int languageId);
-
-        /// <summary>
-        /// Sends a new order note added notification to a customer
-        /// </summary>
-        /// <param name="orderNote">Order note</param>
-        /// <param name="languageId">Message language identifier</param>
-        /// <returns>Queued email identifier</returns>
-        IList<int> SendNewOrderNoteAddedCustomerNotification(OrderNote orderNote, int languageId);
-
-        /// <summary>
-        /// Sends a "Recurring payment cancelled" notification to a store owner
-        /// </summary>
-        /// <param name="recurringPayment">Recurring payment</param>
-        /// <param name="languageId">Message language identifier</param>
-        /// <returns>Queued email identifier</returns>
-        IList<int> SendRecurringPaymentCancelledStoreOwnerNotification(RecurringPayment recurringPayment, int languageId);
-
-        /// <summary>
-        /// Sends a "Recurring payment cancelled" notification to a customer
-        /// </summary>
-        /// <param name="recurringPayment">Recurring payment</param>
-        /// <param name="languageId">Message language identifier</param>
-        /// <returns>Queued email identifier</returns>
-        IList<int> SendRecurringPaymentCancelledCustomerNotification(RecurringPayment recurringPayment, int languageId);
-
-        /// <summary>
-        /// Sends a "Recurring payment failed" notification to a customer
-        /// </summary>
-        /// <param name="recurringPayment">Recurring payment</param>
-        /// <param name="languageId">Message language identifier</param>
-        /// <returns>Queued email identifier</returns>
-        IList<int> SendRecurringPaymentFailedCustomerNotification(RecurringPayment recurringPayment, int languageId);
-
-        #endregion
+        
 
         #region Newsletter workflow
 
@@ -270,36 +109,7 @@ namespace Nop.Services.Messages
 
         #endregion
 
-        #region Return requests
-
-        /// <summary>
-        /// Sends 'New Return Request' message to a store owner
-        /// </summary>
-        /// <param name="returnRequest">Return request</param>
-        /// <param name="orderItem">Order item</param>
-        /// <param name="languageId">Message language identifier</param>
-        /// <returns>Queued email identifier</returns>
-        IList<int> SendNewReturnRequestStoreOwnerNotification(ReturnRequest returnRequest, OrderItem orderItem, int languageId);
-
-        /// <summary>
-        /// Sends 'New Return Request' message to a customer
-        /// </summary>
-        /// <param name="returnRequest">Return request</param>
-        /// <param name="orderItem">Order item</param>
-        /// <param name="languageId">Message language identifier</param>
-        /// <returns>Queued email identifier</returns>
-        IList<int> SendNewReturnRequestCustomerNotification(ReturnRequest returnRequest, OrderItem orderItem, int languageId);
-
-        /// <summary>
-        /// Sends 'Return Request status changed' message to a customer
-        /// </summary>
-        /// <param name="returnRequest">Return request</param>
-        /// <param name="orderItem">Order item</param>
-        /// <param name="languageId">Message language identifier</param>
-        /// <returns>Queued email identifier</returns>
-        IList<int> SendReturnRequestStatusChangedCustomerNotification(ReturnRequest returnRequest, OrderItem orderItem, int languageId);
-
-        #endregion
+        
 
         #region Forum Notifications
 
@@ -370,14 +180,6 @@ namespace Nop.Services.Messages
         /// <param name="languageId">Message language identifier</param>
         /// <returns>Queued email identifier</returns>
         IList<int> SendProductReviewReplyCustomerNotificationMessage(ProductReview productReview, int languageId);
-
-        /// <summary>
-        /// Sends a gift card notification
-        /// </summary>
-        /// <param name="giftCard">Gift card</param>
-        /// <param name="languageId">Message language identifier</param>
-        /// <returns>Queued email identifier</returns>
-        IList<int> SendGiftCardNotification(GiftCard giftCard, int languageId);
 
         /// <summary>
         /// Sends a "quantity below" notification to a store owner

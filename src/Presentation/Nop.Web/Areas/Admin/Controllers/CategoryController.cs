@@ -5,10 +5,8 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Nop.Core;
 using Nop.Core.Domain.Catalog;
-using Nop.Core.Domain.Discounts;
 using Nop.Services.Catalog;
 using Nop.Services.Customers;
-using Nop.Services.Discounts;
 using Nop.Services.ExportImport;
 using Nop.Services.Localization;
 using Nop.Services.Logging;
@@ -35,7 +33,6 @@ namespace Nop.Web.Areas.Admin.Controllers
         private readonly ICategoryService _categoryService;
         private readonly ICustomerActivityService _customerActivityService;
         private readonly ICustomerService _customerService;
-        private readonly IDiscountService _discountService;
         private readonly IExportManager _exportManager;
         private readonly IImportManager _importManager;
         private readonly ILocalizationService _localizationService;
@@ -58,7 +55,6 @@ namespace Nop.Web.Areas.Admin.Controllers
             ICategoryService categoryService,
             ICustomerActivityService customerActivityService,
             ICustomerService customerService,
-            IDiscountService discountService,
             IExportManager exportManager,
             IImportManager importManager,
             ILocalizationService localizationService,
@@ -77,7 +73,6 @@ namespace Nop.Web.Areas.Admin.Controllers
             this._categoryService = categoryService;
             this._customerActivityService = customerActivityService;
             this._customerService = customerService;
-            this._discountService = discountService;
             this._exportManager = exportManager;
             this._importManager = importManager;
             this._localizationService = localizationService;
@@ -253,15 +248,6 @@ namespace Nop.Web.Areas.Admin.Controllers
                 //locales
                 UpdateLocales(category, model);
 
-                //discounts
-                var allDiscounts = _discountService.GetAllDiscounts(DiscountType.AssignedToCategories, showHidden: true);
-                foreach (var discount in allDiscounts)
-                {
-                    if (model.SelectedDiscountIds != null && model.SelectedDiscountIds.Contains(discount.Id))
-                        //category.AppliedDiscounts.Add(discount);
-                        category.DiscountCategoryMappings.Add(new DiscountCategoryMapping { Discount = discount });
-                }
-
                 _categoryService.UpdateCategory(category);
 
                 //update picture seo file name
@@ -336,25 +322,6 @@ namespace Nop.Web.Areas.Admin.Controllers
 
                 //locales
                 UpdateLocales(category, model);
-
-                //discounts
-                var allDiscounts = _discountService.GetAllDiscounts(DiscountType.AssignedToCategories, showHidden: true);
-                foreach (var discount in allDiscounts)
-                {
-                    if (model.SelectedDiscountIds != null && model.SelectedDiscountIds.Contains(discount.Id))
-                    {
-                        //new discount
-                        if (category.DiscountCategoryMappings.Count(mapping => mapping.DiscountId == discount.Id) == 0)
-                            category.DiscountCategoryMappings.Add(new DiscountCategoryMapping { Discount = discount });
-                    }
-                    else
-                    {
-                        //remove discount
-                        if (category.DiscountCategoryMappings.Count(mapping => mapping.DiscountId == discount.Id) > 0)
-                            category.DiscountCategoryMappings
-                                .Remove(category.DiscountCategoryMappings.FirstOrDefault(mapping => mapping.DiscountId == discount.Id));
-                    }
-                }
 
                 _categoryService.UpdateCategory(category);
 

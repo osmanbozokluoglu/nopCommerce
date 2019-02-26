@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Nop.Core.Domain.Common;
-using Nop.Core.Domain.Orders;
 
 namespace Nop.Core.Domain.Customers
 {
@@ -13,8 +12,6 @@ namespace Nop.Core.Domain.Customers
     {
         private ICollection<ExternalAuthenticationRecord> _externalAuthenticationRecords;
         private ICollection<CustomerCustomerRoleMapping> _customerCustomerRoleMappings;
-        private ICollection<ShoppingCartItem> _shoppingCartItems;
-        private ICollection<ReturnRequest> _returnRequests;
         protected ICollection<CustomerAddressMapping> _customerAddressMappings;
         private IList<CustomerRole> _customerRoles;
 
@@ -169,24 +166,6 @@ namespace Nop.Core.Domain.Customers
         {
             get => _customerCustomerRoleMappings ?? (_customerCustomerRoleMappings = new List<CustomerCustomerRoleMapping>());
             protected set => _customerCustomerRoleMappings = value;
-        }
-
-        /// <summary>
-        /// Gets or sets shopping cart items
-        /// </summary>
-        public virtual ICollection<ShoppingCartItem> ShoppingCartItems
-        {
-            get => _shoppingCartItems ?? (_shoppingCartItems = new List<ShoppingCartItem>());
-            protected set => _shoppingCartItems = value;
-        }
-
-        /// <summary>
-        /// Gets or sets return request of this customer
-        /// </summary>
-        public virtual ICollection<ReturnRequest> ReturnRequests
-        {
-            get => _returnRequests ?? (_returnRequests = new List<ReturnRequest>());
-            protected set => _returnRequests = value;
         }
 
         /// <summary>

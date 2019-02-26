@@ -29,20 +29,6 @@ namespace Nop.Web.Areas.Admin.Factories
         CategoryTemplateListModel PrepareCategoryTemplateListModel(CategoryTemplateSearchModel searchModel);
 
         /// <summary>
-        /// Prepare manufacturer template search model
-        /// </summary>
-        /// <param name="searchModel">Manufacturer template search model</param>
-        /// <returns>Manufacturer template search model</returns>
-        ManufacturerTemplateSearchModel PrepareManufacturerTemplateSearchModel(ManufacturerTemplateSearchModel searchModel);
-
-        /// <summary>
-        /// Prepare paged manufacturer template list model
-        /// </summary>
-        /// <param name="searchModel">Manufacturer template search model</param>
-        /// <returns>Manufacturer template list model</returns>
-        ManufacturerTemplateListModel PrepareManufacturerTemplateListModel(ManufacturerTemplateSearchModel searchModel);
-
-        /// <summary>
         /// Prepare product template search model
         /// </summary>
         /// <param name="searchModel">Product template search model</param>

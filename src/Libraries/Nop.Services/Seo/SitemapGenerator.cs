@@ -36,7 +36,6 @@ namespace Nop.Services.Seo
         private readonly IActionContextAccessor _actionContextAccessor;
         private readonly ICategoryService _categoryService;
         private readonly ILanguageService _languageService;
-        private readonly IManufacturerService _manufacturerService;
         private readonly IProductService _productService;
         private readonly IProductTagService _productTagService;
         private readonly IStoreContext _storeContext;
@@ -59,7 +58,6 @@ namespace Nop.Services.Seo
             IActionContextAccessor actionContextAccessor,
             ICategoryService categoryService,
             ILanguageService languageService,
-            IManufacturerService manufacturerService,
             IProductService productService,
             IProductTagService productTagService,
             IStoreContext storeContext,
@@ -77,7 +75,6 @@ namespace Nop.Services.Seo
             this._actionContextAccessor = actionContextAccessor;
             this._categoryService = categoryService;
             this._languageService = languageService;
-            this._manufacturerService = manufacturerService;
             this._productService = productService;
             this._productTagService = productTagService;
             this._storeContext = storeContext;
@@ -210,9 +207,6 @@ namespace Nop.Services.Seo
             if (_commonSettings.SitemapIncludeCategories)
                 sitemapUrls.AddRange(GetCategoryUrls());
 
-            //manufacturers
-            if (_commonSettings.SitemapIncludeManufacturers)
-                sitemapUrls.AddRange(GetManufacturerUrls());
 
             //products
             if (_commonSettings.SitemapIncludeProducts)
@@ -239,16 +233,6 @@ namespace Nop.Services.Seo
         {
             return _categoryService.GetAllCategories(storeId: _storeContext.CurrentStore.Id)
                 .Select(category => GetLocalizedSitemapUrl("Category", GetSeoRouteParams(category), category.UpdatedOnUtc));
-        }
-
-        /// <summary>
-        /// Get manufacturer URLs for the sitemap
-        /// </summary>
-        /// <returns>Sitemap URLs</returns>
-        protected virtual IEnumerable<SitemapUrl> GetManufacturerUrls()
-        {
-            return _manufacturerService.GetAllManufacturers(storeId: _storeContext.CurrentStore.Id)
-                .Select(manufacturer => GetLocalizedSitemapUrl("Manufacturer", GetSeoRouteParams(manufacturer), manufacturer.UpdatedOnUtc));
         }
 
         /// <summary>

@@ -38,7 +38,6 @@ namespace Nop.Web.Areas.Admin.Controllers
         private readonly IAclService _aclService;
         private readonly IBackInStockSubscriptionService _backInStockSubscriptionService;
         private readonly ICategoryService _categoryService;
-        private readonly ICopyProductService _copyProductService;
         private readonly ICustomerActivityService _customerActivityService;
         private readonly ICustomerService _customerService;
         private readonly IDownloadService _downloadService;
@@ -70,7 +69,6 @@ namespace Nop.Web.Areas.Admin.Controllers
         public ProductController(IAclService aclService,
             IBackInStockSubscriptionService backInStockSubscriptionService,
             ICategoryService categoryService,
-            ICopyProductService copyProductService,
             ICustomerActivityService customerActivityService,
             ICustomerService customerService,
             IDownloadService downloadService,
@@ -98,7 +96,6 @@ namespace Nop.Web.Areas.Admin.Controllers
             this._aclService = aclService;
             this._backInStockSubscriptionService = backInStockSubscriptionService;
             this._categoryService = categoryService;
-            this._copyProductService = copyProductService;
             this._customerActivityService = customerActivityService;
             this._customerService = customerService;
             this._downloadService = downloadService;
@@ -870,34 +867,7 @@ namespace Nop.Web.Areas.Admin.Controllers
 
             return Json(new { Result = true });
         }
-
-        [HttpPost]
-        public virtual IActionResult CopyProduct(ProductModel model)
-        {
-            if (!_permissionService.Authorize(StandardPermissionProvider.ManageProducts))
-                return AccessDeniedView();
-
-            var copyModel = model.CopyProductModel;
-            try
-            {
-                var originalProduct = _productService.GetProductById(copyModel.Id);
-
-                //a vendor should have access only to his products
-                if (_workContext.CurrentVendor != null && originalProduct.VendorId != _workContext.CurrentVendor.Id)
-                    return RedirectToAction("List");
-
-                var newProduct = _copyProductService.CopyProduct(originalProduct, copyModel.Name, copyModel.Published, copyModel.CopyImages);
-
-                _notificationService.SuccessNotification(_localizationService.GetResource("Admin.Catalog.Products.Copied"));
-
-                return RedirectToAction("Edit", new { id = newProduct.Id });
-            }
-            catch (Exception exc)
-            {
-                _notificationService.ErrorNotification(exc.Message);
-                return RedirectToAction("Edit", new { id = copyModel.Id });
-            }
-        }
+               
 
         //action displaying notification (warning) to a store owner that entered SKU already exists
         public virtual IActionResult SkuReservedWarning(int productId, string sku)

@@ -203,31 +203,6 @@ namespace Nop.Services.Catalog
 
             _productAttributeParser.GetGiftCardAttribute(attributesXml, out var giftCardRecipientName, out var giftCardRecipientEmail, out var giftCardSenderName, out var giftCardSenderEmail, out var _);
 
-            //sender
-            var giftCardFrom = product.GiftCardType == GiftCardType.Virtual ?
-                string.Format(_localizationService.GetResource("GiftCardAttribute.From.Virtual"), giftCardSenderName, giftCardSenderEmail) :
-                string.Format(_localizationService.GetResource("GiftCardAttribute.From.Physical"), giftCardSenderName);
-            //recipient
-            var giftCardFor = product.GiftCardType == GiftCardType.Virtual ?
-                string.Format(_localizationService.GetResource("GiftCardAttribute.For.Virtual"), giftCardRecipientName, giftCardRecipientEmail) :
-                string.Format(_localizationService.GetResource("GiftCardAttribute.For.Physical"), giftCardRecipientName);
-
-            //encode (if required)
-            if (htmlEncode)
-            {
-                giftCardFrom = WebUtility.HtmlEncode(giftCardFrom);
-                giftCardFor = WebUtility.HtmlEncode(giftCardFor);
-            }
-
-            if (!string.IsNullOrEmpty(result.ToString()))
-            {
-                result.Append(separator);
-            }
-
-            result.Append(giftCardFrom);
-            result.Append(separator);
-            result.Append(giftCardFor);
-
             return result.ToString();
         }
 

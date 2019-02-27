@@ -576,34 +576,7 @@ namespace Nop.Core.Domain.Catalog
             get => (DownloadActivationType)DownloadActivationTypeId;
             set => DownloadActivationTypeId = (int)value;
         }
-
-        /// <summary>
-        /// Gets or sets the gift card type
-        /// </summary>
-        public GiftCardType GiftCardType
-        {
-            get => (GiftCardType)GiftCardTypeId;
-            set => GiftCardTypeId = (int)value;
-        }
-
-        /// <summary>
-        /// Gets or sets the low stock activity
-        /// </summary>
-        public LowStockActivity LowStockActivity
-        {
-            get => (LowStockActivity)LowStockActivityId;
-            set => LowStockActivityId = (int)value;
-        }
-
-        /// <summary>
-        /// Gets or sets the value indicating how to manage inventory
-        /// </summary>
-        public ManageInventoryMethod ManageInventoryMethod
-        {
-            get => (ManageInventoryMethod)ManageInventoryMethodId;
-            set => ManageInventoryMethodId = (int)value;
-        }
-
+                
         /// <summary>
         /// Gets or sets the cycle period for recurring products
         /// </summary>

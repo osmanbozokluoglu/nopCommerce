@@ -777,18 +777,6 @@ namespace Nop.Web.Areas.Admin.Controllers
                 //picture seo names
                 UpdatePictureSeoNames(product);
 
-                //back in stock notifications
-                if (product.ManageInventoryMethod == ManageInventoryMethod.ManageStock &&
-                    product.BackorderMode == BackorderMode.NoBackorders &&
-                    product.AllowBackInStockSubscriptions &&
-                    _productService.GetTotalStockQuantity(product) > 0 &&
-                    prevTotalStockQuantity <= 0 &&
-                    product.Published &&
-                    !product.Deleted)
-                {
-                    _backInStockSubscriptionService.SendNotificationsToSubscribers(product);
-                }
-
                 //delete an old "download" file (if deleted or updated)
                 if (prevDownloadId > 0 && prevDownloadId != product.DownloadId)
                 {
@@ -1086,110 +1074,7 @@ namespace Nop.Web.Areas.Admin.Controllers
         }
 
         #endregion
-
-        #region Cross-sell products
-
-        [HttpPost]
-        public virtual IActionResult CrossSellProductList(CrossSellProductSearchModel searchModel)
-        {
-            if (!_permissionService.Authorize(StandardPermissionProvider.ManageProducts))
-                return AccessDeniedKendoGridJson();
-
-            //try to get a product with the specified id
-            var product = _productService.GetProductById(searchModel.ProductId)
-                ?? throw new ArgumentException("No product found with the specified id");
-
-            //a vendor should have access only to his products
-            if (_workContext.CurrentVendor != null && product.VendorId != _workContext.CurrentVendor.Id)
-                return Content("This is not your product");
-
-            //prepare model
-            var model = _productModelFactory.PrepareCrossSellProductListModel(searchModel, product);
-
-            return Json(model);
-        }
-
-        [HttpPost]
-        public virtual IActionResult CrossSellProductDelete(int id)
-        {
-            if (!_permissionService.Authorize(StandardPermissionProvider.ManageProducts))
-                return AccessDeniedView();
-
-            //try to get a cross-sell product with the specified id
-            var crossSellProduct = _productService.GetCrossSellProductById(id)
-                ?? throw new ArgumentException("No cross-sell product found with the specified id");
-
-            //a vendor should have access only to his products
-            if (_workContext.CurrentVendor != null)
-            {
-                var product = _productService.GetProductById(crossSellProduct.ProductId1);
-                if (product != null && product.VendorId != _workContext.CurrentVendor.Id)
-                    return Content("This is not your product");
-            }
-
-            _productService.DeleteCrossSellProduct(crossSellProduct);
-
-            return new NullJsonResult();
-        }
-
-        public virtual IActionResult CrossSellProductAddPopup(int productId)
-        {
-            if (!_permissionService.Authorize(StandardPermissionProvider.ManageProducts))
-                return AccessDeniedView();
-
-            //prepare model
-            var model = _productModelFactory.PrepareAddCrossSellProductSearchModel(new AddCrossSellProductSearchModel());
-
-            return View(model);
-        }
-
-        [HttpPost]
-        public virtual IActionResult CrossSellProductAddPopupList(AddCrossSellProductSearchModel searchModel)
-        {
-            if (!_permissionService.Authorize(StandardPermissionProvider.ManageProducts))
-                return AccessDeniedKendoGridJson();
-
-            //prepare model
-            var model = _productModelFactory.PrepareAddCrossSellProductListModel(searchModel);
-
-            return Json(model);
-        }
-
-        [HttpPost]
-        [FormValueRequired("save")]
-        public virtual IActionResult CrossSellProductAddPopup(AddCrossSellProductModel model)
-        {
-            if (!_permissionService.Authorize(StandardPermissionProvider.ManageProducts))
-                return AccessDeniedView();
-
-            var selectedProducts = _productService.GetProductsByIds(model.SelectedProductIds.ToArray());
-            if (selectedProducts.Any())
-            {
-                var existingCrossSellProducts = _productService.GetCrossSellProductsByProductId1(model.ProductId);
-                foreach (var product in selectedProducts)
-                {
-                    //a vendor should have access only to his products
-                    if (_workContext.CurrentVendor != null && product.VendorId != _workContext.CurrentVendor.Id)
-                        continue;
-
-                    if (_productService.FindCrossSellProduct(existingCrossSellProducts, model.ProductId, product.Id) != null)
-                        continue;
-
-                    _productService.InsertCrossSellProduct(new CrossSellProduct
-                    {
-                        ProductId1 = model.ProductId,
-                        ProductId2 = product.Id
-                    });
-                }
-            }
-
-            ViewBag.RefreshPage = true;
-
-            return View(new AddCrossSellProductSearchModel());
-        }
-
-        #endregion
-
+                
         #region Associated products
 
         [HttpPost]
@@ -1985,18 +1870,6 @@ namespace Nop.Web.Areas.Admin.Controllers
         }
 
         [HttpPost]
-        public virtual IActionResult BulkEditSelect(BulkEditProductSearchModel searchModel)
-        {
-            if (!_permissionService.Authorize(StandardPermissionProvider.ManageProducts))
-                return AccessDeniedKendoGridJson();
-
-            //prepare model
-            var model = _productModelFactory.PrepareBulkEditProductListModel(searchModel);
-
-            return Json(model);
-        }
-
-        [HttpPost]
         public virtual IActionResult BulkEditUpdate(IEnumerable<BulkEditProductModel> products)
         {
             if (!_permissionService.Authorize(StandardPermissionProvider.ManageProducts))
@@ -2027,18 +1900,6 @@ namespace Nop.Web.Areas.Admin.Controllers
                 product.Published = pModel.Published;
                 product.UpdatedOnUtc = DateTime.UtcNow;
                 _productService.UpdateProduct(product);
-
-                //back in stock notifications
-                if (product.ManageInventoryMethod == ManageInventoryMethod.ManageStock &&
-                    product.BackorderMode == BackorderMode.NoBackorders &&
-                    product.AllowBackInStockSubscriptions &&
-                    _productService.GetTotalStockQuantity(product) > 0 &&
-                    prevTotalStockQuantity <= 0 &&
-                    product.Published &&
-                    !product.Deleted)
-                {
-                    _backInStockSubscriptionService.SendNotificationsToSubscribers(product);
-                }
 
                 //quantity change history
                 _productService.AddStockQuantityHistoryEntry(product, product.StockQuantity - previousStockQuantity, product.StockQuantity,

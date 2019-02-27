@@ -28,33 +28,7 @@ namespace Nop.Web.Areas.Admin.Controllers
 
         #region Methods
 
-        #region Low stock
-
-        public virtual IActionResult LowStock()
-        {
-            if (!_permissionService.Authorize(StandardPermissionProvider.ManageProducts))
-                return AccessDeniedView();
-
-            //prepare model
-            var model = _reportModelFactory.PrepareLowStockProductSearchModel(new LowStockProductSearchModel());
-
-            return View(model);
-        }
-
-        [HttpPost]
-        public virtual IActionResult LowStockList(LowStockProductSearchModel searchModel)
-        {
-            if (!_permissionService.Authorize(StandardPermissionProvider.ManageProducts))
-                return AccessDeniedKendoGridJson();
-
-            //prepare model
-            var model = _reportModelFactory.PrepareLowStockProductListModel(searchModel);
-
-            return Json(model);
-        }
-
-        #endregion        
-
+        
         #region Customer reports
 
         public virtual IActionResult RegisteredCustomers()

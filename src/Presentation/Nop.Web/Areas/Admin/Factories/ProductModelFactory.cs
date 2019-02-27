@@ -627,9 +627,6 @@ namespace Nop.Web.Areas.Admin.Factories
                     var defaultProductPicture = _pictureService.GetPicturesByProductId(product.Id, 1).FirstOrDefault();
                     productModel.PictureThumbnailUrl = _pictureService.GetPictureUrl(defaultProductPicture, 75);
                     productModel.ProductTypeName = _localizationService.GetLocalizedEnum(product.ProductType);
-                    if (product.ProductType == ProductType.SimpleProduct && product.ManageInventoryMethod == ManageInventoryMethod.ManageStock)
-                        productModel.StockQuantityStr = _productService.GetTotalStockQuantity(product).ToString();
-
                     return productModel;
                 }),
                 Total = products.TotalCount
@@ -960,46 +957,6 @@ namespace Nop.Web.Areas.Admin.Factories
                     return productModel;
                 }),
                 Total = products.TotalCount
-            };
-
-            return model;
-        }
-
-        /// <summary>
-        /// Prepare paged cross-sell product list model
-        /// </summary>
-        /// <param name="searchModel">Cross-sell product search model</param>
-        /// <param name="product">Product</param>
-        /// <returns>Cross-sell product list model</returns>
-        public virtual CrossSellProductListModel PrepareCrossSellProductListModel(CrossSellProductSearchModel searchModel, Product product)
-        {
-            if (searchModel == null)
-                throw new ArgumentNullException(nameof(searchModel));
-
-            if (product == null)
-                throw new ArgumentNullException(nameof(product));
-
-            //get cross-sell products
-            var crossSellProducts = _productService.GetCrossSellProductsByProductId1(productId1: product.Id, showHidden: true);
-
-            //prepare grid model
-            var model = new CrossSellProductListModel
-            {
-                Data = crossSellProducts.PaginationByRequestModel(searchModel).Select(crossSellProduct =>
-                {
-                    //fill in model values from the entity
-                    var crossSellProductModel = new CrossSellProductModel
-                    {
-                        Id = crossSellProduct.Id,
-                        ProductId2 = crossSellProduct.ProductId2
-                    };
-
-                    //fill in additional values (not existing in the entity)
-                    crossSellProductModel.Product2Name = _productService.GetProductById(crossSellProduct.ProductId2)?.Name;
-
-                    return crossSellProductModel;
-                }),
-                Total = crossSellProducts.Count
             };
 
             return model;
@@ -1462,48 +1419,6 @@ namespace Nop.Web.Areas.Admin.Factories
             searchModel.SetGridPageSize();
 
             return searchModel;
-        }
-
-        /// <summary>
-        /// Prepare paged bulk edit product list model
-        /// </summary>
-        /// <param name="searchModel">Bulk edit product search model</param>
-        /// <returns>Bulk edit product list model</returns>
-        public virtual BulkEditProductListModel PrepareBulkEditProductListModel(BulkEditProductSearchModel searchModel)
-        {
-            if (searchModel == null)
-                throw new ArgumentNullException(nameof(searchModel));
-
-            //get products
-            var products = _productService.SearchProducts(showHidden: true,
-                categoryIds: new List<int> { searchModel.SearchCategoryId },
-                manufacturerId: searchModel.SearchManufacturerId,
-                vendorId: _workContext.CurrentVendor?.Id ?? 0,
-                productType: searchModel.SearchProductTypeId > 0 ? (ProductType?)searchModel.SearchProductTypeId : null,
-                keywords: searchModel.SearchProductName,
-                pageIndex: searchModel.Page - 1, pageSize: searchModel.PageSize);
-
-            //prepare list model
-            var model = new BulkEditProductListModel
-            {
-                Data = products.Select(product =>
-                {
-                    //fill in model values from the entity
-                    var productModel = product.ToModel<BulkEditProductModel>();
-
-                    //fill in additional values (not existing in the entity)
-                    productModel.ManageInventoryMethod = _localizationService.GetLocalizedEnum(product.ManageInventoryMethod);
-                    if (product.ManageInventoryMethod == ManageInventoryMethod.ManageStock && product.UseMultipleWarehouses)
-                    {
-                        productModel.ManageInventoryMethod = $"{productModel.ManageInventoryMethod} {_localizationService.GetResource("Admin.Catalog.BulkEdit.Fields.ManageInventoryMethod.MultipleWarehouse")}";
-                    }
-
-                    return productModel;
-                }),
-                Total = products.TotalCount
-            };
-
-            return model;
         }
 
         /// <summary>

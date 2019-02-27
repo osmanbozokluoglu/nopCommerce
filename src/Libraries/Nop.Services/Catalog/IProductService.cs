@@ -218,31 +218,7 @@ namespace Nop.Services.Catalog
         /// <param name="product">Product</param>
         void UpdateProductReviewTotals(Product product);
 
-        /// <summary>
-        /// Get low stock products
-        /// </summary>
-        /// <param name="vendorId">Vendor identifier; pass null to load all records</param>
-        /// <param name="loadPublishedOnly">Whether to load published products only; pass null to load all products, pass true to load only published products, pass false to load only unpublished products</param>
-        /// <param name="pageIndex">Page index</param>
-        /// <param name="pageSize">Page size</param>
-        /// <param name="getOnlyTotalCount">A value in indicating whether you want to load only total number of records. Set to "true" if you don't want to load data from database</param>
-        /// <returns>Products</returns>
-        IPagedList<Product> GetLowStockProducts(int? vendorId = null, bool? loadPublishedOnly = true,
-            int pageIndex = 0, int pageSize = int.MaxValue, bool getOnlyTotalCount = false);
-
-        /// <summary>
-        /// Get low stock product combinations
-        /// </summary>
-        /// <param name="vendorId">Vendor identifier; pass null to load all records</param>
-        /// <param name="loadPublishedOnly">Whether to load combinations of published products only; pass null to load all products, pass true to load only published products, pass false to load only unpublished products</param>
-        /// <param name="pageIndex">Page index</param>
-        /// <param name="pageSize">Page size</param>
-        /// <param name="getOnlyTotalCount">A value in indicating whether you want to load only total number of records. Set to "true" if you don't want to load data from database</param>
-        /// <returns>Product combinations</returns>
-        IPagedList<ProductAttributeCombination> GetLowStockProductCombinations(int? vendorId = null, bool? loadPublishedOnly = true,
-            int pageIndex = 0, int pageSize = int.MaxValue, bool getOnlyTotalCount = false);
-
-        /// <summary>
+             /// <summary>
         /// Gets a product by SKU
         /// </summary>
         /// <param name="sku">SKU</param>
@@ -333,30 +309,6 @@ namespace Nop.Services.Catalog
         string FormatStockMessage(Product product, string attributesXml);
 
         /// <summary>
-        /// Formats SKU
-        /// </summary>
-        /// <param name="product">Product</param>
-        /// <param name="attributesXml">Attributes in XML format</param>
-        /// <returns>SKU</returns>
-        string FormatSku(Product product, string attributesXml = null);
-
-        /// <summary>
-        /// Formats manufacturer part number
-        /// </summary>
-        /// <param name="product">Product</param>
-        /// <param name="attributesXml">Attributes in XML format</param>
-        /// <returns>Manufacturer part number</returns>
-        string FormatMpn(Product product, string attributesXml = null);
-
-        /// <summary>
-        /// Formats GTIN
-        /// </summary>
-        /// <param name="product">Product</param>
-        /// <param name="attributesXml">Attributes in XML format</param>
-        /// <returns>GTIN</returns>
-        string FormatGtin(Product product, string attributesXml = null);
-
-        /// <summary>
         /// Formats start/end date for rental product
         /// </summary>
         /// <param name="product">Product</param>
@@ -373,44 +325,7 @@ namespace Nop.Services.Catalog
 
         #endregion
 
-        #region Inventory management methods
-
-        /// <summary>
-        /// Adjust inventory
-        /// </summary>
-        /// <param name="product">Product</param>
-        /// <param name="quantityToChange">Quantity to increase or decrease</param>
-        /// <param name="attributesXml">Attributes in XML format</param>
-        /// <param name="message">Message for the stock quantity history</param>
-        void AdjustInventory(Product product, int quantityToChange, string attributesXml = "", string message = "");
-
-        /// <summary>
-        /// Reserve the given quantity in the warehouses.
-        /// </summary>
-        /// <param name="product">Product</param>
-        /// <param name="quantity">Quantity, must be negative</param>
-        void ReserveInventory(Product product, int quantity);
-
-        /// <summary>
-        /// Unblocks the given quantity reserved items in the warehouses
-        /// </summary>
-        /// <param name="product">Product</param>
-        /// <param name="quantity">Quantity, must be positive</param>
-        void UnblockReservedInventory(Product product, int quantity);
-
-        /// <summary>
-        /// Book the reserved quantity
-        /// </summary>
-        /// <param name="product">Product</param>
-        /// <param name="warehouseId">Warehouse identifier</param>
-        /// <param name="quantity">Quantity, must be negative</param>
-        /// <param name="message">Message for the stock quantity history</param>
-        void BookReservedInventory(Product product, int warehouseId, int quantity, string message = "");
-        
-
-        #endregion
-
-        #region Related products
+                #region Related products
 
         /// <summary>
         /// Deletes a related product
@@ -455,61 +370,7 @@ namespace Nop.Services.Catalog
         RelatedProduct FindRelatedProduct(IList<RelatedProduct> source, int productId1, int productId2);
 
         #endregion
-
-        #region Cross-sell products
-
-        /// <summary>
-        /// Deletes a cross-sell product
-        /// </summary>
-        /// <param name="crossSellProduct">Cross-sell</param>
-        void DeleteCrossSellProduct(CrossSellProduct crossSellProduct);
-
-        /// <summary>
-        /// Gets cross-sell products by product identifier
-        /// </summary>
-        /// <param name="productId1">The first product identifier</param>
-        /// <param name="showHidden">A value indicating whether to show hidden records</param>
-        /// <returns>Cross-sell products</returns>
-        IList<CrossSellProduct> GetCrossSellProductsByProductId1(int productId1, bool showHidden = false);
-
-        /// <summary>
-        /// Gets cross-sell products by product identifier
-        /// </summary>
-        /// <param name="productIds">The first product identifiers</param>
-        /// <param name="showHidden">A value indicating whether to show hidden records</param>
-        /// <returns>Cross-sell products</returns>
-        IList<CrossSellProduct> GetCrossSellProductsByProductIds(int[] productIds, bool showHidden = false);
-
-        /// <summary>
-        /// Gets a cross-sell product
-        /// </summary>
-        /// <param name="crossSellProductId">Cross-sell product identifier</param>
-        /// <returns>Cross-sell product</returns>
-        CrossSellProduct GetCrossSellProductById(int crossSellProductId);
-
-        /// <summary>
-        /// Inserts a cross-sell product
-        /// </summary>
-        /// <param name="crossSellProduct">Cross-sell product</param>
-        void InsertCrossSellProduct(CrossSellProduct crossSellProduct);
-
-        /// <summary>
-        /// Updates a cross-sell product
-        /// </summary>
-        /// <param name="crossSellProduct">Cross-sell product</param>
-        void UpdateCrossSellProduct(CrossSellProduct crossSellProduct);
-
-        /// <summary>
-        /// Finds a cross-sell product item by specified identifiers
-        /// </summary>
-        /// <param name="source">Source</param>
-        /// <param name="productId1">The first product identifier</param>
-        /// <param name="productId2">The second product identifier</param>
-        /// <returns>Cross-sell product</returns>
-        CrossSellProduct FindCrossSellProduct(IList<CrossSellProduct> source, int productId1, int productId2);
-
-        #endregion
-
+                
         #region Tier prices
 
         /// <summary>

@@ -38,7 +38,6 @@ namespace Nop.Services.Catalog
         private readonly IProductAttributeParser _productAttributeParser;
         private readonly IProductAttributeService _productAttributeService;
         private readonly IRepository<AclRecord> _aclRepository;
-        private readonly IRepository<CrossSellProduct> _crossSellProductRepository;
         private readonly IRepository<Product> _productRepository;
         private readonly IRepository<ProductPicture> _productPictureRepository;
         private readonly IRepository<ProductReview> _productReviewRepository;
@@ -68,7 +67,6 @@ namespace Nop.Services.Catalog
             IProductAttributeParser productAttributeParser,
             IProductAttributeService productAttributeService,
             IRepository<AclRecord> aclRepository,
-            IRepository<CrossSellProduct> crossSellProductRepository,
             IRepository<Product> productRepository,
             IRepository<ProductPicture> productPictureRepository,
             IRepository<ProductReview> productReviewRepository,
@@ -93,7 +91,6 @@ namespace Nop.Services.Catalog
             this._productAttributeParser = productAttributeParser;
             this._productAttributeService = productAttributeService;
             this._aclRepository = aclRepository;
-            this._crossSellProductRepository = crossSellProductRepository;
             this._productRepository = productRepository;
             this._productPictureRepository = productPictureRepository;
             this._productReviewRepository = productReviewRepository;
@@ -106,50 +103,6 @@ namespace Nop.Services.Catalog
             this._workContext = workContext;
             this._localizationSettings = localizationSettings;
             this._entityName = typeof(Product).Name;
-        }
-
-        #endregion
-
-        #region Utilities
-
-        /// <summary>
-        /// Gets SKU, Manufacturer part number and GTIN
-        /// </summary>
-        /// <param name="product">Product</param>
-        /// <param name="attributesXml">Attributes in XML format</param>
-        /// <param name="sku">SKU</param>
-        /// <param name="manufacturerPartNumber">Manufacturer part number</param>
-        /// <param name="gtin">GTIN</param>
-        protected virtual void GetSkuMpnGtin(Product product, string attributesXml,
-            out string sku, out string manufacturerPartNumber, out string gtin)
-        {
-            if (product == null)
-                throw new ArgumentNullException(nameof(product));
-
-            sku = null;
-            manufacturerPartNumber = null;
-            gtin = null;
-
-            if (!string.IsNullOrEmpty(attributesXml) &&
-                product.ManageInventoryMethod == ManageInventoryMethod.ManageStockByAttributes)
-            {
-                //manage stock by attribute combinations
-                //let's find appropriate record
-                var combination = _productAttributeParser.FindProductAttributeCombination(product, attributesXml);
-                if (combination != null)
-                {
-                    sku = combination.Sku;
-                    manufacturerPartNumber = combination.ManufacturerPartNumber;
-                    gtin = combination.Gtin;
-                }
-            }
-
-            if (string.IsNullOrEmpty(sku))
-                sku = product.Sku;
-            if (string.IsNullOrEmpty(manufacturerPartNumber))
-                manufacturerPartNumber = product.ManufacturerPartNumber;
-            if (string.IsNullOrEmpty(gtin))
-                gtin = product.Gtin;
         }
 
         #endregion
@@ -727,83 +680,6 @@ namespace Nop.Services.Catalog
         }
 
         /// <summary>
-        /// Get low stock products
-        /// </summary>
-        /// <param name="vendorId">Vendor identifier; pass null to load all records</param>
-        /// <param name="loadPublishedOnly">Whether to load published products only; pass null to load all products, pass true to load only published products, pass false to load only unpublished products</param>
-        /// <param name="pageIndex">Page index</param>
-        /// <param name="pageSize">Page size</param>
-        /// <param name="getOnlyTotalCount">A value in indicating whether you want to load only total number of records. Set to "true" if you don't want to load data from database</param>
-        /// <returns>Products</returns>
-        public virtual IPagedList<Product> GetLowStockProducts(int? vendorId = null, bool? loadPublishedOnly = true,
-            int pageIndex = 0, int pageSize = int.MaxValue, bool getOnlyTotalCount = false)
-        {
-            var query = _productRepository.Table;
-
-            //filter by products with tracking inventory
-            query = query.Where(product => product.ManageInventoryMethodId == (int)ManageInventoryMethod.ManageStock);
-
-            //ignore deleted products
-            query = query.Where(product => !product.Deleted);
-
-            //ignore grouped products
-            query = query.Where(product => product.ProductTypeId != (int)ProductType.GroupedProduct);
-
-            //filter by vendor
-            if (vendorId.HasValue && vendorId.Value > 0)
-                query = query.Where(product => product.VendorId == vendorId.Value);
-
-            //whether to load published products only
-            if (loadPublishedOnly.HasValue)
-                query = loadPublishedOnly.Value ? query.Where(product => product.Published) : query.Where(product => !product.Published);
-
-            query = query.OrderBy(product => product.MinStockQuantity).ThenBy(product => product.DisplayOrder).ThenBy(product => product.Id);
-
-            return new PagedList<Product>(query, pageIndex, pageSize, getOnlyTotalCount);
-        }
-
-        /// <summary>
-        /// Get low stock product combinations
-        /// </summary>
-        /// <param name="vendorId">Vendor identifier; pass null to load all records</param>
-        /// <param name="loadPublishedOnly">Whether to load combinations of published products only; pass null to load all products, pass true to load only published products, pass false to load only unpublished products</param>
-        /// <param name="pageIndex">Page index</param>
-        /// <param name="pageSize">Page size</param>
-        /// <param name="getOnlyTotalCount">A value in indicating whether you want to load only total number of records. Set to "true" if you don't want to load data from database</param>
-        /// <returns>Product combinations</returns>
-        public virtual IPagedList<ProductAttributeCombination> GetLowStockProductCombinations(int? vendorId = null, bool? loadPublishedOnly = true,
-            int pageIndex = 0, int pageSize = int.MaxValue, bool getOnlyTotalCount = false)
-        {
-            var products = _productRepository.Table;
-
-            //filter by products with tracking inventory by attributes
-            products = products.Where(product => product.ManageInventoryMethodId == (int)ManageInventoryMethod.ManageStockByAttributes);
-
-            //ignore deleted products
-            products = products.Where(product => !product.Deleted);
-
-            //ignore grouped products
-            products = products.Where(product => product.ProductTypeId != (int)ProductType.GroupedProduct);
-
-            //filter by vendor
-            if (vendorId.HasValue && vendorId.Value > 0)
-                products = products.Where(product => product.VendorId == vendorId.Value);
-
-            //whether to load published products only
-            if (loadPublishedOnly.HasValue)
-                products = loadPublishedOnly.Value ? products.Where(product => product.Published) : products.Where(product => !product.Published);
-
-            var combinations = products.SelectMany(product => product.ProductAttributeCombinations);
-
-            //filter by combinations with stock quantity less than the minimum
-            combinations = combinations.Where(combination => combination.StockQuantity <= 0);
-
-            combinations = combinations.OrderBy(combination => combination.ProductId).ThenBy(combination => combination.Id);
-
-            return new PagedList<ProductAttributeCombination>(combinations, pageIndex, pageSize, getOnlyTotalCount);
-        }
-
-        /// <summary>
         /// Gets a product by SKU
         /// </summary>
         /// <param name="sku">SKU</param>
@@ -1022,55 +898,8 @@ namespace Nop.Services.Catalog
             return totalPeriods;
         }
 
-        /// <summary>
-        /// Formats SKU
-        /// </summary>
-        /// <param name="product">Product</param>
-        /// <param name="attributesXml">Attributes in XML format</param>
-        /// <returns>SKU</returns>
-        public virtual string FormatSku(Product product, string attributesXml = null)
-        {
-            if (product == null)
-                throw new ArgumentNullException(nameof(product));
-
-            this.GetSkuMpnGtin(product, attributesXml, out var sku, out var _, out var _);
-
-            return sku;
-        }
-
-        /// <summary>
-        /// Formats manufacturer part number
-        /// </summary>
-        /// <param name="product">Product</param>
-        /// <param name="attributesXml">Attributes in XML format</param>
-        /// <returns>Manufacturer part number</returns>
-        public virtual string FormatMpn(Product product, string attributesXml = null)
-        {
-            if (product == null)
-                throw new ArgumentNullException(nameof(product));
-
-            this.GetSkuMpnGtin(product, attributesXml, out var _, out var manufacturerPartNumber, out var _);
-
-            return manufacturerPartNumber;
-        }
-
-        /// <summary>
-        /// Formats GTIN
-        /// </summary>
-        /// <param name="product">Product</param>
-        /// <param name="attributesXml">Attributes in XML format</param>
-        /// <returns>GTIN</returns>
-        public virtual string FormatGtin(Product product, string attributesXml = null)
-        {
-            if (product == null)
-                throw new ArgumentNullException(nameof(product));
-
-            this.GetSkuMpnGtin(product, attributesXml, out var _, out var _, out var gtin);
-
-            return gtin;
-        }
-
-        /// <summary>
+       
+                       /// <summary>
         /// Formats start/end date for rental product
         /// </summary>
         /// <param name="product">Product</param>
@@ -1217,116 +1046,7 @@ namespace Nop.Services.Catalog
 
         #endregion
 
-        #region Cross-sell products
-
-        /// <summary>
-        /// Deletes a cross-sell product
-        /// </summary>
-        /// <param name="crossSellProduct">Cross-sell identifier</param>
-        public virtual void DeleteCrossSellProduct(CrossSellProduct crossSellProduct)
-        {
-            if (crossSellProduct == null)
-                throw new ArgumentNullException(nameof(crossSellProduct));
-
-            _crossSellProductRepository.Delete(crossSellProduct);
-
-            //event notification
-            _eventPublisher.EntityDeleted(crossSellProduct);
-        }
-
-        /// <summary>
-        /// Gets cross-sell products by product identifier
-        /// </summary>
-        /// <param name="productId1">The first product identifier</param>
-        /// <param name="showHidden">A value indicating whether to show hidden records</param>
-        /// <returns>Cross-sell products</returns>
-        public virtual IList<CrossSellProduct> GetCrossSellProductsByProductId1(int productId1, bool showHidden = false)
-        {
-            return GetCrossSellProductsByProductIds(new[] { productId1 }, showHidden);
-        }
-
-        /// <summary>
-        /// Gets cross-sell products by product identifier
-        /// </summary>
-        /// <param name="productIds">The first product identifiers</param>
-        /// <param name="showHidden">A value indicating whether to show hidden records</param>
-        /// <returns>Cross-sell products</returns>
-        public virtual IList<CrossSellProduct> GetCrossSellProductsByProductIds(int[] productIds, bool showHidden = false)
-        {
-            if (productIds == null || productIds.Length == 0)
-                return new List<CrossSellProduct>();
-
-            var query = from csp in _crossSellProductRepository.Table
-                        join p in _productRepository.Table on csp.ProductId2 equals p.Id
-                        where productIds.Contains(csp.ProductId1) &&
-                              !p.Deleted &&
-                              (showHidden || p.Published)
-                        orderby csp.Id
-                        select csp;
-            var crossSellProducts = query.ToList();
-            return crossSellProducts;
-        }
-
-        /// <summary>
-        /// Gets a cross-sell product
-        /// </summary>
-        /// <param name="crossSellProductId">Cross-sell product identifier</param>
-        /// <returns>Cross-sell product</returns>
-        public virtual CrossSellProduct GetCrossSellProductById(int crossSellProductId)
-        {
-            if (crossSellProductId == 0)
-                return null;
-
-            return _crossSellProductRepository.GetById(crossSellProductId);
-        }
-
-        /// <summary>
-        /// Inserts a cross-sell product
-        /// </summary>
-        /// <param name="crossSellProduct">Cross-sell product</param>
-        public virtual void InsertCrossSellProduct(CrossSellProduct crossSellProduct)
-        {
-            if (crossSellProduct == null)
-                throw new ArgumentNullException(nameof(crossSellProduct));
-
-            _crossSellProductRepository.Insert(crossSellProduct);
-
-            //event notification
-            _eventPublisher.EntityInserted(crossSellProduct);
-        }
-
-        /// <summary>
-        /// Updates a cross-sell product
-        /// </summary>
-        /// <param name="crossSellProduct">Cross-sell product</param>
-        public virtual void UpdateCrossSellProduct(CrossSellProduct crossSellProduct)
-        {
-            if (crossSellProduct == null)
-                throw new ArgumentNullException(nameof(crossSellProduct));
-
-            _crossSellProductRepository.Update(crossSellProduct);
-
-            //event notification
-            _eventPublisher.EntityUpdated(crossSellProduct);
-        }
-
-        /// <summary>
-        /// Finds a cross-sell product item by specified identifiers
-        /// </summary>
-        /// <param name="source">Source</param>
-        /// <param name="productId1">The first product identifier</param>
-        /// <param name="productId2">The second product identifier</param>
-        /// <returns>Cross-sell product</returns>
-        public virtual CrossSellProduct FindCrossSellProduct(IList<CrossSellProduct> source, int productId1, int productId2)
-        {
-            foreach (var crossSellProduct in source)
-                if (crossSellProduct.ProductId1 == productId1 && crossSellProduct.ProductId2 == productId2)
-                    return crossSellProduct;
-            return null;
-        }
-
-        #endregion
-
+        
         #region Tier prices
 
         /// <summary>

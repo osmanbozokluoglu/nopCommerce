@@ -45,10 +45,6 @@ namespace Nop.Data.Mapping.Catalog
             builder.Ignore(product => product.ProductType);
             builder.Ignore(product => product.BackorderMode);
             builder.Ignore(product => product.DownloadActivationType);
-            builder.Ignore(product => product.GiftCardType);
-            builder.Ignore(product => product.LowStockActivity);
-            builder.Ignore(product => product.ManageInventoryMethod);
-            builder.Ignore(product => product.RecurringCyclePeriod);
             builder.Ignore(product => product.RentalPricePeriod);
             base.Configure(builder);
         }

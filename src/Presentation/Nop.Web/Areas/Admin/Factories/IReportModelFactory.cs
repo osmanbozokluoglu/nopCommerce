@@ -7,23 +7,7 @@ namespace Nop.Web.Areas.Admin.Factories
     /// </summary>
     public partial interface IReportModelFactory
     {
-        #region LowStockProduct
-
-        /// <summary>
-        /// Prepare low stock product search model
-        /// </summary>
-        /// <param name="searchModel">Low stock product search model</param>
-        /// <returns>Low stock product search model</returns>
-        LowStockProductSearchModel PrepareLowStockProductSearchModel(LowStockProductSearchModel searchModel);
-
-        /// <summary>
-        /// Prepare paged low stock product list model
-        /// </summary>
-        /// <param name="searchModel">Low stock product search model</param>
-        /// <returns>Low stock product list model</returns>
-        LowStockProductListModel PrepareLowStockProductListModel(LowStockProductSearchModel searchModel);
-
-        #endregion
+        
 
         
         #region Customer reports

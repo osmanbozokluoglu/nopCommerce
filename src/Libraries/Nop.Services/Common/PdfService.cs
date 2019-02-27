@@ -373,9 +373,6 @@ namespace Nop.Services.Common
                     if (product.IsShipEnabled && product.Weight > decimal.Zero)
                         productTable.AddCell(new Paragraph($"{_localizationService.GetResource("PDFProductCatalog.Weight", lang.Id)}: {product.Weight:0.00} {_measureService.GetMeasureWeightById(_measureSettings.BaseWeightId).Name}", font));
 
-                    if (product.ManageInventoryMethod == ManageInventoryMethod.ManageStock)
-                        productTable.AddCell(new Paragraph($"{_localizationService.GetResource("PDFProductCatalog.StockQuantity", lang.Id)}: {_productService.GetTotalStockQuantity(product)}", font));
-
                     productTable.AddCell(new Paragraph(" "));
                 }
 
@@ -450,9 +447,6 @@ namespace Nop.Services.Common
 
                         if (associatedProduct.IsShipEnabled && associatedProduct.Weight > decimal.Zero)
                             productTable.AddCell(new Paragraph($"{_localizationService.GetResource("PDFProductCatalog.Weight", lang.Id)}: {associatedProduct.Weight:0.00} {_measureService.GetMeasureWeightById(_measureSettings.BaseWeightId).Name}", font));
-
-                        if (associatedProduct.ManageInventoryMethod == ManageInventoryMethod.ManageStock)
-                            productTable.AddCell(new Paragraph($"{_localizationService.GetResource("PDFProductCatalog.StockQuantity", lang.Id)}: {_productService.GetTotalStockQuantity(associatedProduct)}", font));
 
                         productTable.AddCell(new Paragraph(" "));
 

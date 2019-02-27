@@ -66,15 +66,7 @@ namespace Nop.Web.Areas.Admin.Factories
         /// <param name="searchModel">Related product search model to add to the product</param>
         /// <returns>Related product list model to add to the product</returns>
         AddRelatedProductListModel PrepareAddRelatedProductListModel(AddRelatedProductSearchModel searchModel);
-
-        /// <summary>
-        /// Prepare paged cross-sell product list model
-        /// </summary>
-        /// <param name="searchModel">Cross-sell product search model</param>
-        /// <param name="product">Product</param>
-        /// <returns>Cross-sell product list model</returns>
-        CrossSellProductListModel PrepareCrossSellProductListModel(CrossSellProductSearchModel searchModel, Product product);
-
+        
         /// <summary>
         /// Prepare cross-sell product search model to add to the product
         /// </summary>
@@ -166,13 +158,6 @@ namespace Nop.Web.Areas.Admin.Factories
         /// <param name="searchModel">Bulk edit product search model</param>
         /// <returns>Bulk edit product search model</returns>
         BulkEditProductSearchModel PrepareBulkEditProductSearchModel(BulkEditProductSearchModel searchModel);
-
-        /// <summary>
-        /// Prepare paged bulk edit product list model
-        /// </summary>
-        /// <param name="searchModel">Bulk edit product search model</param>
-        /// <returns>Bulk edit product list model</returns>
-        BulkEditProductListModel PrepareBulkEditProductListModel(BulkEditProductSearchModel searchModel);
 
         /// <summary>
         /// Prepare paged tier price list model

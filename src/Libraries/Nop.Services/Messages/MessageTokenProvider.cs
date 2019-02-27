@@ -622,9 +622,6 @@ namespace Nop.Services.Messages
                 renderPrices: false);
 
             tokens.Add(new Token("AttributeCombination.Formatted", attributes, true));
-            tokens.Add(new Token("AttributeCombination.SKU", productService.FormatSku(combination.Product, combination.AttributesXml)));
-            tokens.Add(new Token("AttributeCombination.StockQuantity", combination.StockQuantity));
-
             //event notification
             _eventPublisher.EntityTokensAdded(combination, tokens);
         }

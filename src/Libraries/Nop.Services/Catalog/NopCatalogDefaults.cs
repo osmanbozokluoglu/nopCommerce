@@ -83,52 +83,7 @@
 
         #endregion
 
-        #region Manufacturers
-
-        /// <summary>
-        /// Gets a key for caching
-        /// </summary>
-        /// <remarks>
-        /// {0} : manufacturer ID
-        /// </remarks>
-        public static string ManufacturersByIdCacheKey => "Nop.manufacturer.id-{0}";
-
-        /// <summary>
-        /// Gets a key for caching
-        /// </summary>
-        /// <remarks>
-        /// {0} : show hidden records?
-        /// {1} : manufacturer ID
-        /// {2} : page index
-        /// {3} : page size
-        /// {4} : current customer ID
-        /// {5} : store ID
-        /// </remarks>
-        public static string ProductManufacturersAllByManufacturerIdCacheKey => "Nop.productmanufacturer.allbymanufacturerid-{0}-{1}-{2}-{3}-{4}-{5}";
-
-        /// <summary>
-        /// Gets a key for caching
-        /// </summary>
-        /// <remarks>
-        /// {0} : show hidden records?
-        /// {1} : product ID
-        /// {2} : current customer ID
-        /// {3} : store ID
-        /// </remarks>
-        public static string ProductManufacturersAllByProductIdCacheKey => "Nop.productmanufacturer.allbyproductid-{0}-{1}-{2}-{3}";
-
-        /// <summary>
-        /// Gets a key pattern to clear cache
-        /// </summary>
-        public static string ManufacturersPatternCacheKey => "Nop.manufacturer.";
-
-        /// <summary>
-        /// Gets a key pattern to clear cache
-        /// </summary>
-        public static string ProductManufacturersPatternCacheKey => "Nop.productmanufacturer.";
-
-        #endregion
-
+        
         #region Products
 
         /// <summary>

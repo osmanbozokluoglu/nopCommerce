@@ -116,13 +116,6 @@ namespace Nop.Services.Messages
         void AddPrivateMessageTokens(IList<Token> tokens, PrivateMessage privateMessage);
 
         /// <summary>
-        /// Add tokens of BackInStock subscription
-        /// </summary>
-        /// <param name="tokens">List of already added tokens</param>
-        /// <param name="subscription">BackInStock subscription</param>
-        void AddBackInStockTokens(IList<Token> tokens, BackInStockSubscription subscription);
-
-        /// <summary>
         /// Get collection of allowed (supported) message tokens for campaigns
         /// </summary>
         /// <returns>Collection of allowed (supported) message tokens for campaigns</returns>

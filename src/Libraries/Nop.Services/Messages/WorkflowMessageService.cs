@@ -1040,49 +1040,7 @@ namespace Nop.Services.Messages
                 return SendNotification(messageTemplate, emailAccount, languageId, tokens, toEmail, toName);
             }).ToList();
         }
-
-        /// <summary>
-        /// Sends a 'Back in stock' notification message to a customer
-        /// </summary>
-        /// <param name="subscription">Subscription</param>
-        /// <param name="languageId">Message language identifier</param>
-        /// <returns>Queued email identifier</returns>
-        public virtual IList<int> SendBackInStockNotification(BackInStockSubscription subscription, int languageId)
-        {
-            if (subscription == null)
-                throw new ArgumentNullException(nameof(subscription));
-
-            var store = _storeService.GetStoreById(subscription.StoreId) ?? _storeContext.CurrentStore;
-            languageId = EnsureLanguageIsActive(languageId, store.Id);
-
-            var messageTemplates = GetActiveMessageTemplates(MessageTemplateSystemNames.BackInStockNotification, store.Id);
-            if (!messageTemplates.Any())
-                return new List<int>();
-
-            //tokens
-            var commonTokens = new List<Token>();
-            _messageTokenProvider.AddCustomerTokens(commonTokens, subscription.Customer);
-            _messageTokenProvider.AddBackInStockTokens(commonTokens, subscription);
-
-            return messageTemplates.Select(messageTemplate =>
-            {
-                //email account
-                var emailAccount = GetEmailAccountOfMessageTemplate(messageTemplate, languageId);
-
-                var tokens = new List<Token>(commonTokens);
-                _messageTokenProvider.AddStoreTokens(tokens, store, emailAccount);
-
-                //event notification
-                _eventPublisher.MessageTokensAdded(messageTemplate, tokens);
-
-                var customer = subscription.Customer;
-                var toEmail = customer.Email;
-                var toName = _customerService.GetCustomerFullName(customer);
-
-                return SendNotification(messageTemplate, emailAccount, languageId, tokens, toEmail, toName);
-            }).ToList();
-        }
-
+        
         /// <summary>
         /// Sends "contact us" message
         /// </summary>

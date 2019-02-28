@@ -59,17 +59,7 @@ namespace Nop.Core.Domain.Catalog
         /// <summary>
         /// Gets or sets a value indicating whether customers can select the page size
         /// </summary>
-        public bool AllowCustomersToSelectPageSize { get; set; }
-
-        /// <summary>
-        /// Gets or sets the available customer selectable page size options
-        /// </summary>
-        public string PageSizeOptions { get; set; }
-
-        /// <summary>
-        /// Gets or sets the available price ranges
-        /// </summary>
-        public string PriceRanges { get; set; }
+        public bool AllowCustomersToSelectPageSize { get; set; }       
 
         /// <summary>
         /// Gets or sets a value indicating whether to show the category on home page

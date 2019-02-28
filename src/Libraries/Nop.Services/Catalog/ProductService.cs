@@ -502,8 +502,6 @@ namespace Nop.Services.Catalog
             var pMarkedAsNewOnly = _dataProvider.GetBooleanParameter("MarkedAsNewOnly", markedAsNewOnly);
             var pProductTagId = _dataProvider.GetInt32Parameter("ProductTagId", productTagId);
             var pFeaturedProducts = _dataProvider.GetBooleanParameter("FeaturedProducts", featuredProducts);
-            var pPriceMin = _dataProvider.GetDecimalParameter("PriceMin", priceMin);
-            var pPriceMax = _dataProvider.GetDecimalParameter("PriceMax", priceMax);
             var pKeywords = _dataProvider.GetStringParameter("Keywords", keywords);
             var pSearchDescriptions = _dataProvider.GetBooleanParameter("SearchDescriptions", searchDescriptions);
             var pSearchManufacturerPartNumber = _dataProvider.GetBooleanParameter("SearchManufacturerPartNumber", searchManufacturerPartNumber);
@@ -538,8 +536,6 @@ namespace Nop.Services.Catalog
                 pMarkedAsNewOnly,
                 pProductTagId,
                 pFeaturedProducts,
-                pPriceMin,
-                pPriceMax,
                 pKeywords,
                 pSearchDescriptions,
                 pSearchManufacturerPartNumber,

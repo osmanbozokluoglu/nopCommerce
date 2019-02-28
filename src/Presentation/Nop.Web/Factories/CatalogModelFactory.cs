@@ -324,23 +324,11 @@ namespace Nop.Web.Factories
             //view mode
             PrepareViewModes(model.PagingFilteringContext, command);
             //page size
+            //todo
             PreparePageSizeOptions(model.PagingFilteringContext, command,
                 category.AllowCustomersToSelectPageSize,
-                category.PageSizeOptions,
+                null,
                 category.PageSize);
-
-            //price ranges
-            var selectedPriceRange = model.PagingFilteringContext.PriceRangeFilter.GetSelectedPriceRange(_webHelper, category.PriceRanges);
-            decimal? minPriceConverted = null;
-            decimal? maxPriceConverted = null;
-            if (selectedPriceRange != null)
-            {
-                if (selectedPriceRange.From.HasValue)
-                    minPriceConverted = _currencyService.ConvertToPrimaryStoreCurrency(selectedPriceRange.From.Value, _workContext.WorkingCurrency);
-
-                if (selectedPriceRange.To.HasValue)
-                    maxPriceConverted = _currencyService.ConvertToPrimaryStoreCurrency(selectedPriceRange.To.Value, _workContext.WorkingCurrency);
-            }
 
             //category breadcrumb
             if (_catalogSettings.CategoryBreadcrumbEnabled)
@@ -454,8 +442,8 @@ namespace Nop.Web.Factories
                 storeId: _storeContext.CurrentStore.Id,
                 visibleIndividuallyOnly: true,
                 featuredProducts: _catalogSettings.IncludeFeaturedProductsInNormalLists ? null : (bool?)false,
-                priceMin: minPriceConverted,
-                priceMax: maxPriceConverted,
+                priceMin: null,
+                priceMax: null,
                 filteredSpecs: alreadyFilteredSpecOptionIds,
                 orderBy: (ProductSortingEnum)command.OrderBy,
                 pageIndex: command.PageNumber - 1,

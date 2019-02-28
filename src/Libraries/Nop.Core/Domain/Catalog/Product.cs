@@ -20,7 +20,6 @@ namespace Nop.Core.Domain.Catalog
         private ICollection<ProductProductTagMapping> _productProductTagMappings;
         private ICollection<ProductAttributeMapping> _productAttributeMappings;
         private ICollection<ProductAttributeCombination> _productAttributeCombinations;
-        protected ICollection<TierPrice> _tierPrices;
 
         /// <summary>
         /// Gets or sets the product type identifier
@@ -578,15 +577,6 @@ namespace Nop.Core.Domain.Catalog
         }
                 
         /// <summary>
-        /// Gets or sets the cycle period for recurring products
-        /// </summary>
-        public RecurringProductCyclePeriod RecurringCyclePeriod
-        {
-            get => (RecurringProductCyclePeriod)RecurringCyclePeriodId;
-            set => RecurringCyclePeriodId = (int)value;
-        }
-
-        /// <summary>
         /// Gets or sets the period for rental products
         /// </summary>
         public RentalPricePeriod RentalPricePeriod
@@ -656,15 +646,6 @@ namespace Nop.Core.Domain.Catalog
         {
             get => _productAttributeCombinations ?? (_productAttributeCombinations = new List<ProductAttributeCombination>());
             protected set => _productAttributeCombinations = value;
-        }
-
-        /// <summary>
-        /// Gets or sets the tier prices
-        /// </summary>
-        public virtual ICollection<TierPrice> TierPrices
-        {
-            get => _tierPrices ?? (_tierPrices = new List<TierPrice>());
-            protected set => _tierPrices = value;
         }
 
     }

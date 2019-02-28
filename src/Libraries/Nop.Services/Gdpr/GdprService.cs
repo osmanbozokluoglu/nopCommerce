@@ -27,7 +27,6 @@ namespace Nop.Services.Gdpr
         #region Fields
 
         private readonly IAddressService _addressService;
-        private readonly IBackInStockSubscriptionService _backInStockSubscriptionService;
         private readonly IBlogService _blogService;
         private readonly ICustomerService _customerService;
         private readonly IExternalAuthenticationService _externalAuthenticationService;
@@ -46,7 +45,6 @@ namespace Nop.Services.Gdpr
         #region Ctor
 
         public GdprService(IAddressService addressService,
-            IBackInStockSubscriptionService backInStockSubscriptionService,
             IBlogService blogService,
             ICustomerService customerService,
             IExternalAuthenticationService externalAuthenticationService,
@@ -61,7 +59,6 @@ namespace Nop.Services.Gdpr
             IStoreService storeService)
         {
             this._addressService = addressService;
-            this._backInStockSubscriptionService = backInStockSubscriptionService;
             this._blogService = blogService;
             this._customerService = customerService;
             this._externalAuthenticationService = externalAuthenticationService;
@@ -322,11 +319,6 @@ namespace Nop.Services.Gdpr
             //news comments
             var newsComments = _newsService.GetAllComments(customerId: customer.Id);
             _newsService.DeleteNewsComments(newsComments);
-
-            //back in stock subscriptions
-            var backInStockSubscriptions = _backInStockSubscriptionService.GetAllSubscriptionsByCustomerId(customer.Id);
-            foreach (var backInStockSubscription in backInStockSubscriptions)
-                _backInStockSubscriptionService.DeleteSubscription(backInStockSubscription);
 
             //product review
             var productReviews = _productService.GetAllProductReviews(customerId: customer.Id, approved: null);

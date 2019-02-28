@@ -224,14 +224,6 @@ namespace Nop.Services.Messages
         IList<int> SendNewsCommentNotificationMessage(NewsComment newsComment, int languageId);
 
         /// <summary>
-        /// Sends a 'Back in stock' notification message to a customer
-        /// </summary>
-        /// <param name="subscription">Subscription</param>
-        /// <param name="languageId">Message language identifier</param>
-        /// <returns>Queued email identifier</returns>
-        IList<int> SendBackInStockNotification(BackInStockSubscription subscription, int languageId);
-
-        /// <summary>
         /// Sends "contact us" message
         /// </summary>
         /// <param name="languageId">Message language identifier</param>

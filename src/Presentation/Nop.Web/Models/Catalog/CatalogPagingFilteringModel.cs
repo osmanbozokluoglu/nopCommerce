@@ -116,34 +116,6 @@ namespace Nop.Web.Models.Catalog
             #region Utilities
 
             /// <summary>
-            /// Gets parsed price ranges
-            /// </summary>
-            /// <param name="priceRangesStr">Price ranges in string format</param>
-            /// <returns>Price ranges</returns>
-            protected virtual IList<PriceRange> GetPriceRangeList(string priceRangesStr)
-            {
-                var priceRanges = new List<PriceRange>();
-                if (string.IsNullOrWhiteSpace(priceRangesStr))
-                    return priceRanges;
-                var rangeArray = priceRangesStr.Split(new [] { ';' }, StringSplitOptions.RemoveEmptyEntries);
-                foreach (var str1 in rangeArray)
-                {
-                    var fromTo = str1.Trim().Split(new [] { '-' });
-
-                    decimal? from = null;
-                    if (!string.IsNullOrEmpty(fromTo[0]) && !string.IsNullOrEmpty(fromTo[0].Trim()))
-                        from = decimal.Parse(fromTo[0].Trim(), new CultureInfo("en-US"));
-
-                    decimal? to = null;
-                    if (!string.IsNullOrEmpty(fromTo[1]) && !string.IsNullOrEmpty(fromTo[1].Trim()))
-                        to = decimal.Parse(fromTo[1].Trim(), new CultureInfo("en-US"));
-
-                    priceRanges.Add(new PriceRange { From = from, To = to });
-                }
-                return priceRanges;
-            }
-
-            /// <summary>
             /// Exclude query string parameters
             /// </summary>
             /// <param name="url">URL</param>
@@ -159,43 +131,6 @@ namespace Nop.Web.Models.Catalog
                 return url;
             }
 
-            #endregion
-
-            #region Methods
-
-            /// <summary>
-            /// Get selected price range
-            /// </summary>
-            /// <param name="webHelper">Web helper</param>
-            /// <param name="priceRangesStr">Price ranges in string format</param>
-            /// <returns>Price ranges</returns>
-            public virtual PriceRange GetSelectedPriceRange(IWebHelper webHelper, string priceRangesStr)
-            {
-                var range = webHelper.QueryString<string>(QUERYSTRINGPARAM);
-                if (string.IsNullOrEmpty(range))
-                    return null;
-                var fromTo = range.Trim().Split(new [] { '-' });
-                if (fromTo.Length == 2)
-                {
-                    decimal? from = null;
-                    if (!string.IsNullOrEmpty(fromTo[0]) && !string.IsNullOrEmpty(fromTo[0].Trim()))
-                        from = decimal.Parse(fromTo[0].Trim(), new CultureInfo("en-US"));
-                    decimal? to = null;
-                    if (!string.IsNullOrEmpty(fromTo[1]) && !string.IsNullOrEmpty(fromTo[1].Trim()))
-                        to = decimal.Parse(fromTo[1].Trim(), new CultureInfo("en-US"));
-
-                    var priceRangeList = GetPriceRangeList(priceRangesStr);
-                    foreach (var pr in priceRangeList)
-                    {
-                        if (pr.From == from && pr.To == to)
-                            return pr;
-                    }
-                }
-                return null;
-            }
-
-          
-            
             #endregion
 
             #region Properties
